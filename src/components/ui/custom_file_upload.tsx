@@ -25,7 +25,15 @@ export default function CustomFileUpload(props: {
       );
     });
 
-    setTransactions(records);
+    setTransactions(
+      records
+      // records.filter(
+      //   (record) =>
+      //     record["Account"] === "LIFEGREEN PREFERRED CHECKING * 4644" &&
+      //     // record["Account"] === "CASH REWARDS VISA SIGNATURE * 3004" &&
+      //     record["Debit"] >= -10000
+      // )
+    );
   };
 
   return (

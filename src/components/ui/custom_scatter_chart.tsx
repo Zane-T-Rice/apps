@@ -1,3 +1,4 @@
+import { DataTransaction } from "@/app/utils/transaction_analysis";
 import {
   CartesianGrid,
   Legend,
@@ -9,13 +10,27 @@ import {
   YAxis,
 } from "recharts";
 
+export type Point = {
+  x: number | string;
+  y: number | string;
+};
+
 export default function CustomScatterChart(props: {
+  minimumY?: number | string;
+  records: Point[];
   scatterName: string;
-  records: object[];
-  xAxisDataKey: string;
-  yAxisDataKey: string;
+  xAxisDataKey: keyof DataTransaction;
+  yAxisDataKey: keyof DataTransaction;
+  reversedYAxis: boolean;
 }) {
-  const { records, scatterName, xAxisDataKey, yAxisDataKey } = props;
+  const {
+    minimumY: maximumY,
+    records,
+    scatterName,
+    xAxisDataKey,
+    yAxisDataKey,
+    reversedYAxis,
+  } = props;
 
   return (
     <ResponsiveContainer width="60%" height={250}>
@@ -38,19 +53,17 @@ export default function CustomScatterChart(props: {
           dataKey={yAxisDataKey}
           type="number"
           name={yAxisDataKey}
-          reversed
+          reversed={reversedYAxis}
         />
         <Tooltip cursor={{ strokeDasharray: "3 3" }} />
         <Legend />
         <Scatter
           name={scatterName}
           data={records
-            .filter(
-              (record) => !!record[xAxisDataKey] && !!record[yAxisDataKey]
-            )
+            .filter((record) => !maximumY || record.y >= maximumY)
             .map((record) => ({
-              ...record,
-              [yAxisDataKey]: parseInt(record[yAxisDataKey]),
+              [xAxisDataKey]: record.x,
+              [yAxisDataKey]: record.y,
             }))}
           fill="#8884d8"
         />

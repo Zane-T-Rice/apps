@@ -2,9 +2,10 @@ import { parse } from "csv-parse/sync";
 import { HiUpload } from "react-icons/hi";
 import { Box, Button, FileUpload } from "@chakra-ui/react";
 import { FileAcceptDetails } from "@zag-js/file-upload";
+import { RawTransaction } from "@/app/utils/transaction_analysis";
 
 export default function CustomFileUpload(props: {
-  setTransactions: (newTransactions: object[]) => void;
+  setTransactions: (newTransactions: RawTransaction[]) => void;
 }) {
   const { setTransactions } = props;
   const handleFileUpload = async (details: FileAcceptDetails) => {
@@ -15,7 +16,7 @@ export default function CustomFileUpload(props: {
       })
     );
 
-    const records: object[] = [];
+    const records: RawTransaction[] = [];
     texts.forEach((text) => {
       records.push(
         ...parse(text, {
@@ -25,15 +26,7 @@ export default function CustomFileUpload(props: {
       );
     });
 
-    setTransactions(
-      records
-      // records.filter(
-      //   (record) =>
-      //     record["Account"] === "LIFEGREEN PREFERRED CHECKING * 4644" &&
-      //     // record["Account"] === "CASH REWARDS VISA SIGNATURE * 3004" &&
-      //     record["Debit"] >= -10000
-      // )
-    );
+    setTransactions(records);
   };
 
   return (

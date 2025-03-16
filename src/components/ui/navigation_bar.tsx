@@ -1,73 +1,33 @@
 import { LuChartLine, LuTable } from "react-icons/lu";
 import { Flex, Tabs } from "@chakra-ui/react";
 import CustomFileUpload from "./custom_file_upload";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import DataTable from "./data_table";
-import CustomScatterChart from "./custom_scatter_chart";
+import TransactionAnalysis, {
+  RawTransaction,
+} from "@/app/utils/transaction_analysis";
+import ChartsTabContent from "../charts_tab_content";
 
 export default function NavigationBar() {
-  const [transactions, setTransactions] = useState<object[]>([]);
+  const [transactions, setTransactions] = useState<RawTransaction[]>([]);
+  const [transactionAnalysis, setTransactionAnalysis] =
+    useState<TransactionAnalysis>();
+  const [account, setAccount] = useState<string>("");
+  const [merchants, setMerchants] = useState<string[]>([]);
+  const [selectedMerchants, setSelectedMerchants] = useState<string[]>([]);
 
-  const setNewTransactions = (newTransactions: object[]) => {
+  const setNewTransactions = (newTransactions: RawTransaction[]) => {
     setTransactions(newTransactions);
   };
 
-  const getTotalDebits = (records: object[], xAxisDataKey, yAxisDataKey) => {
-    const totalDebits = {};
+  useEffect(() => {
+    setTransactionAnalysis(new TransactionAnalysis(transactions));
+  }, [transactions]);
 
-    records
-      .filter((record) => !!record[xAxisDataKey] && !!record[yAxisDataKey])
-      .forEach((record) => {
-        if (totalDebits[record[xAxisDataKey]])
-          totalDebits[record[xAxisDataKey]] += parseInt(record[yAxisDataKey]);
-        else totalDebits[record[xAxisDataKey]] = parseInt(record[yAxisDataKey]);
-      });
-
-    const data: object[] = [];
-    Object.keys(totalDebits).forEach((key) => {
-      data.push({ [xAxisDataKey]: key, [yAxisDataKey]: totalDebits[key] });
-    });
-
-    return data;
-  };
-
-  const getTotalMonthlyDebits = (
-    records: object[],
-    xAxisDataKey,
-    yAxisDataKey
-  ) => {
-    const totalDebits = {};
-
-    records
-      .filter((record) => !!record[xAxisDataKey] && !!record[yAxisDataKey])
-      .forEach((record) => {
-        if (
-          totalDebits[
-            record[xAxisDataKey].substring(0, 2) +
-              record[xAxisDataKey].substring(5)
-          ]
-        )
-          totalDebits[
-            record[xAxisDataKey].substring(0, 2) +
-              record[xAxisDataKey].substring(5)
-          ] += parseInt(record[yAxisDataKey]);
-        else
-          totalDebits[
-            record[xAxisDataKey].substring(0, 2) +
-              record[xAxisDataKey].substring(5)
-          ] = parseInt(record[yAxisDataKey]);
-      });
-
-    const data: object[] = [];
-    Object.keys(totalDebits).forEach((key) => {
-      data.push({
-        [xAxisDataKey]: key,
-        [yAxisDataKey]: totalDebits[key],
-      });
-    });
-
-    return data;
-  };
+  useEffect(() => {
+    setMerchants(transactionAnalysis?.getMerchants(account) || []);
+    setSelectedMerchants(transactionAnalysis?.getMerchants(account) || []);
+  }, [account, transactionAnalysis]);
 
   return (
     <Tabs.Root defaultValue="charts" variant="line">
@@ -85,31 +45,19 @@ export default function NavigationBar() {
         <CustomFileUpload setTransactions={setNewTransactions} />
       </Flex>
       <Tabs.Content value="charts" marginLeft="10">
-        <CustomScatterChart
-          records={transactions}
-          scatterName="Debits"
-          xAxisDataKey="Transaction Date"
-          yAxisDataKey="Debit"
-        />
-        <CustomScatterChart
-          records={getTotalDebits(transactions, "Transaction Date", "Debit")}
-          scatterName="Total Debits"
-          xAxisDataKey="Transaction Date"
-          yAxisDataKey="Debit"
-        />
-        <CustomScatterChart
-          records={getTotalMonthlyDebits(
-            transactions,
-            "Transaction Date",
-            "Debit"
-          )}
-          scatterName="Total Montly Debits"
-          xAxisDataKey="Transaction Date"
-          yAxisDataKey="Debit"
+        <ChartsTabContent
+          transactionAnalysis={transactionAnalysis}
+          selectedMerchants={selectedMerchants}
+          setSelectedMerchants={(value: string[]) =>
+            setSelectedMerchants(value)
+          }
+          merchants={merchants}
+          account={account}
+          setAccount={(value: string) => setAccount(value)}
         />
       </Tabs.Content>
       <Tabs.Content value="raw_data">
-        <DataTable records={transactions} />{" "}
+        <DataTable records={transactions} />
       </Tabs.Content>
     </Tabs.Root>
   );

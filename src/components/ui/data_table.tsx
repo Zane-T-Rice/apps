@@ -1,10 +1,13 @@
 import { Table } from "@chakra-ui/react";
 
-export default function DataTable(props: { records: object[] }) {
-  const { records } = props;
+export default function DataTable(props: {
+  records: object[];
+  style: React.CSSProperties;
+}) {
+  const { records, style } = props;
 
   return records.length > 0 ? (
-    <Table.Root variant="outline">
+    <Table.Root variant="outline" width="fit-content" style={style}>
       <Table.Header>
         <Table.Row key="column-row">
           {Object.keys(records[0]).map((columnName, index) => (

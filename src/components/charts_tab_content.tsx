@@ -2,6 +2,7 @@ import TransactionAnalysis from "@/app/utils/transaction_analysis";
 import { createListCollection, HStack, Portal, Select } from "@chakra-ui/react";
 import CustomScatterChart from "./ui/custom_scatter_chart";
 import { useMemo } from "react";
+import DataTable from "./ui/data_table";
 
 export default function ChartsTabContent(props: {
   transactionAnalysis?: TransactionAnalysis;
@@ -21,7 +22,6 @@ export default function ChartsTabContent(props: {
   } = props;
 
   const accountsCollection = useMemo(() => {
-    // console.log("accounts collection MEMO RUNNING");
     return createListCollection({
       items:
         transactionAnalysis
@@ -31,7 +31,6 @@ export default function ChartsTabContent(props: {
   }, [transactionAnalysis]);
 
   const merchantsCollection = useMemo(() => {
-    // console.log("merchants collection MEMO RUNNING");
     return createListCollection({
       items:
         merchants.map((description) => ({
@@ -42,7 +41,6 @@ export default function ChartsTabContent(props: {
   }, [merchants]);
 
   const merchantsList = useMemo(() => {
-    // console.log("Merchants MEMO RUNNING");
     return merchants.map((description) => (
       <Select.Item item={description} key={description}>
         {description}
@@ -52,7 +50,6 @@ export default function ChartsTabContent(props: {
   }, [merchants]);
 
   const accountsList = useMemo(() => {
-    // console.log("Accounts MEMO RUNNING");
     return transactionAnalysis?.getAccounts().map((account) => (
       <Select.Item item={account} key={account}>
         {account}
@@ -61,7 +58,22 @@ export default function ChartsTabContent(props: {
     ));
   }, [transactionAnalysis]);
 
-  return (
+  const monthlyDebits =
+    transactionAnalysis
+      ?.getMonthlyTotals(account, selectedMerchants)
+      ?.map((monthlyTotal) => ({
+        x: monthlyTotal.transactionDate.toLocaleDateString("default", {
+          month: "2-digit",
+          year: "numeric",
+        }),
+        y: monthlyTotal.total,
+      })) || [];
+  const averageMonthlyDebit = (
+    monthlyDebits.map((debit) => debit.y).reduce((a, b) => a + b, 0) /
+    monthlyDebits.length
+  ).toFixed(2);
+
+  return account ? (
     <>
       <HStack>
         <Select.Root
@@ -71,6 +83,7 @@ export default function ChartsTabContent(props: {
           onValueChange={(value) => {
             setAccount(value.value[0]);
           }}
+          value={[account]}
         >
           <Select.HiddenSelect />
           <Select.Label>Account</Select.Label>
@@ -115,160 +128,177 @@ export default function ChartsTabContent(props: {
           </Portal>
         </Select.Root>
       </HStack>
-      <HStack>
-        <CustomScatterChart
-          records={
-            transactionAnalysis
-              ?.getTransactions(account, selectedMerchants)
-              ?.filter(
-                (transaction) => transaction.Debit && transaction.Debit < 0
-              )
-              .map((transaction) => ({
-                x: transaction["Transaction Date"].toLocaleDateString(
-                  "default",
-                  {
-                    month: "2-digit",
-                    day: "2-digit",
-                    year: "numeric",
-                  }
-                ),
-                y: transaction.Debit ?? 0,
-              })) || []
-          }
-          scatterName="Debits"
-          xAxisDataKey="Transaction Date"
-          yAxisDataKey="Debit"
-          reversedYAxis
-        />
-        <CustomScatterChart
-          records={
-            transactionAnalysis
-              ?.getDailyTotals(account, selectedMerchants)
-              ?.map((monthlyTotal) => ({
-                x: monthlyTotal.transactionDate.toLocaleDateString("default", {
-                  month: "2-digit",
-                  day: "2-digit",
-                  year: "numeric",
-                }),
-                y: monthlyTotal.total,
-              })) || []
-          }
-          scatterName="Daily Total Debits"
-          xAxisDataKey="Transaction Date"
-          yAxisDataKey="Debit"
-          reversedYAxis
-        />
-        <CustomScatterChart
-          records={
-            transactionAnalysis
-              ?.getMonthlyTotals(account, selectedMerchants)
-              ?.map((monthlyTotal) => ({
-                x: monthlyTotal.transactionDate.toLocaleDateString("default", {
-                  month: "2-digit",
-                  year: "numeric",
-                }),
-                y: monthlyTotal.total,
-              })) || []
-          }
-          scatterName="Monthly Total Debits"
-          xAxisDataKey="Transaction Date"
-          yAxisDataKey="Debit"
-          reversedYAxis
-        />
-        <CustomScatterChart
-          records={
-            transactionAnalysis
-              ?.getYearlyTotals(account, selectedMerchants)
-              ?.map((yearlyTotal) => ({
-                x: yearlyTotal.transactionDate.toLocaleDateString("default", {
-                  year: "numeric",
-                }),
-                y: yearlyTotal.total,
-              })) || []
-          }
-          scatterName="Yearly Total Debits"
-          xAxisDataKey="Transaction Date"
-          yAxisDataKey="Debit"
-          reversedYAxis
-        />
-      </HStack>
-      <HStack>
-        <CustomScatterChart
-          records={
-            transactionAnalysis
-              ?.getTransactions(account, selectedMerchants)
-              ?.filter(
-                (transaction) => transaction.Credit && transaction.Credit > 0
-              )
-              .map((transaction) => ({
-                x: transaction["Transaction Date"].toLocaleDateString(
-                  "default",
-                  {
-                    month: "2-digit",
-                    day: "2-digit",
-                    year: "numeric",
-                  }
-                ),
-                y: transaction.Credit ?? 0,
-              })) || []
-          }
-          scatterName="Credits"
-          xAxisDataKey="Transaction Date"
-          yAxisDataKey="Credit"
-          reversedYAxis={false}
-        />
-        <CustomScatterChart
-          records={
-            transactionAnalysis
-              ?.getDailyTotals(account, selectedMerchants, "Credit")
-              ?.map((monthlyTotal) => ({
-                x: monthlyTotal.transactionDate.toLocaleDateString("default", {
-                  month: "2-digit",
-                  day: "2-digit",
-                  year: "numeric",
-                }),
-                y: monthlyTotal.total,
-              })) || []
-          }
-          scatterName="Daily Total Credits"
-          xAxisDataKey="Transaction Date"
-          yAxisDataKey="Credit"
-          reversedYAxis={false}
-        />
-        <CustomScatterChart
-          records={
-            transactionAnalysis
-              ?.getMonthlyTotals(account, selectedMerchants, "Credit")
-              ?.map((monthlyTotal) => ({
-                x: monthlyTotal.transactionDate.toLocaleDateString("default", {
-                  month: "2-digit",
-                  year: "numeric",
-                }),
-                y: monthlyTotal.total,
-              })) || []
-          }
-          scatterName="Monthly Total Credits"
-          xAxisDataKey="Transaction Date"
-          yAxisDataKey="Credit"
-          reversedYAxis={false}
-        />
-        <CustomScatterChart
-          records={
-            transactionAnalysis
-              ?.getYearlyTotals(account, selectedMerchants, "Credit")
-              ?.map((yearlyTotal) => ({
-                x: yearlyTotal.transactionDate.toLocaleDateString("default", {
-                  year: "numeric",
-                }),
-                y: yearlyTotal.total,
-              })) || []
-          }
-          scatterName="Yearly Total Credits"
-          xAxisDataKey="Transaction Date"
-          yAxisDataKey="Credit"
-          reversedYAxis={false}
-        />
-      </HStack>
+      {selectedMerchants && selectedMerchants.length > 0 ? (
+        <>
+          <DataTable
+            records={[{ "Average Monthly Debit": averageMonthlyDebit }]}
+            style={{
+              marginTop: "10px",
+              marginBottom: "10px",
+            }}
+          />
+          <HStack>
+            <CustomScatterChart
+              records={
+                transactionAnalysis
+                  ?.getTransactions(account, selectedMerchants)
+                  ?.filter(
+                    (transaction) => transaction.Debit && transaction.Debit < 0
+                  )
+                  .map((transaction) => ({
+                    x: transaction["Transaction Date"].toLocaleDateString(
+                      "default",
+                      {
+                        month: "2-digit",
+                        day: "2-digit",
+                        year: "numeric",
+                      }
+                    ),
+                    y: transaction.Debit ?? 0,
+                  })) || []
+              }
+              scatterName="Debits"
+              xAxisDataKey="Transaction Date"
+              yAxisDataKey="Debit"
+              reversedYAxis
+            />
+            <CustomScatterChart
+              records={
+                transactionAnalysis
+                  ?.getDailyTotals(account, selectedMerchants)
+                  ?.map((dailyTotal) => ({
+                    x: dailyTotal.transactionDate.toLocaleDateString(
+                      "default",
+                      {
+                        month: "2-digit",
+                        day: "2-digit",
+                        year: "numeric",
+                      }
+                    ),
+                    y: dailyTotal.total,
+                  })) || []
+              }
+              scatterName="Daily Total Debits"
+              xAxisDataKey="Transaction Date"
+              yAxisDataKey="Debit"
+              reversedYAxis
+            />
+            <CustomScatterChart
+              records={monthlyDebits}
+              scatterName="Monthly Total Debits"
+              xAxisDataKey="Transaction Date"
+              yAxisDataKey="Debit"
+              reversedYAxis
+            />
+            <CustomScatterChart
+              records={
+                transactionAnalysis
+                  ?.getYearlyTotals(account, selectedMerchants)
+                  ?.map((yearlyTotal) => ({
+                    x: yearlyTotal.transactionDate.toLocaleDateString(
+                      "default",
+                      {
+                        year: "numeric",
+                      }
+                    ),
+                    y: yearlyTotal.total,
+                  })) || []
+              }
+              scatterName="Yearly Total Debits"
+              xAxisDataKey="Transaction Date"
+              yAxisDataKey="Debit"
+              reversedYAxis
+            />
+          </HStack>
+          <HStack>
+            <CustomScatterChart
+              records={
+                transactionAnalysis
+                  ?.getTransactions(account, selectedMerchants)
+                  ?.filter(
+                    (transaction) =>
+                      transaction.Credit && transaction.Credit > 0
+                  )
+                  .map((transaction) => ({
+                    x: transaction["Transaction Date"].toLocaleDateString(
+                      "default",
+                      {
+                        month: "2-digit",
+                        day: "2-digit",
+                        year: "numeric",
+                      }
+                    ),
+                    y: transaction.Credit ?? 0,
+                  })) || []
+              }
+              scatterName="Credits"
+              xAxisDataKey="Transaction Date"
+              yAxisDataKey="Credit"
+              reversedYAxis={false}
+            />
+            <CustomScatterChart
+              records={
+                transactionAnalysis
+                  ?.getDailyTotals(account, selectedMerchants, "Credit")
+                  ?.map((monthlyTotal) => ({
+                    x: monthlyTotal.transactionDate.toLocaleDateString(
+                      "default",
+                      {
+                        month: "2-digit",
+                        day: "2-digit",
+                        year: "numeric",
+                      }
+                    ),
+                    y: monthlyTotal.total,
+                  })) || []
+              }
+              scatterName="Daily Total Credits"
+              xAxisDataKey="Transaction Date"
+              yAxisDataKey="Credit"
+              reversedYAxis={false}
+            />
+            <CustomScatterChart
+              records={
+                transactionAnalysis
+                  ?.getMonthlyTotals(account, selectedMerchants, "Credit")
+                  ?.map((monthlyTotal) => ({
+                    x: monthlyTotal.transactionDate.toLocaleDateString(
+                      "default",
+                      {
+                        month: "2-digit",
+                        year: "numeric",
+                      }
+                    ),
+                    y: monthlyTotal.total,
+                  })) || []
+              }
+              scatterName="Monthly Total Credits"
+              xAxisDataKey="Transaction Date"
+              yAxisDataKey="Credit"
+              reversedYAxis={false}
+            />
+            <CustomScatterChart
+              records={
+                transactionAnalysis
+                  ?.getYearlyTotals(account, selectedMerchants, "Credit")
+                  ?.map((yearlyTotal) => ({
+                    x: yearlyTotal.transactionDate.toLocaleDateString(
+                      "default",
+                      {
+                        year: "numeric",
+                      }
+                    ),
+                    y: yearlyTotal.total,
+                  })) || []
+              }
+              scatterName="Yearly Total Credits"
+              xAxisDataKey="Transaction Date"
+              yAxisDataKey="Credit"
+              reversedYAxis={false}
+            />
+          </HStack>
+        </>
+      ) : null}
     </>
-  );
+  ) : null;
 }

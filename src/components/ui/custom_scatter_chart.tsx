@@ -39,7 +39,6 @@ export default function CustomScatterChart(props: {
           top: 20,
           right: 10,
           bottom: 10,
-          left: 20,
         }}
       >
         <CartesianGrid strokeDasharray="3 3" />

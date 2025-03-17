@@ -1,5 +1,5 @@
 import { LuChartLine, LuTable } from "react-icons/lu";
-import { Flex, Tabs } from "@chakra-ui/react";
+import { Flex, HStack, Tabs } from "@chakra-ui/react";
 import CustomFileUpload from "./custom_file_upload";
 import { useEffect, useState } from "react";
 import DataTable from "./data_table";
@@ -25,9 +25,22 @@ export default function NavigationBar() {
   }, [transactions]);
 
   useEffect(() => {
+    const defaultAccount = transactionAnalysis?.getAccounts()?.[0];
+    if (defaultAccount) setAccount(defaultAccount);
+  }, [transactionAnalysis]);
+
+  useEffect(() => {
     setMerchants(transactionAnalysis?.getMerchants(account) || []);
     setSelectedMerchants(transactionAnalysis?.getMerchants(account) || []);
   }, [account, transactionAnalysis]);
+
+  const clearTransactions = () => {
+    setTransactions([]);
+    setTransactionAnalysis(new TransactionAnalysis([]));
+    setMerchants([]);
+    setSelectedMerchants([]);
+    setAccount("");
+  };
 
   return (
     <Tabs.Root defaultValue="charts" variant="line" lazyMount unmountOnExit>
@@ -42,7 +55,12 @@ export default function NavigationBar() {
             Raw Data
           </Tabs.Trigger>
         </Tabs.List>
-        <CustomFileUpload setTransactions={setNewTransactions} />
+        <HStack>
+          <CustomFileUpload
+            clearTransactions={clearTransactions}
+            setTransactions={setNewTransactions}
+          />
+        </HStack>
       </Flex>
       <Tabs.Content value="charts" marginLeft="10">
         <ChartsTabContent
@@ -57,7 +75,7 @@ export default function NavigationBar() {
         />
       </Tabs.Content>
       <Tabs.Content value="raw_data">
-        <DataTable records={transactions} />
+        <DataTable records={transactions} style={{}} />
       </Tabs.Content>
     </Tabs.Root>
   );

@@ -1,6 +1,6 @@
 import TransactionAnalysis from "@/app/utils/transaction_analysis";
 import { createListCollection, HStack, Portal, Select } from "@chakra-ui/react";
-import CustomScatterChart, { Point } from "./ui/custom_scatter_chart";
+import CustomScatterChart from "./ui/custom_scatter_chart";
 import { useMemo } from "react";
 
 export default function ChartsTabContent(props: {
@@ -10,7 +10,6 @@ export default function ChartsTabContent(props: {
   merchants: string[];
   account: string;
   setAccount: (account: string) => void;
-  allDebits: Point[];
 }) {
   const {
     account,
@@ -19,11 +18,10 @@ export default function ChartsTabContent(props: {
     setSelectedMerchants,
     merchants,
     setAccount,
-    allDebits,
   } = props;
 
   const accountsCollection = useMemo(() => {
-    console.log("accounts collection MEMO RUNNING");
+    // console.log("accounts collection MEMO RUNNING");
     return createListCollection({
       items:
         transactionAnalysis
@@ -33,7 +31,7 @@ export default function ChartsTabContent(props: {
   }, [transactionAnalysis]);
 
   const merchantsCollection = useMemo(() => {
-    console.log("merchants collection MEMO RUNNING");
+    // console.log("merchants collection MEMO RUNNING");
     return createListCollection({
       items:
         merchants.map((description) => ({
@@ -44,7 +42,7 @@ export default function ChartsTabContent(props: {
   }, [merchants]);
 
   const merchantsList = useMemo(() => {
-    console.log("Merchants MEMO RUNNING");
+    // console.log("Merchants MEMO RUNNING");
     return merchants.map((description) => (
       <Select.Item item={description} key={description}>
         {description}
@@ -54,7 +52,7 @@ export default function ChartsTabContent(props: {
   }, [merchants]);
 
   const accountsList = useMemo(() => {
-    console.log("Accounts MEMO RUNNING");
+    // console.log("Accounts MEMO RUNNING");
     return transactionAnalysis?.getAccounts().map((account) => (
       <Select.Item item={account} key={account}>
         {account}
@@ -119,13 +117,29 @@ export default function ChartsTabContent(props: {
       </HStack>
       <HStack>
         <CustomScatterChart
-          records={allDebits}
+          records={
+            transactionAnalysis
+              ?.getTransactions(account, selectedMerchants)
+              ?.filter(
+                (transaction) => transaction.Debit && transaction.Debit < 0
+              )
+              .map((transaction) => ({
+                x: transaction["Transaction Date"].toLocaleDateString(
+                  "default",
+                  {
+                    month: "2-digit",
+                    day: "2-digit",
+                    year: "numeric",
+                  }
+                ),
+                y: transaction.Debit ?? 0,
+              })) || []
+          }
           scatterName="Debits"
           xAxisDataKey="Transaction Date"
           yAxisDataKey="Debit"
           reversedYAxis
         />
-        {/*
         <CustomScatterChart
           records={
             transactionAnalysis
@@ -254,7 +268,6 @@ export default function ChartsTabContent(props: {
           yAxisDataKey="Credit"
           reversedYAxis={false}
         />
-        */}
       </HStack>
     </>
   );

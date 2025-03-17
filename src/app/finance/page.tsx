@@ -5,8 +5,15 @@ import {
   createSystem,
   defaultConfig,
   defineConfig,
-  Link,
 } from "@chakra-ui/react";
+import dynamic from "next/dynamic";
+
+const NavigationBar = dynamic(
+  () => import("../../components/ui/navigation_bar"),
+  {
+    ssr: false,
+  }
+);
 
 const customConfig = defineConfig({
   theme: {
@@ -21,7 +28,7 @@ const system = createSystem(defaultConfig, customConfig);
 export default function Home() {
   return (
     <ChakraProvider value={system}>
-      <Link href="/finance">Finance</Link>
+      <NavigationBar />
     </ChakraProvider>
   );
 }

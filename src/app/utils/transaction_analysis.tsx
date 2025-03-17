@@ -163,10 +163,7 @@ export default class TransactionAnalysis {
   };
 
   getTransactions = (account: string, merchants?: string[]) =>
-    this.transactionGroupings?.[account]?.transactions.filter(
-      (transaction) =>
-        !merchants || merchants.indexOf(transaction.Description) !== -1
-    ) || [];
+    this.transactionGroupings?.[account]?.transactions || [];
   getYearlyTotals = (
     account: string,
     merchants?: string[],

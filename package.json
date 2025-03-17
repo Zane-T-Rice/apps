@@ -3,10 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev;",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "build:workers": "tsc -p tsconfig.worker.json"
   },
   "dependencies": {
     "@chakra-ui/icons": "^2.2.4",

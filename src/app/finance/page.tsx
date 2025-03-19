@@ -1,19 +1,12 @@
 "use client";
 
+import NavigationBar from "@/components/ui/navigation_bar";
 import {
   ChakraProvider,
   createSystem,
   defaultConfig,
   defineConfig,
 } from "@chakra-ui/react";
-import dynamic from "next/dynamic";
-
-const NavigationBar = dynamic(
-  () => import("../../components/ui/navigation_bar"),
-  {
-    ssr: false,
-  }
-);
 
 const customConfig = defineConfig({
   theme: {

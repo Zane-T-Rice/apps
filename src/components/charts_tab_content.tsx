@@ -1,7 +1,7 @@
 import TransactionAnalysis from "@/app/utils/transaction_analysis";
 import { createListCollection, HStack, Portal, Select } from "@chakra-ui/react";
 import CustomScatterChart from "./ui/custom_scatter_chart";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import DataTable from "./ui/data_table";
 
 export default function ChartsTabContent(props: {
@@ -20,6 +20,14 @@ export default function ChartsTabContent(props: {
     merchants,
     setAccount,
   } = props;
+
+  const [internalSelectedMerchants, setInternalSelectedMerchants] = useState<
+    string[]
+  >([]);
+
+  useEffect(() => {
+    setInternalSelectedMerchants(merchants);
+  }, [merchants]);
 
   const accountsCollection = useMemo(() => {
     return createListCollection({
@@ -106,9 +114,12 @@ export default function ChartsTabContent(props: {
           size="sm"
           width="320px"
           onValueChange={(value) => {
-            setSelectedMerchants(value.value);
+            setInternalSelectedMerchants(value.value);
           }}
-          value={selectedMerchants}
+          onBlur={() => {
+            setSelectedMerchants(internalSelectedMerchants);
+          }}
+          value={internalSelectedMerchants}
           multiple
         >
           <Select.HiddenSelect />

@@ -12,7 +12,7 @@ import {
 import { GrClear } from "react-icons/gr";
 import { Item } from "./calories_page_content";
 import { FaPlus } from "react-icons/fa";
-import { useSessionStorage } from "@/app/utils/use_session_storage";
+import { useState } from "react";
 
 export default function AddItemButtonGroup(props: {
   clearItems: () => void;
@@ -20,8 +20,8 @@ export default function AddItemButtonGroup(props: {
   items: Item[];
 }) {
   const { clearItems, addItem, items } = props;
-  const [name, setName] = useSessionStorage("name", "");
-  const [calories, setCalories] = useSessionStorage("calories", "");
+  const [name, setName] = useState<string>("");
+  const [calories, setCalories] = useState<string>("");
 
   return (
     <Box>

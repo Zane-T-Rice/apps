@@ -1,5 +1,5 @@
 import { LuChartLine, LuTable } from "react-icons/lu";
-import { Flex, HStack, Tabs } from "@chakra-ui/react";
+import { Field, Flex, HStack, Input, Tabs } from "@chakra-ui/react";
 import DataTable from "./data_table";
 import AddItemButtonGroup from "./add_item_button_group";
 import { Cell, Pie, PieChart } from "recharts";
@@ -15,9 +15,9 @@ const fontSize = 20;
 
 export default function CaloriesPageContent() {
   const [items, setItems] = useLocalStorage<Item[]>("items", []);
+  const [target, setTarget] = useLocalStorage<number>("target", 0);
 
   const value = items.map((item) => item.amount).reduce((a, b) => a + b, 0);
-  const target = 1600;
   const outerRadius = 160;
   const innerRadius = outerRadius / 2;
   const cx = outerRadius;
@@ -59,6 +59,19 @@ export default function CaloriesPageContent() {
           </Tabs.Trigger>
         </Tabs.List>
         <HStack>
+          <Field.Root>
+            <HStack>
+              <Field.Label>Calorie Target</Field.Label>
+              <Input
+                placeholder="1600"
+                onChange={(event) => {
+                  const newValue = event.target.value.replace(/\D/g, "");
+                  setTarget(newValue !== "" ? parseInt(newValue) : 0);
+                }}
+                value={target}
+              />
+            </HStack>
+          </Field.Root>
           <AddItemButtonGroup
             clearItems={() => {
               setItems([]);

@@ -1,16 +1,49 @@
 import { LuChartLine, LuTable } from "react-icons/lu";
 import { Flex, HStack, Tabs } from "@chakra-ui/react";
 import DataTable from "./data_table";
-import { useState } from "react";
 import AddItemButtonGroup from "./add_item_button_group";
+import { Cell, Pie, PieChart } from "recharts";
+import { useLocalStorage } from "@/app/utils/use_local_storage";
 
 export type Item = {
   name: string;
   amount: number;
 };
 
+const COLORS = ["#AA8042", "#00C49F", "#EEEE00", "#FF0000"];
+const fontSize = 20;
+
 export default function CaloriesPageContent() {
-  const [items, setItems] = useState<Item[]>([]);
+  const [items, setItems] = useLocalStorage<Item[]>("items", []);
+
+  const value = items.map((item) => item.amount).reduce((a, b) => a + b, 0);
+  const target = 1600;
+  const outerRadius = 160;
+  const innerRadius = outerRadius / 2;
+  const cx = outerRadius;
+  const cy = outerRadius;
+
+  const data = [
+    {
+      name: "Target",
+      value: target - value,
+    },
+    {
+      name: "Actual",
+      value: value,
+    },
+  ];
+
+  const sectorColor = (index: number) => {
+    if (index > 0) {
+      if (value > target) {
+        return COLORS[2];
+      } else if (target - value > target) {
+        return COLORS[3];
+      }
+    }
+    return COLORS[index % COLORS.length];
+  };
 
   return (
     <Tabs.Root defaultValue="charts" variant="line" lazyMount unmountOnExit>
@@ -38,13 +71,38 @@ export default function CaloriesPageContent() {
         </HStack>
       </Flex>
       <Tabs.Content value="charts" marginLeft="10">
-        {
-          // Ring showing target, current calories with ring
-          // filling up to the percent of calories consumed
-        }
+        {items.length > 0 ? (
+          <PieChart width={outerRadius * 2 + 10} height={outerRadius * 2 + 10}>
+            <Pie
+              data={data}
+              cx={cx}
+              cy={cy}
+              innerRadius={innerRadius}
+              outerRadius={outerRadius}
+              dataKey="value"
+              nameKey="name"
+              labelLine={false}
+              isAnimationActive={true}
+            >
+              {data.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={sectorColor(index)} />
+              ))}
+            </Pie>
+            <text x={cx - 54} y={cy} style={{ fontSize }}>
+              Calories Left
+            </text>
+            <text
+              x={cx - ((target - value).toString().length - 1) * 4.5}
+              y={cy + 20}
+              style={{ fontSize }}
+            >
+              {target - value}
+            </text>
+          </PieChart>
+        ) : null}
       </Tabs.Content>
       <Tabs.Content value="raw_data">
-        <DataTable records={items} style={{}} />
+        <DataTable records={items} style={{ marginLeft: 10 }} />
       </Tabs.Content>
     </Tabs.Root>
   );

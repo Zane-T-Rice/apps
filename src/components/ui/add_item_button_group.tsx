@@ -1,10 +1,9 @@
-"use client";
-
 import {
   Box,
   Button,
   CloseButton,
   Drawer,
+  Field,
   HStack,
   Input,
   Portal,
@@ -13,6 +12,7 @@ import { GrClear } from "react-icons/gr";
 import { Item } from "./calories_page_content";
 import { FaPlus } from "react-icons/fa";
 import { useState } from "react";
+import { UseDialogContext } from "@ark-ui/react";
 
 export default function AddItemButtonGroup(props: {
   clearItems: () => void;
@@ -22,6 +22,18 @@ export default function AddItemButtonGroup(props: {
   const { clearItems, addItem, items } = props;
   const [name, setName] = useState<string>("");
   const [calories, setCalories] = useState<string>("");
+  const [submittedOnce, setSubmittedOnce] = useState<boolean>(false);
+
+  const submit = (store: UseDialogContext) => {
+    setSubmittedOnce(true);
+    if (name && calories) {
+      addItem({ name, amount: parseInt(calories) });
+      store.setOpen(false);
+      setName("");
+      setCalories("");
+      setSubmittedOnce(false);
+    }
+  };
 
   return (
     <Box>
@@ -36,45 +48,81 @@ export default function AddItemButtonGroup(props: {
             <Drawer.Backdrop />
             <Drawer.Positioner>
               <Drawer.Content>
-                <Drawer.Header>
-                  <Drawer.Title>Add Item</Drawer.Title>
-                </Drawer.Header>
-                <Drawer.Body>
-                  <Input
-                    placeholder="Name"
-                    onChange={(event) => setName(event.target.value)}
-                    value={name}
-                  />
-                  <Input
-                    placeholder="Calories"
-                    onChange={(event) => setCalories(event.target.value)}
-                    value={calories}
-                  />
-                </Drawer.Body>
                 <Drawer.Context>
                   {(store) => (
-                    <Drawer.Footer>
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          store.setOpen(false);
-                          setName("");
-                          setCalories("");
-                        }}
-                      >
-                        Cancel
-                      </Button>
-                      <Button
-                        onClick={() => {
-                          addItem({ name, amount: parseInt(calories) });
-                          store.setOpen(false);
-                          setName("");
-                          setCalories("");
-                        }}
-                      >
-                        Save
-                      </Button>
-                    </Drawer.Footer>
+                    <>
+                      <Drawer.Header>
+                        <Drawer.Title>Add Item</Drawer.Title>
+                      </Drawer.Header>
+                      <Drawer.Body>
+                        <Field.Root invalid={!name && submittedOnce} required>
+                          <Field.Label>
+                            Name <Field.RequiredIndicator />
+                          </Field.Label>
+                          <Input
+                            placeholder="Coke"
+                            onChange={(event) => setName(event.target.value)}
+                            value={name}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                submit(store);
+                              }
+                            }}
+                          />
+                          <Field.ErrorText>
+                            This field is required
+                          </Field.ErrorText>
+                        </Field.Root>
+                        <br />
+                        <Field.Root
+                          invalid={!calories && submittedOnce}
+                          required
+                        >
+                          <Field.Label>
+                            Calories <Field.RequiredIndicator />
+                          </Field.Label>
+                          <Input
+                            placeholder="140"
+                            onChange={(event) => {
+                              const negative =
+                                event.target.value.charAt(0) === "-" ? "-" : "";
+                              const newValue = event.target.value.replace(
+                                /\D/g,
+                                ""
+                              );
+                              setCalories(negative + newValue);
+                            }}
+                            value={calories}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                submit(store);
+                              }
+                            }}
+                          />
+                          <Field.ErrorText>
+                            This field is required
+                          </Field.ErrorText>
+                        </Field.Root>
+                      </Drawer.Body>
+                      <Drawer.Footer>
+                        <Button
+                          variant="outline"
+                          onClick={() => {
+                            store.setOpen(false);
+                            setName("");
+                            setCalories("");
+                          }}
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          onClick={() => submit(store)}
+                          disabled={!name || !calories}
+                        >
+                          Save
+                        </Button>
+                      </Drawer.Footer>
+                    </>
                   )}
                 </Drawer.Context>
                 <Drawer.CloseTrigger asChild>

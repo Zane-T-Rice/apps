@@ -1,20 +1,22 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
-export function useLocalStorage(
+export function useLocalStorage<T>(
   storageKey: string,
-  defaultValue = ""
-): [string, Dispatch<SetStateAction<string>>] {
-  const [value, setValue] = useState<string>(() => {
-    if (typeof window !== "undefined") {
-      const storedValue = localStorage.getItem(storageKey);
-      return storedValue !== null ? storedValue : defaultValue;
-    } else {
-      return defaultValue;
-    }
-  });
+  defaultValue: T
+): [T, Dispatch<SetStateAction<T>>] {
+  const [value, setValue] = useState<T>(defaultValue);
 
+  // The empty dependency array will only call this
+  // once, when the component is rendered. This sets
+  // the initial value from local storage.
   useEffect(() => {
-    localStorage.setItem(storageKey, value);
+    const storedValue = localStorage.getItem(storageKey);
+    setValue(storedValue !== null ? JSON.parse(storedValue) : defaultValue);
+  }, []);
+
+  // This useEffect updates the value in storage as the user makes changes.
+  useEffect(() => {
+    localStorage.setItem(storageKey, JSON.stringify(value));
   }, [storageKey, value]);
 
   return [value, setValue];

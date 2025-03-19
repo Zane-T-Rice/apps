@@ -75,7 +75,7 @@ export default function NavigationBar() {
         />
       </Tabs.Content>
       <Tabs.Content value="raw_data">
-        <DataTable records={transactions} style={{}} />
+        <DataTable records={transactions} style={{ marginLeft: 10 }} />
       </Tabs.Content>
     </Tabs.Root>
   );

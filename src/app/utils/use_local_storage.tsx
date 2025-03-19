@@ -12,6 +12,7 @@ export function useLocalStorage<T>(
   useEffect(() => {
     const storedValue = localStorage.getItem(storageKey);
     setValue(storedValue !== null ? JSON.parse(storedValue) : defaultValue);
+    // eslint-disable-next-line
   }, []);
 
   // This useEffect updates the value in storage as the user makes changes.

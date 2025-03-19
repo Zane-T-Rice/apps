@@ -1,5 +1,5 @@
 import { LuChartLine, LuTable } from "react-icons/lu";
-import { Field, Flex, HStack, Input, Tabs } from "@chakra-ui/react";
+import { Field, HStack, Input, Stack, Tabs } from "@chakra-ui/react";
 import DataTable from "./data_table";
 import AddItemButtonGroup from "./add_item_button_group";
 import { Cell, Pie, PieChart } from "recharts";
@@ -18,7 +18,7 @@ export default function CaloriesPageContent() {
   const [target, setTarget] = useLocalStorage<number>("target", 0);
 
   const value = items.map((item) => item.amount).reduce((a, b) => a + b, 0);
-  const outerRadius = 160;
+  const outerRadius = 130;
   const innerRadius = outerRadius / 2;
   const cx = outerRadius;
   const cy = outerRadius;
@@ -45,19 +45,19 @@ export default function CaloriesPageContent() {
     return COLORS[index % COLORS.length];
   };
 
-  return (
-    <Tabs.Root defaultValue="charts" variant="line" lazyMount unmountOnExit>
-      <Flex direction="row" borderColor="black" padding="2px">
-        <Tabs.List maxWidth="75%" overflow="hidden" marginEnd="auto">
-          <Tabs.Trigger value="charts">
-            <LuChartLine />
-            Calories
-          </Tabs.Trigger>
-          <Tabs.Trigger value="raw_data">
-            <LuTable />
-            Raw Data
-          </Tabs.Trigger>
-        </Tabs.List>
+  const content = (
+    <>
+      <Tabs.List marginEnd="auto">
+        <Tabs.Trigger value="charts">
+          <LuChartLine />
+          Calories
+        </Tabs.Trigger>
+        <Tabs.Trigger value="raw_data">
+          <LuTable />
+          Raw Data
+        </Tabs.Trigger>
+      </Tabs.List>
+      <HStack mdDown={{ marginLeft: 1 }}>
         <HStack>
           <Field.Root>
             <HStack>
@@ -69,6 +69,7 @@ export default function CaloriesPageContent() {
                   setTarget(newValue !== "" ? parseInt(newValue) : 0);
                 }}
                 value={target}
+                minWidth={`${Math.max(4, target.toString().length * 14)}px`}
               />
             </HStack>
           </Field.Root>
@@ -82,8 +83,15 @@ export default function CaloriesPageContent() {
             items={items}
           />
         </HStack>
-      </Flex>
-      <Tabs.Content value="charts" marginLeft="10">
+      </HStack>
+    </>
+  );
+
+  return (
+    <Tabs.Root defaultValue="charts" variant="line" lazyMount unmountOnExit>
+      <Stack hideFrom="md">{content}</Stack>
+      <HStack hideBelow="md">{content}</HStack>
+      <Tabs.Content value="charts">
         {items.length > 0 ? (
           <PieChart width={outerRadius * 2 + 10} height={outerRadius * 2 + 10}>
             <Pie

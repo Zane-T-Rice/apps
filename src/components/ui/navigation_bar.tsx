@@ -1,5 +1,5 @@
 import { LuChartLine, LuTable } from "react-icons/lu";
-import { Flex, HStack, Tabs } from "@chakra-ui/react";
+import { HStack, Stack, Tabs } from "@chakra-ui/react";
 import CustomFileUpload from "./custom_file_upload";
 import { useEffect, useState } from "react";
 import DataTable from "./data_table";
@@ -42,27 +42,33 @@ export default function NavigationBar() {
     setAccount("");
   };
 
+  const navbarbuttons = (
+    <>
+      <Tabs.List marginEnd="auto">
+        <Tabs.Trigger value="charts">
+          <LuChartLine />
+          Charts
+        </Tabs.Trigger>
+        <Tabs.Trigger value="raw_data">
+          <LuTable />
+          Raw Data
+        </Tabs.Trigger>
+      </Tabs.List>
+      <HStack mdDown={{ marginLeft: 1 }}>
+        <CustomFileUpload
+          clearTransactions={clearTransactions}
+          setTransactions={setNewTransactions}
+          transactions={transactions}
+        />
+      </HStack>
+    </>
+  );
+
   return (
     <Tabs.Root defaultValue="charts" variant="line" lazyMount unmountOnExit>
-      <Flex direction="row" borderColor="black" padding="2px">
-        <Tabs.List maxWidth="75%" overflow="hidden" marginEnd="auto">
-          <Tabs.Trigger value="charts">
-            <LuChartLine />
-            Charts
-          </Tabs.Trigger>
-          <Tabs.Trigger value="raw_data">
-            <LuTable />
-            Raw Data
-          </Tabs.Trigger>
-        </Tabs.List>
-        <HStack>
-          <CustomFileUpload
-            clearTransactions={clearTransactions}
-            setTransactions={setNewTransactions}
-          />
-        </HStack>
-      </Flex>
-      <Tabs.Content value="charts" marginLeft="10">
+      <HStack hideBelow="md">{navbarbuttons}</HStack>
+      <Stack hideFrom="md">{navbarbuttons}</Stack>
+      <Tabs.Content value="charts">
         <ChartsTabContent
           transactionAnalysis={transactionAnalysis}
           selectedMerchants={selectedMerchants}

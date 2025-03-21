@@ -21,8 +21,8 @@ const system = createSystem(defaultConfig, customConfig);
 export default function Home() {
   return (
     <ChakraProvider value={system}>
-      <Link href="/calories">Calories</Link>
-      <Link href="/finance">Finance</Link>
+      <Link href="/calories/calories">Calories</Link>
+      <Link href="/calories/finance">Finance</Link>
     </ChakraProvider>
   );
 }

@@ -5,6 +5,8 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ["@chakra-ui/react"],
   },
+  basePath: "/calories",
+  assetPrefix: "/calories",
 };
 
 export default nextConfig;

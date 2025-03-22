@@ -1,10 +1,10 @@
 import { LuChartLine, LuTable } from "react-icons/lu";
 import { Field, HStack, Input, Spinner, Stack, Tabs } from "@chakra-ui/react";
-import DataTable from "./data_table";
-import AddItemButtonGroup from "./add_item_button_group";
+import DataTable from "../shared/data_table";
+import AddItemButtonGroup from "../ui/add_item_button_group";
 import { Cell, Pie, PieChart } from "recharts";
 import { useLocalStorage } from "@/app/utils/use_local_storage";
-import { QuickAddButton } from "./quick_add_button";
+import { QuickAddRemoveButton } from "../ui/quick_add_remove_button";
 
 export type Item = {
   name: string;
@@ -147,7 +147,7 @@ export default function CaloriesPageContent() {
               borderWidth="thick"
             />
           )}
-          <QuickAddButton
+          <QuickAddRemoveButton
             items={items}
             addItem={addItem}
             removeItem={removeItem}

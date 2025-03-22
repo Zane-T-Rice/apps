@@ -1,9 +1,9 @@
 import { useLocalStorage } from "@/app/utils/use_local_storage";
-import { Item } from "./calories_page_content";
+import { Item } from "../calories/calories_page_content";
 import { Button, Center, HStack, Text } from "@chakra-ui/react";
 import { useEffect } from "react";
 
-export function QuickAddButton(props: {
+export function QuickAddRemoveButton(props: {
   items: Item[];
   addItem: (item: Item) => void;
   removeItem: (item: Item) => void;

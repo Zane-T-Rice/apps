@@ -22,8 +22,6 @@ export default function Home() {
   return (
     <ChakraProvider value={system}>
       <Link href="/apps/calories">Calories</Link>
-      <br />
-      <Link href="/apps/finance">Finance</Link>
     </ChakraProvider>
   );
 }

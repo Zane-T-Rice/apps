@@ -4,6 +4,7 @@ import DataTable from "./data_table";
 import AddItemButtonGroup from "./add_item_button_group";
 import { Cell, Pie, PieChart } from "recharts";
 import { useLocalStorage } from "@/app/utils/use_local_storage";
+import { QuickAddButton } from "./quick_add_button";
 
 export type Item = {
   name: string;
@@ -45,6 +46,15 @@ export default function CaloriesPageContent() {
     return COLORS[index % COLORS.length];
   };
 
+  const addItem = (item: Item) => {
+    setItems([...items, item]);
+  };
+
+  const removeItem = (item: Item) => {
+    const index = items.findIndex((e) => e.name === item.name);
+    setItems(items.filter((e, i) => i !== index));
+  };
+
   const content = (
     <>
       <Tabs.List marginEnd="auto">
@@ -77,9 +87,7 @@ export default function CaloriesPageContent() {
             clearItems={() => {
               setItems([]);
             }}
-            addItem={(item) => {
-              setItems([...items, item]);
-            }}
+            addItem={addItem}
             items={items}
           />
         </HStack>
@@ -92,8 +100,12 @@ export default function CaloriesPageContent() {
       <Stack hideFrom="md">{content}</Stack>
       <HStack hideBelow="md">{content}</HStack>
       <Tabs.Content value="charts">
-        {items.length > 0 ? (
-          <PieChart width={outerRadius * 2 + 10} height={outerRadius * 2 + 10}>
+        <Stack>
+          <PieChart
+            width={outerRadius * 2 + 10}
+            height={outerRadius * 2 + 10}
+            style={{ marginLeft: 70 }}
+          >
             <Pie
               data={data}
               cx={cx}
@@ -120,7 +132,12 @@ export default function CaloriesPageContent() {
               {target - value}
             </text>
           </PieChart>
-        ) : null}
+          <QuickAddButton
+            items={items}
+            addItem={addItem}
+            removeItem={removeItem}
+          />
+        </Stack>
       </Tabs.Content>
       <Tabs.Content value="raw_data">
         <DataTable records={items} style={{ marginLeft: 10 }} />

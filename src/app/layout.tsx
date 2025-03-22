@@ -1,5 +1,4 @@
 import { Provider } from "@/components/ui/provider";
-import "./globals.css";
 
 export default function DashboardLayout({
   children,

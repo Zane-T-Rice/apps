@@ -1,27 +1,7 @@
 "use client";
 
-import {
-  ChakraProvider,
-  createSystem,
-  defaultConfig,
-  defineConfig,
-  Link,
-} from "@chakra-ui/react";
-
-const customConfig = defineConfig({
-  theme: {
-    tokens: {
-      colors: {},
-    },
-  },
-});
-
-const system = createSystem(defaultConfig, customConfig);
+import Link from "next/link";
 
 export default function Home() {
-  return (
-    <ChakraProvider value={system}>
-      <Link href="/apps/calories">Calories</Link>
-    </ChakraProvider>
-  );
+  return <Link href="/calories">Calories</Link>;
 }

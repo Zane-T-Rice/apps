@@ -1,5 +1,5 @@
 import { LuChartLine, LuTable } from "react-icons/lu";
-import { Field, HStack, Input, Stack, Tabs } from "@chakra-ui/react";
+import { Field, HStack, Input, Spinner, Stack, Tabs } from "@chakra-ui/react";
 import DataTable from "./data_table";
 import AddItemButtonGroup from "./add_item_button_group";
 import { Cell, Pie, PieChart } from "recharts";
@@ -15,8 +15,13 @@ const COLORS = ["#AA8042", "#00C49F", "#EEEE00", "#FF0000"];
 const fontSize = 20;
 
 export default function CaloriesPageContent() {
-  const [items, setItems] = useLocalStorage<Item[]>("items", []);
-  const [target, setTarget] = useLocalStorage<number>("target", 0);
+  const [items, setItems, itemsLoading] = useLocalStorage<Item[]>("items", []);
+  const [target, setTarget, targetLoading] = useLocalStorage<number>(
+    "target",
+    0
+  );
+
+  const isLoading = itemsLoading || targetLoading;
 
   const value = items.map((item) => item.amount).reduce((a, b) => a + b, 0);
   const outerRadius = 130;
@@ -101,37 +106,47 @@ export default function CaloriesPageContent() {
       <HStack hideBelow="md">{content}</HStack>
       <Tabs.Content value="charts">
         <Stack>
-          <PieChart
-            width={outerRadius * 2 + 10}
-            height={outerRadius * 2 + 10}
-            style={{ marginLeft: 70 }}
-          >
-            <Pie
-              data={data}
-              cx={cx}
-              cy={cy}
-              innerRadius={innerRadius}
-              outerRadius={outerRadius}
-              dataKey="value"
-              nameKey="name"
-              labelLine={false}
-              isAnimationActive={true}
+          {!isLoading ? (
+            <PieChart
+              width={outerRadius * 2 + 10}
+              height={outerRadius * 2 + 10}
+              style={{ marginLeft: 70 }}
             >
-              {data.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={sectorColor(index)} />
-              ))}
-            </Pie>
-            <text x={cx - 54} y={cy} style={{ fontSize }}>
-              Calories Left
-            </text>
-            <text
-              x={cx - ((target - value).toString().length - 1) * 4.5}
-              y={cy + 20}
-              style={{ fontSize }}
-            >
-              {target - value}
-            </text>
-          </PieChart>
+              <Pie
+                data={data}
+                cx={cx}
+                cy={cy}
+                innerRadius={innerRadius}
+                outerRadius={outerRadius}
+                dataKey="value"
+                nameKey="name"
+                labelLine={false}
+                isAnimationActive={true}
+              >
+                {data.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={sectorColor(index)} />
+                ))}
+              </Pie>
+              <text x={cx - 54} y={cy} style={{ fontSize }}>
+                Calories Left
+              </text>
+              <text
+                x={cx - ((target - value).toString().length - 1) * 4.5}
+                y={cy + 20}
+                style={{ fontSize }}
+              >
+                {target - value}
+              </text>
+            </PieChart>
+          ) : (
+            <Spinner
+              marginLeft={cx + 70}
+              marginTop={cy}
+              color="blue"
+              size="xl"
+              borderWidth="thick"
+            />
+          )}
           <QuickAddButton
             items={items}
             addItem={addItem}

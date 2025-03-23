@@ -1,7 +1,8 @@
 import { useLocalStorage } from "@/app/utils/use_local_storage";
 import { Item } from "../calories/calories_page_content";
-import { Button, Center, HStack, Text } from "@chakra-ui/react";
+import { Center, HStack, Text } from "@chakra-ui/react";
 import { useEffect } from "react";
+import { Button } from "../recipes/button";
 
 export function QuickAddRemoveButton(props: {
   items: Item[];
@@ -50,7 +51,7 @@ export function QuickAddRemoveButton(props: {
           >{`${quickItem.name} - ${quickItem.amount}`}</Text>
         </Center>
         <Button
-          variant="solid"
+          safe="solid"
           colorPalette="green"
           rounded="xl"
           key={`${quickItem.name}-add`}
@@ -58,7 +59,7 @@ export function QuickAddRemoveButton(props: {
           width="1/6"
         >{`+`}</Button>
         <Button
-          variant="solid"
+          safe="solid"
           colorPalette="green"
           rounded="xl"
           key={`${quickItem.name}-remove`}
@@ -66,7 +67,7 @@ export function QuickAddRemoveButton(props: {
           width="1/6"
         >{`-`}</Button>
         <Button
-          variant="solid"
+          unsafe="solid"
           colorPalette="green"
           rounded="xl"
           key={`${quickItem.name}-remove-quick-item`}

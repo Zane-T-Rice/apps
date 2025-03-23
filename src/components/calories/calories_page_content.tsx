@@ -110,7 +110,7 @@ export default function CaloriesPageContent() {
             <PieChart
               width={outerRadius * 2 + 10}
               height={outerRadius * 2 + 10}
-              style={{ marginLeft: 70 }}
+              style={{ marginLeft: 75 }}
             >
               <Pie
                 data={data}
@@ -151,6 +151,7 @@ export default function CaloriesPageContent() {
             items={items}
             addItem={addItem}
             removeItem={removeItem}
+            style={{ marginLeft: 5 }}
           />
         </Stack>
       </Tabs.Content>

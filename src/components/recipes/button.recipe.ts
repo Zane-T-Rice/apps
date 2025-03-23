@@ -4,16 +4,17 @@ export const buttonRecipe = defineRecipe({
   ...defaultConfig.theme?.recipes?.button,
   variants: {
     ...defaultConfig.theme?.recipes?.button?.variants,
-    safe: {
-      solid: {
-        bg: "green.600",
-        color: "white",
+    variant: {
+      outline: {
+        ...defaultConfig.theme?.recipes?.button?.variants?.variant?.outline,
       },
-    },
-    unsafe: {
-      solid: {
-        bg: "red",
-        color: "white",
+      safe: {
+        ...defaultConfig.theme?.recipes?.button?.variants?.variant?.solid,
+        colorPalette: "green",
+      },
+      unsafe: {
+        ...defaultConfig.theme?.recipes?.button?.variants?.variant?.solid,
+        colorPalette: "red",
       },
     },
   },

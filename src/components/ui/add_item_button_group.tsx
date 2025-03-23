@@ -1,5 +1,4 @@
 import {
-  Button,
   CloseButton,
   Drawer,
   Field,
@@ -12,6 +11,7 @@ import { Item } from "../calories/calories_page_content";
 import { FaPlus } from "react-icons/fa";
 import { useState } from "react";
 import { UseDialogContext } from "@ark-ui/react";
+import { Button } from "../recipes/button";
 
 export default function AddItemButtonGroup(props: {
   clearItems: () => void;
@@ -38,7 +38,7 @@ export default function AddItemButtonGroup(props: {
     <HStack>
       <Drawer.Root>
         <Drawer.Trigger asChild>
-          <Button variant="solid" colorPalette="green" rounded="xl">
+          <Button variant="safe" colorPalette="green" rounded="xl">
             <FaPlus /> Add Item
           </Button>
         </Drawer.Trigger>
@@ -111,6 +111,7 @@ export default function AddItemButtonGroup(props: {
                         Cancel
                       </Button>
                       <Button
+                        variant="safe"
                         onClick={() => submit(store)}
                         disabled={!name || !calories}
                       >
@@ -129,8 +130,7 @@ export default function AddItemButtonGroup(props: {
       </Drawer.Root>
       {items && items.length > 0 ? (
         <Button
-          variant="solid"
-          colorPalette="green"
+          variant="unsafe"
           rounded="xl"
           onClick={() => {
             clearItems();

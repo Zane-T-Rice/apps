@@ -1,15 +1,16 @@
 import { useLocalStorage } from "@/app/utils/use_local_storage";
 import { Item } from "../calories/calories_page_content";
 import { Center, HStack, Text } from "@chakra-ui/react";
-import { useEffect } from "react";
+import { CSSProperties, useEffect } from "react";
 import { Button } from "../recipes/button";
 
 export function QuickAddRemoveButton(props: {
   items: Item[];
   addItem: (item: Item) => void;
   removeItem: (item: Item) => void;
+  style: CSSProperties | undefined;
 }) {
-  const { items, addItem, removeItem } = props;
+  const { items, addItem, removeItem, style } = props;
 
   const [quickItems, setQuickItems] = useLocalStorage<Item[]>("quickItems", []);
 
@@ -36,7 +37,7 @@ export function QuickAddRemoveButton(props: {
 
   return quickItems.map((quickItem) => {
     return (
-      <HStack key={quickItem.name} width="400px">
+      <HStack key={quickItem.name} width="400px" style={style}>
         <Center
           width="3/6"
           bgColor="black"
@@ -51,24 +52,21 @@ export function QuickAddRemoveButton(props: {
           >{`${quickItem.name} - ${quickItem.amount}`}</Text>
         </Center>
         <Button
-          safe="solid"
-          colorPalette="green"
+          variant="safe"
           rounded="xl"
           key={`${quickItem.name}-add`}
           onClick={() => addItem(quickItem)}
           width="1/6"
         >{`+`}</Button>
         <Button
-          safe="solid"
-          colorPalette="green"
+          variant="safe"
           rounded="xl"
           key={`${quickItem.name}-remove`}
           onClick={() => removeItem(quickItem)}
           width="1/6"
         >{`-`}</Button>
         <Button
-          unsafe="solid"
-          colorPalette="green"
+          variant="unsafe"
           rounded="xl"
           key={`${quickItem.name}-remove-quick-item`}
           onClick={() => removeQuickItem(quickItem)}

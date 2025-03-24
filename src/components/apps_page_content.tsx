@@ -25,6 +25,294 @@ const apps = [
     image: "/apps/calories_chart.png",
     imageDescription: "Calories pie chart.",
   },
+  {
+    name: "Calories",
+    description: `Daily calorie goal tracking app. Although, I suppose you could use
+            it for any numerical goal.`,
+    link: "/calories",
+    image: "/apps/calories_chart.png",
+    imageDescription: "Calories pie chart.",
+  },
+  {
+    name: "Calories",
+    description: `Daily calorie goal tracking app. Although, I suppose you could use
+            it for any numerical goal.`,
+    link: "/calories",
+    image: "/apps/calories_chart.png",
+    imageDescription: "Calories pie chart.",
+  },
+  {
+    name: "Calories",
+    description: `Daily calorie goal tracking app. Although, I suppose you could use
+            it for any numerical goal.`,
+    link: "/calories",
+    image: "/apps/calories_chart.png",
+    imageDescription: "Calories pie chart.",
+  },
+  {
+    name: "Calories",
+    description: `Daily calorie goal tracking app. Although, I suppose you could use
+            it for any numerical goal.`,
+    link: "/calories",
+    image: "/apps/calories_chart.png",
+    imageDescription: "Calories pie chart.",
+  },
+  {
+    name: "Calories",
+    description: `Daily calorie goal tracking app. Although, I suppose you could use
+            it for any numerical goal.`,
+    link: "/calories",
+    image: "/apps/calories_chart.png",
+    imageDescription: "Calories pie chart.",
+  },
+  {
+    name: "Calories",
+    description: `Daily calorie goal tracking app. Although, I suppose you could use
+            it for any numerical goal.`,
+    link: "/calories",
+    image: "/apps/calories_chart.png",
+    imageDescription: "Calories pie chart.",
+  },
+  {
+    name: "Calories",
+    description: `Daily calorie goal tracking app. Although, I suppose you could use
+            it for any numerical goal.`,
+    link: "/calories",
+    image: "/apps/calories_chart.png",
+    imageDescription: "Calories pie chart.",
+  },
+  {
+    name: "Calories",
+    description: `Daily calorie goal tracking app. Although, I suppose you could use
+            it for any numerical goal.`,
+    link: "/calories",
+    image: "/apps/calories_chart.png",
+    imageDescription: "Calories pie chart.",
+  },
+  {
+    name: "Calories",
+    description: `Daily calorie goal tracking app. Although, I suppose you could use
+            it for any numerical goal.`,
+    link: "/calories",
+    image: "/apps/calories_chart.png",
+    imageDescription: "Calories pie chart.",
+  },
+  {
+    name: "Calories",
+    description: `Daily calorie goal tracking app. Although, I suppose you could use
+            it for any numerical goal.`,
+    link: "/calories",
+    image: "/apps/calories_chart.png",
+    imageDescription: "Calories pie chart.",
+  },
+  {
+    name: "Calories",
+    description: `Daily calorie goal tracking app. Although, I suppose you could use
+            it for any numerical goal.`,
+    link: "/calories",
+    image: "/apps/calories_chart.png",
+    imageDescription: "Calories pie chart.",
+  },
+  {
+    name: "Calories",
+    description: `Daily calorie goal tracking app. Although, I suppose you could use
+            it for any numerical goal.`,
+    link: "/calories",
+    image: "/apps/calories_chart.png",
+    imageDescription: "Calories pie chart.",
+  },
+  {
+    name: "Calories",
+    description: `Daily calorie goal tracking app. Although, I suppose you could use
+            it for any numerical goal.`,
+    link: "/calories",
+    image: "/apps/calories_chart.png",
+    imageDescription: "Calories pie chart.",
+  },
+  {
+    name: "Calories",
+    description: `Daily calorie goal tracking app. Although, I suppose you could use
+            it for any numerical goal.`,
+    link: "/calories",
+    image: "/apps/calories_chart.png",
+    imageDescription: "Calories pie chart.",
+  },
+  {
+    name: "Calories",
+    description: `Daily calorie goal tracking app. Although, I suppose you could use
+            it for any numerical goal.`,
+    link: "/calories",
+    image: "/apps/calories_chart.png",
+    imageDescription: "Calories pie chart.",
+  },
+  {
+    name: "Calories",
+    description: `Daily calorie goal tracking app. Although, I suppose you could use
+            it for any numerical goal.`,
+    link: "/calories",
+    image: "/apps/calories_chart.png",
+    imageDescription: "Calories pie chart.",
+  },
+  {
+    name: "Calories",
+    description: `Daily calorie goal tracking app. Although, I suppose you could use
+            it for any numerical goal.`,
+    link: "/calories",
+    image: "/apps/calories_chart.png",
+    imageDescription: "Calories pie chart.",
+  },
+  {
+    name: "Calories",
+    description: `Daily calorie goal tracking app. Although, I suppose you could use
+            it for any numerical goal.`,
+    link: "/calories",
+    image: "/apps/calories_chart.png",
+    imageDescription: "Calories pie chart.",
+  },
+  {
+    name: "Calories",
+    description: `Daily calorie goal tracking app. Although, I suppose you could use
+            it for any numerical goal.`,
+    link: "/calories",
+    image: "/apps/calories_chart.png",
+    imageDescription: "Calories pie chart.",
+  },
+  {
+    name: "Calories",
+    description: `Daily calorie goal tracking app. Although, I suppose you could use
+            it for any numerical goal.`,
+    link: "/calories",
+    image: "/apps/calories_chart.png",
+    imageDescription: "Calories pie chart.",
+  },
+  {
+    name: "Calories",
+    description: `Daily calorie goal tracking app. Although, I suppose you could use
+            it for any numerical goal.`,
+    link: "/calories",
+    image: "/apps/calories_chart.png",
+    imageDescription: "Calories pie chart.",
+  },
+  {
+    name: "Calories",
+    description: `Daily calorie goal tracking app. Although, I suppose you could use
+            it for any numerical goal.`,
+    link: "/calories",
+    image: "/apps/calories_chart.png",
+    imageDescription: "Calories pie chart.",
+  },
+  {
+    name: "Calories",
+    description: `Daily calorie goal tracking app. Although, I suppose you could use
+            it for any numerical goal.`,
+    link: "/calories",
+    image: "/apps/calories_chart.png",
+    imageDescription: "Calories pie chart.",
+  },
+  {
+    name: "Calories",
+    description: `Daily calorie goal tracking app. Although, I suppose you could use
+            it for any numerical goal.`,
+    link: "/calories",
+    image: "/apps/calories_chart.png",
+    imageDescription: "Calories pie chart.",
+  },
+  {
+    name: "Calories",
+    description: `Daily calorie goal tracking app. Although, I suppose you could use
+            it for any numerical goal.`,
+    link: "/calories",
+    image: "/apps/calories_chart.png",
+    imageDescription: "Calories pie chart.",
+  },
+  {
+    name: "Calories",
+    description: `Daily calorie goal tracking app. Although, I suppose you could use
+            it for any numerical goal.`,
+    link: "/calories",
+    image: "/apps/calories_chart.png",
+    imageDescription: "Calories pie chart.",
+  },
+  {
+    name: "Calories",
+    description: `Daily calorie goal tracking app. Although, I suppose you could use
+            it for any numerical goal.`,
+    link: "/calories",
+    image: "/apps/calories_chart.png",
+    imageDescription: "Calories pie chart.",
+  },
+  {
+    name: "Calories",
+    description: `Daily calorie goal tracking app. Although, I suppose you could use
+            it for any numerical goal.`,
+    link: "/calories",
+    image: "/apps/calories_chart.png",
+    imageDescription: "Calories pie chart.",
+  },
+  {
+    name: "Calories",
+    description: `Daily calorie goal tracking app. Although, I suppose you could use
+            it for any numerical goal.`,
+    link: "/calories",
+    image: "/apps/calories_chart.png",
+    imageDescription: "Calories pie chart.",
+  },
+  {
+    name: "Calories",
+    description: `Daily calorie goal tracking app. Although, I suppose you could use
+            it for any numerical goal.`,
+    link: "/calories",
+    image: "/apps/calories_chart.png",
+    imageDescription: "Calories pie chart.",
+  },
+  {
+    name: "Calories",
+    description: `Daily calorie goal tracking app. Although, I suppose you could use
+            it for any numerical goal.`,
+    link: "/calories",
+    image: "/apps/calories_chart.png",
+    imageDescription: "Calories pie chart.",
+  },
+  {
+    name: "Calories",
+    description: `Daily calorie goal tracking app. Although, I suppose you could use
+            it for any numerical goal.`,
+    link: "/calories",
+    image: "/apps/calories_chart.png",
+    imageDescription: "Calories pie chart.",
+  },
+  {
+    name: "Calories",
+    description: `Daily calorie goal tracking app. Although, I suppose you could use
+            it for any numerical goal.`,
+    link: "/calories",
+    image: "/apps/calories_chart.png",
+    imageDescription: "Calories pie chart.",
+  },
+  {
+    name: "Calories",
+    description: `Daily calorie goal tracking app. Although, I suppose you could use
+            it for any numerical goal.`,
+    link: "/calories",
+    image: "/apps/calories_chart.png",
+    imageDescription: "Calories pie chart.",
+  },
+  {
+    name: "Calories",
+    description: `Daily calorie goal tracking app. Although, I suppose you could use
+            it for any numerical goal.`,
+    link: "/calories",
+    image: "/apps/calories_chart.png",
+    imageDescription: "Calories pie chart.",
+  },
+  {
+    name: "Calories",
+    description: `Daily calorie goal tracking app. Although, I suppose you could use
+            it for any numerical goal.`,
+    link: "/calories",
+    image: "/apps/calories_chart.png",
+    imageDescription: "Calories pie chart.",
+  },
 ];
 
 const tabTriggers = (
@@ -51,13 +339,13 @@ const tabContents = (
             key={`navigation-bar-grid-item-${index}`}
             justifyItems="center"
           >
-            <LinkBox>
-              <Card.Root
-                variant="elevated"
-                width="95%"
-                height="95%"
-                key={`navigation-bar-${index}`}
-              >
+            <Card.Root
+              variant="elevated"
+              width="95%"
+              height="95%"
+              key={`navigation-bar-${index}`}
+            >
+              <LinkBox>
                 <Card.Body gap="2">
                   <Card.Title mt="2">{app.name}</Card.Title>
                   <Box justifyItems="center">
@@ -76,16 +364,16 @@ const tabContents = (
                     {app.description}
                   </Card.Description>
                 </Card.Body>
-                <Card.Footer justifyContent="flex-end">
+                <Card.Footer justifyContent="flex-end" marginBottom={2}>
                   <Link href={app.link} variant="button">
                     View
                   </Link>
                 </Card.Footer>
-              </Card.Root>
+              </LinkBox>
               <LinkOverlay asChild>
                 <NextLink href={app.link} />
               </LinkOverlay>
-            </LinkBox>
+            </Card.Root>
           </GridItem>
         );
       })}

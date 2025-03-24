@@ -1,4 +1,4 @@
-import { Provider } from "@/components/shared/provider";
+import { Provider } from "@/components/shared/static/provider";
 
 export default function DashboardLayout({
   children,

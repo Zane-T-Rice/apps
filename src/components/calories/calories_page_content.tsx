@@ -1,10 +1,11 @@
 import { LuChartLine, LuTable } from "react-icons/lu";
 import { Field, HStack, Input, Spinner, Stack, Tabs } from "@chakra-ui/react";
-import DataTable from "../shared/data_table";
-import AddItemButtonGroup from "../ui/add_item_button_group";
+import DataTable from "../shared/dynamic/data_table";
+import AddItemButtonGroup from "./add_item_button_group";
 import { Cell, Pie, PieChart } from "recharts";
 import { useLocalStorage } from "@/app/utils/use_local_storage";
-import { QuickAddRemoveButton } from "../ui/quick_add_remove_button";
+import { QuickAddRemoveButton } from "./quick_add_remove_button";
+import { NavigationBar } from "../shared/dynamic/navigation_bar";
 
 export type Item = {
   name: string;
@@ -18,7 +19,7 @@ export default function CaloriesPageContent() {
   const [items, setItems, itemsLoading] = useLocalStorage<Item[]>("items", []);
   const [target, setTarget, targetLoading] = useLocalStorage<number>(
     "target",
-    0
+    1500
   );
 
   const isLoading = itemsLoading || targetLoading;
@@ -60,50 +61,49 @@ export default function CaloriesPageContent() {
     setItems(items.filter((e, i) => i !== index));
   };
 
-  const content = (
-    <>
-      <Tabs.List marginEnd="auto">
-        <Tabs.Trigger value="charts">
-          <LuChartLine />
-          Calories
-        </Tabs.Trigger>
-        <Tabs.Trigger value="raw_data">
-          <LuTable />
-          Raw Data
-        </Tabs.Trigger>
-      </Tabs.List>
-      <HStack mdDown={{ marginLeft: 1 }}>
-        <HStack>
-          <Field.Root>
-            <HStack>
-              <Field.Label>Calorie Target</Field.Label>
-              <Input
-                placeholder="1600"
-                onChange={(event) => {
-                  const newValue = event.target.value.replace(/\D/g, "");
-                  setTarget(newValue !== "" ? parseInt(newValue) : 0);
-                }}
-                value={target}
-                minWidth={`${Math.max(4, target.toString().length * 14)}px`}
-              />
-            </HStack>
-          </Field.Root>
-          <AddItemButtonGroup
-            clearItems={() => {
-              setItems([]);
-            }}
-            addItem={addItem}
-            items={items}
-          />
-        </HStack>
+  const actions = (
+    <HStack mdDown={{ marginLeft: 1 }}>
+      <HStack>
+        <Field.Root>
+          <HStack>
+            <Field.Label>Calorie Target</Field.Label>
+            <Input
+              placeholder="1600"
+              onChange={(event) => {
+                const newValue = event.target.value.replace(/\D/g, "");
+                setTarget(newValue !== "" ? parseInt(newValue) : 0);
+              }}
+              value={target}
+              minWidth={`${Math.max(4, target.toString().length * 14)}px`}
+            />
+          </HStack>
+        </Field.Root>
+        <AddItemButtonGroup
+          clearItems={() => {
+            setItems([]);
+          }}
+          addItem={addItem}
+          items={items}
+        />
       </HStack>
+    </HStack>
+  );
+
+  const tabTriggers = (
+    <>
+      <Tabs.Trigger value="charts">
+        <LuChartLine />
+        Calories
+      </Tabs.Trigger>
+      <Tabs.Trigger value="raw_data">
+        <LuTable />
+        Raw Data
+      </Tabs.Trigger>
     </>
   );
 
-  return (
-    <Tabs.Root defaultValue="charts" variant="line" lazyMount unmountOnExit>
-      <Stack hideFrom="md">{content}</Stack>
-      <HStack hideBelow="md">{content}</HStack>
+  const tabContents = (
+    <>
       <Tabs.Content value="charts">
         <Stack>
           {!isLoading ? (
@@ -158,6 +158,15 @@ export default function CaloriesPageContent() {
       <Tabs.Content value="raw_data">
         <DataTable records={items} style={{ marginLeft: 10 }} />
       </Tabs.Content>
-    </Tabs.Root>
+    </>
+  );
+
+  return (
+    <NavigationBar
+      defaultTab="charts"
+      tabTriggers={tabTriggers}
+      tabContents={tabContents}
+      actions={actions}
+    />
   );
 }

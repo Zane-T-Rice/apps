@@ -1,5 +1,5 @@
 import { useLocalStorage } from "@/app/utils/use_local_storage";
-import { Item } from "../calories/calories_page_content";
+import { Item } from "./calories_page_content";
 import { Center, HStack, Text } from "@chakra-ui/react";
 import { CSSProperties, useEffect } from "react";
 import { Button } from "../recipes/button";

@@ -7,7 +7,7 @@ import {
   Portal,
 } from "@chakra-ui/react";
 import { GrClear } from "react-icons/gr";
-import { Item } from "../calories/calories_page_content";
+import { Item } from "./calories_page_content";
 import { FaPlus } from "react-icons/fa";
 import { useState } from "react";
 import { UseDialogContext } from "@ark-ui/react";
@@ -38,7 +38,7 @@ export default function AddItemButtonGroup(props: {
     <HStack>
       <Drawer.Root>
         <Drawer.Trigger asChild>
-          <Button variant="safe" colorPalette="green" rounded="xl">
+          <Button variant="safe" rounded="xl">
             <FaPlus /> Add Item
           </Button>
         </Drawer.Trigger>

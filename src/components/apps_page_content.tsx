@@ -1,10 +1,20 @@
 "use client";
 
 import { NavigationBar } from "@/components/shared/dynamic/navigation_bar";
-import { Box, Card, Grid, GridItem, Image, Tabs } from "@chakra-ui/react";
+import {
+  Box,
+  Card,
+  Grid,
+  GridItem,
+  Image,
+  LinkBox,
+  LinkOverlay,
+  Tabs,
+} from "@chakra-ui/react";
 import { HiHome } from "react-icons/hi";
 import { Link } from "@/components/shared/dynamic/link";
 import NextImage from "next/image";
+import NextLink from "next/link";
 
 const apps = [
   {
@@ -41,36 +51,41 @@ const tabContents = (
             key={`navigation-bar-grid-item-${index}`}
             justifyItems="center"
           >
-            <Card.Root
-              variant="elevated"
-              width="95%"
-              height="95%"
-              key={`navigation-bar-${index}`}
-            >
-              <Card.Body gap="2">
-                <Card.Title mt="2">{app.name}</Card.Title>
-                <Box justifyItems="center">
-                  <Image asChild alt={app.imageDescription}>
-                    <NextImage
-                      src={app.image}
-                      alt={app.imageDescription}
-                      priority
-                      width={250}
-                      height={250}
-                      style={{ width: 250, height: 250 }}
-                    />
-                  </Image>
-                </Box>
-                <Card.Description fontSize={18}>
-                  {app.description}
-                </Card.Description>
-              </Card.Body>
-              <Card.Footer justifyContent="flex-end" marginBottom={2}>
-                <Link href={app.link} variant="button">
-                  View
-                </Link>
-              </Card.Footer>
-            </Card.Root>
+            <LinkBox>
+              <Card.Root
+                variant="elevated"
+                width="95%"
+                height="95%"
+                key={`navigation-bar-${index}`}
+              >
+                <Card.Body gap="2">
+                  <Card.Title mt="2">{app.name}</Card.Title>
+                  <Box justifyItems="center">
+                    <Image asChild alt={app.imageDescription}>
+                      <NextImage
+                        src={app.image}
+                        alt={app.imageDescription}
+                        priority
+                        width={250}
+                        height={250}
+                        style={{ width: 250, height: 250 }}
+                      />
+                    </Image>
+                  </Box>
+                  <Card.Description fontSize={18}>
+                    {app.description}
+                  </Card.Description>
+                </Card.Body>
+                <Card.Footer justifyContent="flex-end">
+                  <Link href={app.link} variant="button">
+                    View
+                  </Link>
+                </Card.Footer>
+              </Card.Root>
+              <LinkOverlay asChild>
+                <NextLink href={app.link} />
+              </LinkOverlay>
+            </LinkBox>
           </GridItem>
         );
       })}

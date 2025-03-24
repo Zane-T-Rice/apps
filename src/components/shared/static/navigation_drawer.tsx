@@ -37,8 +37,8 @@ export function NavigationDrawer() {
                 </Link>
               </Stack>
             </Drawer.Body>
-            <Drawer.CloseTrigger asChild>
-              <CloseButton size="sm" />
+            <Drawer.CloseTrigger asChild justifyItems="center">
+              <CloseButton size="sm" marginTop={2} />
             </Drawer.CloseTrigger>
           </Drawer.Content>
         </Drawer.Positioner>

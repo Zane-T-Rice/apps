@@ -1,6 +1,8 @@
-import { Provider } from "@/components/shared/static/provider";
+"use server";
 
-export default function DashboardLayout({
+import { Provider } from "@/components/ui/provider";
+
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;

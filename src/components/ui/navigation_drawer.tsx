@@ -6,7 +6,7 @@ import {
   Stack,
 } from "@chakra-ui/react";
 import { GiHamburgerMenu } from "react-icons/gi";
-import { Link } from "../dynamic/link";
+import { Link } from "./link";
 
 export function NavigationDrawer() {
   return (

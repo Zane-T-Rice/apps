@@ -1,11 +1,13 @@
+"use client";
+
 import { LuChartLine, LuTable } from "react-icons/lu";
 import { Field, HStack, Input, Spinner, Stack, Tabs } from "@chakra-ui/react";
-import DataTable from "../shared/dynamic/data_table";
+import DataTable from "../ui/data_table";
 import AddItemButtonGroup from "./add_item_button_group";
 import { Cell, Pie, PieChart } from "recharts";
 import { useLocalStorage } from "@/app/utils/use_local_storage";
 import { QuickAddRemoveButton } from "./quick_add_remove_button";
-import { NavigationBar } from "../shared/dynamic/navigation_bar";
+import { NavigationBar } from "../ui/navigation_bar";
 
 export type Item = {
   name: string;

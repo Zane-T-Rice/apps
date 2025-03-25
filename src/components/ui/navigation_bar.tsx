@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { Stack, Tabs } from "@chakra-ui/react";
-import { NavigationDrawer } from "../static/navigation_drawer";
+import { NavigationDrawer } from "./navigation_drawer";
 
 export function NavigationBar(props: {
   defaultTab: string;

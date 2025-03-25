@@ -35,6 +35,9 @@ export function NavigationDrawer() {
                 <Link href="/calories" variant="button">
                   Calories
                 </Link>
+                <Link href="/servers" variant="button">
+                  Server Manager
+                </Link>
               </Stack>
             </Drawer.Body>
             <Drawer.CloseTrigger asChild justifyItems="center">

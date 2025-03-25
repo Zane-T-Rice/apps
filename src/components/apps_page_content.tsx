@@ -25,7 +25,15 @@ const apps = [
     link: "/calories",
     image: "/apps/calories_chart.png",
     imageDescription: "Calories pie chart.",
-    requiredPermissions: [],
+    requiredPermissions: ["logged-in"],
+  },
+  {
+    name: "Server Manager",
+    description: "UI for the Server Manager Service.",
+    link: "/servers",
+    image: "/apps/servers.png",
+    imageDescription: "Servers.",
+    requiredPermissions: ["logged-in", "server-manager-service"],
   },
 ];
 

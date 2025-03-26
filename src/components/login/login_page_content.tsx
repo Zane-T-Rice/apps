@@ -5,6 +5,7 @@ import { useState } from "react";
 import { PasswordInput } from "../ui/password-input";
 import { Button } from "../recipes/button";
 import { login } from "@/app/utils/login/login";
+import { redirect } from "next/navigation";
 
 export default function LoginPageContent() {
   const [username, setUsername] = useState<string>("");
@@ -13,16 +14,19 @@ export default function LoginPageContent() {
 
   const submit = async () => {
     if (username && password) {
-      await login(username, password);
+      if (await login(username, password)) redirect("/");
+      setSubmittedOnce(true);
     }
-
-    setSubmittedOnce(true);
   };
 
   return (
     <Box justifyItems="center" marginTop={10}>
       <Stack direction="column" width={300}>
-        {submittedOnce ? <Text>Username or Password is incorrect.</Text> : null}
+        {submittedOnce ? (
+          <Text style={{ color: "red" }}>
+            Username or Password is incorrect.
+          </Text>
+        ) : null}
         <Field.Root invalid={!username && submittedOnce} required>
           <Field.Label>
             Username <Field.RequiredIndicator />

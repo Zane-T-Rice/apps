@@ -1,9 +1,11 @@
 "use server";
 
 import { cookies as nextCookies } from "next/headers";
-import { redirect } from "next/navigation";
 
-export async function login(username: string, password: string) {
+export async function login(
+  username: string,
+  password: string
+): Promise<boolean> {
   // This really should be some kind of oauth or something, but for
   // now it is good enough to just try to fetch servers and see if
   // it works.
@@ -17,7 +19,7 @@ export async function login(username: string, password: string) {
   });
 
   if (response.status !== 200) {
-    return;
+    return false;
   }
 
   const cookies = await nextCookies();
@@ -36,5 +38,5 @@ export async function login(username: string, password: string) {
     sameSite: "strict",
   });
 
-  redirect("/");
+  return true;
 }

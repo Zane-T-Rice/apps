@@ -36,6 +36,7 @@ const deleteServerSchema = object({
   id: string().required(),
 }).stripUnknown();
 const rebootServerSchema = deleteServerSchema;
+const updateServerSchema = deleteServerSchema;
 
 export function ServerTabContent(props: {
   selectedServer: Server | null;
@@ -274,10 +275,10 @@ export function ServerTabContent(props: {
 
   const onServerUpdate = async (serverToUpdate: Server): Promise<boolean> => {
     // Validate input
-    let validate: InferType<typeof rebootServerSchema> | null = null;
+    let validate: InferType<typeof updateServerSchema> | null = null;
 
     try {
-      validate = rebootServerSchema.validateSync(serverToUpdate, {
+      validate = updateServerSchema.validateSync(serverToUpdate, {
         abortEarly: false,
       });
     } catch {

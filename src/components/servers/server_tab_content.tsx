@@ -92,6 +92,9 @@ export function ServerTabContent(props: {
         title: `Creating server ${newServer.applicationName}/${newServer.containerName}`,
         description: "Failed",
         type: "error",
+        meta: {
+          closable: true,
+        },
       });
       return false;
     }
@@ -100,6 +103,9 @@ export function ServerTabContent(props: {
       title: `Creating server ${newServer.applicationName}/${newServer.containerName}`,
       description: "Finished",
       type: "success",
+      meta: {
+        closable: true,
+      },
     });
 
     // Update servers with new record
@@ -131,6 +137,9 @@ export function ServerTabContent(props: {
       toaster.create({
         description: "Edit of server failed.",
         type: "error",
+        meta: {
+          closable: true,
+        },
       });
       return false;
     }
@@ -157,6 +166,9 @@ export function ServerTabContent(props: {
       toaster.create({
         description: "Deletion of server failed.",
         type: "error",
+        meta: {
+          closable: true,
+        },
       });
     }
 
@@ -181,14 +193,23 @@ export function ServerTabContent(props: {
         success: {
           title: `Deleting ${serverToDelete.applicationName}/${serverToDelete.containerName}`,
           description: "Finished",
+          meta: {
+            closable: true,
+          },
         },
         error: {
           title: `Deleting ${serverToDelete.applicationName}/${serverToDelete.containerName}`,
           description: "Failed",
+          meta: {
+            closable: true,
+          },
         },
         loading: {
           title: `Deleting ${serverToDelete.applicationName}/${serverToDelete.containerName}`,
           description: "...",
+          meta: {
+            closable: true,
+          },
         },
       }
     );
@@ -208,6 +229,9 @@ export function ServerTabContent(props: {
       toaster.create({
         description: "Reboot of server failed.",
         type: "error",
+        meta: {
+          closable: true,
+        },
       });
     }
 
@@ -224,14 +248,23 @@ export function ServerTabContent(props: {
         success: {
           title: `Rebooting ${serverToReboot.applicationName}/${serverToReboot.containerName}`,
           description: "Finished",
+          meta: {
+            closable: true,
+          },
         },
         error: {
           title: `Rebooting ${serverToReboot.applicationName}/${serverToReboot.containerName}`,
           description: "Failed",
+          meta: {
+            closable: true,
+          },
         },
         loading: {
           title: `Rebooting ${serverToReboot.applicationName}/${serverToReboot.containerName}`,
           description: "...",
+          meta: {
+            closable: true,
+          },
         },
       }
     );
@@ -251,6 +284,9 @@ export function ServerTabContent(props: {
       toaster.create({
         description: "Update of server failed.",
         type: "error",
+        meta: {
+          closable: true,
+        },
       });
     }
 
@@ -267,14 +303,23 @@ export function ServerTabContent(props: {
         success: {
           title: `Updating ${serverToUpdate.applicationName}/${serverToUpdate.containerName}`,
           description: "Finished",
+          meta: {
+            closable: true,
+          },
         },
         error: {
           title: `Updating ${serverToUpdate.applicationName}/${serverToUpdate.containerName}`,
           description: "Failed",
+          meta: {
+            closable: true,
+          },
         },
         loading: {
           title: `Updating ${serverToUpdate.applicationName}/${serverToUpdate.containerName}`,
           description: "...",
+          meta: {
+            closable: true,
+          },
         },
       }
     );

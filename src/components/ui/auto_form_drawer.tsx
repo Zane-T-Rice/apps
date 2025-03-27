@@ -10,13 +10,19 @@ import {
   Stack,
 } from "@chakra-ui/react";
 import { Button } from "../recipes/button";
-import { ChangeEvent, ChangeEventHandler, useEffect, useState } from "react";
+import {
+  ChangeEvent,
+  ChangeEventHandler,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 
-export type FormFields = {
+export type FormFields<T> = {
   id: number;
   invalid: boolean;
   required: boolean;
-  name: string;
+  name: keyof T;
   placeholder: string;
   setField: ChangeEventHandler<HTMLInputElement>;
   value: string;
@@ -27,11 +33,56 @@ export function AutoFormDrawer<T extends object>(props: {
   title: string;
   isOpen: boolean;
   setIsOpen: (value: boolean) => void;
+  onSubmit: (value: T) => Promise<boolean>;
+  errors: { [Property in keyof T]?: string };
+  omit?: string[];
 }) {
-  const { isOpen, setIsOpen, title, record } = props;
+  const { isOpen, setIsOpen, title, record, onSubmit, errors, omit } = props;
 
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [submittedOnce, setSubmittedOnce] = useState<boolean>(false);
-  const [fields, setFields] = useState<FormFields[]>([]);
+  const [fields, setFields] = useState<FormFields<T>[]>([]);
+
+  const resetFields = useCallback(() => {
+    if (!record) return;
+
+    const newFields = (Object.keys(record) as (keyof T)[])
+      // Filter out any non-primitives. Maybe later make an AutoForm that
+      // does something sane for arrays and associative arrays?
+      // Also, I should move the field generation logic in to
+      // a component that can be used outside of a drawer.
+      .filter((fieldName) => {
+        return !(record[fieldName] instanceof Object);
+      })
+      // Filter out any fields which are in the omit array.
+      .filter((fieldName) => !omit?.find((name) => name === fieldName))
+      .map((fieldName, index) => ({
+        id: index,
+        invalid: false,
+        required: true,
+        name: fieldName,
+        placeholder: "",
+        setField: (event: ChangeEvent<HTMLInputElement>) => {
+          setFields((prev) => {
+            const newField = prev[index];
+            newField.value = event.target.value;
+            return [
+              ...prev.slice(0, index),
+              newField,
+              ...prev.slice(index + 1),
+            ];
+          });
+        },
+        value: `${record[fieldName]}`,
+      }));
+
+    setFields(newFields);
+  }, [record, omit]);
+
+  // When a new record comes in, set the default state of the input fields.
+  useEffect(() => {
+    resetFields();
+  }, [resetFields]);
 
   // When a submit happens, check for invalid fields.
   useEffect(() => {
@@ -40,74 +91,35 @@ export function AutoFormDrawer<T extends object>(props: {
     setFields((prev) => {
       const newFields = prev.map((field) => ({
         ...field,
-        invalid:
-          (field.value === undefined || field.value === null) && submittedOnce,
+        invalid: errors[field.name] && submittedOnce,
       }));
       return newFields;
     });
-  }, [setFields, submittedOnce]);
-
-  // When a new record comes in, set the default state of the input fields.
-  useEffect(() => {
-    if (!record) return;
-
-    const newFields = (Object.keys(record) as (keyof T)[]).map(
-      (fieldName, index) => ({
-        id: index,
-        invalid: false,
-        required: true,
-        name: fieldName.toString(),
-        placeholder: "",
-        setField: (event: ChangeEvent<HTMLInputElement>) => {
-          setFields((prev) => {
-            const newField = prev[index];
-            newField.value = event.target.value;
-            return [
-              ...prev.slice(0, index),
-              newField,
-              ...prev.slice(index + 1),
-            ];
-          });
-        },
-        value: `${record[fieldName]}`,
-      })
-    );
-
-    setFields(newFields);
-  }, [record, setFields]);
+  }, [setFields, submittedOnce, errors]);
 
   const cancel = () => {
-    if (!record) return;
-
-    const newFields = (Object.keys(record) as (keyof T)[]).map(
-      (fieldName, index) => ({
-        id: index,
-        invalid: false,
-        required: true,
-        name: fieldName.toString(),
-        placeholder: "",
-        setField: (event: ChangeEvent<HTMLInputElement>) => {
-          setFields((prev) => {
-            const newField = prev[index];
-            newField.value = event.target.value;
-            return [
-              ...prev.slice(0, index),
-              newField,
-              ...prev.slice(index + 1),
-            ];
-          });
-        },
-        value: `${record[fieldName]}`,
-      })
-    );
-
-    setFields(newFields);
+    resetFields();
     setIsOpen(false);
   };
 
-  const submit = () => {
-    setSubmittedOnce(true);
-    console.log("Submit: ", fields);
+  const submit = async () => {
+    if (isSubmitting) return;
+
+    setIsSubmitting(true);
+    (async () => {
+      if (
+        await onSubmit(
+          fields.reduce((a, b) => ({ ...a, [b.name]: b.value }), {}) as T
+        )
+      ) {
+        resetFields();
+        setIsOpen(false);
+        setSubmittedOnce(false);
+      } else {
+        setSubmittedOnce(true);
+      }
+      setIsSubmitting(false);
+    })();
   };
 
   return (
@@ -129,7 +141,7 @@ export function AutoFormDrawer<T extends object>(props: {
                 {fields.map((field) => (
                   <Field.Root invalid={field.invalid} required key={field.id}>
                     <Field.Label>
-                      {field.name} <Field.RequiredIndicator />
+                      {field.name.toString()} <Field.RequiredIndicator />
                     </Field.Label>
                     <Input
                       placeholder={field.placeholder}
@@ -141,7 +153,7 @@ export function AutoFormDrawer<T extends object>(props: {
                         }
                       }}
                     />
-                    <Field.ErrorText>This field is required</Field.ErrorText>
+                    <Field.ErrorText>{errors[field.name]}</Field.ErrorText>
                   </Field.Root>
                 ))}
               </Stack>
@@ -160,11 +172,14 @@ export function AutoFormDrawer<T extends object>(props: {
                 onClick={() => submit()}
                 disabled={
                   fields.findIndex(
-                    (field) => field.value === undefined || field.value == null
-                  ) !== -1
+                    (field) =>
+                      field.value === undefined ||
+                      field.value === null ||
+                      field.value === ""
+                  ) !== -1 || isSubmitting
                 }
               >
-                Save
+                {isSubmitting ? "Saving..." : "Save"}
               </Button>
             </Drawer.Footer>
             <Drawer.CloseTrigger asChild>

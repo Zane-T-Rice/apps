@@ -40,3 +40,13 @@ export async function login(
 
   return true;
 }
+
+export async function getLoginCookies() {
+  const cookies = await nextCookies();
+  return [
+    ...[cookies.get("username"), cookies.get("password")].map((cookie) =>
+      cookie ? decodeURIComponent(cookie.value) : ""
+    ),
+    process.env.SERVER_MANAGER_SERVICE_URL || "",
+  ];
+}

@@ -9,7 +9,7 @@ import {
   rebootServer,
   updateServer,
   Server,
-} from "@/app/utils/server-manager-service/server-manager-service-client";
+} from "@/app/utils/server-manager-service/server-manager-service";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { string, boolean, object, ValidationError, InferType } from "yup";
 import { yupErrorsToMap } from "@/app/utils/yup_errors_to_map";

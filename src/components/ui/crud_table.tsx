@@ -48,11 +48,15 @@ export default function CRUDTable<T extends object>(
     : null;
   const [createOmit] = useState<string[]>([idKey.toString()]);
   const { hasPermissions } = usePermissions();
-  const [hasCreatePermission, setHasCreatePermission] =
-    useState<boolean>(false);
-  const [hasEditPermission, setHasEditPermission] = useState<boolean>(false);
-  const [hasDeletePermission, setHasDeletePermission] =
-    useState<boolean>(false);
+  const [hasCreatePermission, setHasCreatePermission] = useState<
+    boolean | null
+  >(false);
+  const [hasEditPermission, setHasEditPermission] = useState<boolean | null>(
+    false
+  );
+  const [hasDeletePermission, setHasDeletePermission] = useState<
+    boolean | null
+  >(false);
 
   useEffect(() => {
     const getPermissions = async () => {

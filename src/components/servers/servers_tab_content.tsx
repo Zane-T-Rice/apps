@@ -64,10 +64,12 @@ export function ServersTabContent(props: {
   } = useServers();
 
   const { hasPermissions } = usePermissions();
-  const [hasRebootPermission, setHasRebootPermission] =
-    useState<boolean>(false);
-  const [hasUpdatePermission, setHasUpdatePermission] =
-    useState<boolean>(false);
+  const [hasRebootPermission, setHasRebootPermission] = useState<
+    boolean | null
+  >(false);
+  const [hasUpdatePermission, setHasUpdatePermission] = useState<
+    boolean | null
+  >(false);
 
   useEffect(() => {
     getServers().then((responseServers) => {

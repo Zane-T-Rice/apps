@@ -22,7 +22,7 @@ export default function CheckPermissionsForContent(props: {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoading, isAuthenticated]);
 
-  if (!hasPermission && hasPermission !== null && redirect)
+  if (!isLoading && !hasPermission && hasPermission !== null && redirect)
     nextRedirect(redirect);
   return hasPermission ? <>{children}</> : null;
 }

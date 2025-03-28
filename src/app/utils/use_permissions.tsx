@@ -6,7 +6,9 @@ export function usePermissions() {
 
   const hasPermissions = async (
     requiredPermissions: string[]
-  ): Promise<boolean> => {
+  ): Promise<boolean | null> => {
+    if (isLoading) return null;
+
     const accessToken =
       !isLoading && isAuthenticated ? await getAccessTokenSilently() : "";
     const permissions = accessToken

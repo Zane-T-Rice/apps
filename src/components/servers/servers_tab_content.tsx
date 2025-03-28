@@ -2,20 +2,14 @@ import { Box, Skeleton, Stack, Text } from "@chakra-ui/react";
 import CRUDTable from "../ui/crud_table";
 import { Button } from "../recipes/button";
 import {
-  createServer,
-  deleteServer,
-  editServer,
-  getServers,
-  rebootServer,
-  updateServer,
   Server,
+  useServers,
 } from "@/app/utils/server-manager-service/server-manager-service-servers";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { string, boolean, object } from "yup";
 import { AlertDialog } from "../ui/alert_dialog";
 import { AutoDataList } from "../ui/auto_data_list";
 import { fetchWithValidateAndToast } from "@/app/utils/fetch/fetch_with_validate_and_toast";
-import { useAuth0 } from "@auth0/auth0-react";
 
 const createServerSchema = object({
   applicationName: string().required(),
@@ -60,16 +54,22 @@ export function ServersTabContent(props: {
     isUpdatable: true,
   });
 
-  const { getAccessTokenSilently } = useAuth0();
+  const {
+    createServer,
+    deleteServer,
+    editServer,
+    getServers,
+    rebootServer,
+    updateServer,
+  } = useServers();
 
   useEffect(() => {
-    const fetchServers = async () =>
-      getServers(await getAccessTokenSilently()).then((responseServers) => {
-        if (responseServers) setServers(responseServers);
-        setIsLoading(false);
-      });
-    fetchServers();
-  }, [getAccessTokenSilently]);
+    getServers().then((responseServers) => {
+      if (responseServers) setServers(responseServers);
+      setIsLoading(false);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const onServerSelect = (server: Server) => {
     setSelectedServer(server);
@@ -85,8 +85,7 @@ export function ServersTabContent(props: {
           abortEarly: false,
         });
       },
-      fetchCallback: async (validate) =>
-        await createServer(await getAccessTokenSilently(), validate),
+      fetchCallback: async (validate) => await createServer(validate),
     });
     if (!server) return false;
 
@@ -108,8 +107,7 @@ export function ServersTabContent(props: {
           abortEarly: false,
         });
       },
-      fetchCallback: async (validate) =>
-        await editServer(await getAccessTokenSilently(), validate),
+      fetchCallback: async (validate) => await editServer(validate),
     });
     if (!server) return false;
 
@@ -133,8 +131,7 @@ export function ServersTabContent(props: {
           abortEarly: false,
         });
       },
-      fetchCallback: async (validate) =>
-        await deleteServer(await getAccessTokenSilently(), validate),
+      fetchCallback: async (validate) => await deleteServer(validate),
     });
     if (!server) return false;
 
@@ -156,8 +153,7 @@ export function ServersTabContent(props: {
           abortEarly: false,
         });
       },
-      fetchCallback: async (validate) =>
-        await rebootServer(await getAccessTokenSilently(), validate),
+      fetchCallback: async (validate) => await rebootServer(validate),
     });
     if (!server) return false;
 
@@ -174,8 +170,7 @@ export function ServersTabContent(props: {
           abortEarly: false,
         });
       },
-      fetchCallback: async (validate) =>
-        await updateServer(await getAccessTokenSilently(), validate),
+      fetchCallback: async (validate) => await updateServer(validate),
     });
     if (!server) return false;
 

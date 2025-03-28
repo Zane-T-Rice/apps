@@ -179,6 +179,8 @@ export function EnvironmentVariablesTabContent(props: {
       onEdit={onEnvironmentVariableEdit}
       onEditErrors={editErrors}
       onDelete={onEnvironmentVariableDelete}
+      marginLeft={3}
+      marginRight={3}
     />
   );
 }

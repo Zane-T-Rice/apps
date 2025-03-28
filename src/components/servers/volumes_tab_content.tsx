@@ -149,6 +149,8 @@ export function VolumesTabContent(props: { selectedServer: Server }) {
       onEdit={onVolumeEdit}
       onEditErrors={editErrors}
       onDelete={onVolumeDelete}
+      marginLeft={3}
+      marginRight={3}
     />
   );
 }

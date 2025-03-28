@@ -1,4 +1,4 @@
-import { Box, Stack, Text } from "@chakra-ui/react";
+import { Box, Stack, StackProps, Text } from "@chakra-ui/react";
 import { Button } from "../recipes/button";
 import DataTable from "./data_table";
 import { AutoFormDrawer } from "./auto_form_drawer";
@@ -6,22 +6,22 @@ import { useState } from "react";
 import { AlertDialog } from "./alert_dialog";
 import { AutoDataList } from "./auto_data_list";
 
-export default function CRUDTable<T extends object>(props: {
-  records: T[];
-  idKey: keyof T;
-  selectedRecordId?: string; // Should this just be selectedRecord: T (and update DataTable also)
-  onRowSelect: (record: T) => void;
-  onCreate: (record: T) => Promise<boolean>;
-  onCreateErrors: { [Property in keyof T]?: string };
-  creationRecord: T;
-  onEdit: (record: T) => Promise<boolean>;
-  onEditErrors: { [Property in keyof T]?: string };
-  onDelete: (record: T) => Promise<boolean>;
-  style: React.CSSProperties;
-}) {
+export default function CRUDTable<T extends object>(
+  props: {
+    records: T[];
+    idKey: keyof T;
+    selectedRecordId?: string; // Should this just be selectedRecord: T (and update DataTable also)
+    onRowSelect: (record: T) => void;
+    onCreate: (record: T) => Promise<boolean>;
+    onCreateErrors: { [Property in keyof T]?: string };
+    creationRecord: T;
+    onEdit: (record: T) => Promise<boolean>;
+    onEditErrors: { [Property in keyof T]?: string };
+    onDelete: (record: T) => Promise<boolean>;
+  } & StackProps
+) {
   const {
     records,
-    style,
     onRowSelect,
     idKey,
     selectedRecordId,
@@ -31,6 +31,7 @@ export default function CRUDTable<T extends object>(props: {
     onCreateErrors,
     onEditErrors,
     onDelete,
+    ...stackProps
   } = props;
 
   const [isEditOpen, setIsEditOpen] = useState<boolean>(false);
@@ -56,8 +57,8 @@ export default function CRUDTable<T extends object>(props: {
 
   return (
     <>
-      <Stack direction="column">
-        <Stack direction="row" gap={1} marginLeft={2} marginRight={4}>
+      <Stack direction="column" {...stackProps}>
+        <Stack direction="row" gap={1}>
           <Button variant="safe" width="1/3" onClick={() => onCreateButton()}>
             Create
           </Button>
@@ -69,28 +70,34 @@ export default function CRUDTable<T extends object>(props: {
           >
             Edit
           </Button>
-          <AlertDialog
-            trigger={
-              <Button variant="unsafe" disabled={!selectedRecord} width="1/3">
-                Delete
-              </Button>
-            }
-            body={
-              selectedRecord ? (
-                <Stack direction="column">
-                  <Text>Are you sure that you want to delete:</Text>
-                  <AutoDataList record={selectedRecord} />
-                </Stack>
-              ) : null
-            }
-            onConfirm={onDeleteConfirm}
-            confirmText="Delete"
-          />
+          <Box width="1/3">
+            <AlertDialog
+              trigger={
+                <Button
+                  variant="unsafe"
+                  disabled={!selectedRecord}
+                  width="100%"
+                >
+                  Delete
+                </Button>
+              }
+              body={
+                selectedRecord ? (
+                  <Stack direction="column">
+                    <Text>Are you sure that you want to delete:</Text>
+                    <AutoDataList record={selectedRecord} />
+                  </Stack>
+                ) : null
+              }
+              onConfirm={onDeleteConfirm}
+              confirmText="Delete"
+            />
+          </Box>
         </Stack>
-        <Box width="100%" overflowX="auto">
+        <Box overflowX="auto">
           <DataTable
             records={records}
-            style={style}
+            style={{}}
             onRowSelect={onRowSelect}
             idKey={idKey}
             selectedRecordId={selectedRecordId}

@@ -149,6 +149,8 @@ export function FilesTabContent(props: { selectedServer: Server }) {
       onEdit={onFileEdit}
       onEditErrors={editErrors}
       onDelete={onFileDelete}
+      marginLeft={3}
+      marginRight={3}
     />
   );
 }

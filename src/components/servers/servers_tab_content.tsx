@@ -1,4 +1,4 @@
-import { Skeleton, Stack, Text } from "@chakra-ui/react";
+import { Box, Skeleton, Stack, Text } from "@chakra-ui/react";
 import CRUDTable from "../ui/crud_table";
 import { Button } from "../recipes/button";
 import {
@@ -182,7 +182,6 @@ export function ServersTabContent(props: {
     <Stack direction="column">
       <CRUDTable
         records={servers}
-        style={{}}
         onRowSelect={onServerSelect}
         idKey="id"
         selectedRecordId={selectedServer?.id}
@@ -192,42 +191,48 @@ export function ServersTabContent(props: {
         onEdit={onServerEdit}
         onEditErrors={editErrors}
         onDelete={onServerDelete}
+        marginLeft={3}
+        marginRight={3}
       />
-      <Stack direction="row" gap={1} marginLeft={2} marginRight={3}>
-        <AlertDialog
-          trigger={
-            <Button variant="safe" disabled={!selectedServer} width="1/2">
-              Reboot
-            </Button>
-          }
-          body={
-            selectedServer ? (
-              <Stack direction="column">
-                <Text>Are you sure that you want to reboot:</Text>
-                <AutoDataList record={selectedServer} />
-              </Stack>
-            ) : null
-          }
-          onConfirm={() => selectedServer && onServerReboot(selectedServer)}
-          confirmText="Reboot"
-        />
-        <AlertDialog
-          trigger={
-            <Button variant="safe" disabled={!selectedServer} width="1/2">
-              Update
-            </Button>
-          }
-          body={
-            selectedServer ? (
-              <Stack direction="column">
-                <Text>Are you sure that you want to update:</Text>
-                <AutoDataList record={selectedServer} />
-              </Stack>
-            ) : null
-          }
-          onConfirm={() => selectedServer && onServerUpdate(selectedServer)}
-          confirmText="Update"
-        />
+      <Stack direction="row" gap={1} marginLeft={3} marginRight={3}>
+        <Box width="1/2">
+          <AlertDialog
+            trigger={
+              <Button variant="safe" disabled={!selectedServer} width="100%">
+                Reboot
+              </Button>
+            }
+            body={
+              selectedServer ? (
+                <Stack direction="column">
+                  <Text>Are you sure that you want to reboot:</Text>
+                  <AutoDataList record={selectedServer} />
+                </Stack>
+              ) : null
+            }
+            onConfirm={() => selectedServer && onServerReboot(selectedServer)}
+            confirmText="Reboot"
+          />
+        </Box>
+        <Box width="1/2">
+          <AlertDialog
+            trigger={
+              <Button variant="safe" disabled={!selectedServer} width="100%">
+                Update
+              </Button>
+            }
+            body={
+              selectedServer ? (
+                <Stack direction="column">
+                  <Text>Are you sure that you want to update:</Text>
+                  <AutoDataList record={selectedServer} />
+                </Stack>
+              ) : null
+            }
+            onConfirm={() => selectedServer && onServerUpdate(selectedServer)}
+            confirmText="Update"
+          />
+        </Box>
       </Stack>
     </Stack>
   );

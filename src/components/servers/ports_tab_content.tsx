@@ -149,6 +149,8 @@ export function PortsTabContent(props: { selectedServer: Server }) {
       onEdit={onPortEdit}
       onEditErrors={editErrors}
       onDelete={onPortDelete}
+      marginLeft={3}
+      marginRight={3}
     />
   );
 }

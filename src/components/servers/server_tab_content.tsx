@@ -11,11 +11,10 @@ import {
   Server,
 } from "@/app/utils/server-manager-service/server-manager-service";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { string, boolean, object, ValidationError, InferType } from "yup";
-import { yupErrorsToMap } from "@/app/utils/yup_errors_to_map";
-import { toaster } from "@/components/ui/toaster";
+import { string, boolean, object } from "yup";
 import { AlertDialog } from "../ui/alert_dialog";
 import { AutoDataList } from "../ui/auto_data_list";
+import { fetchWithValidateAndToast } from "@/app/utils/fetch/fetch_with_validate_and_toast";
 
 const createServerSchema = object({
   applicationName: string().required(),
@@ -72,42 +71,18 @@ export function ServerTabContent(props: {
   };
 
   const onServerCreate = async (newServer: Server): Promise<boolean> => {
-    // Validate input
-    let validate: InferType<typeof createServerSchema> | null = null;
-
-    try {
-      validate = createServerSchema.validateSync(newServer, {
-        abortEarly: false,
-      });
-      setCreateErrors({});
-    } catch (err) {
-      setCreateErrors(yupErrorsToMap(err as ValidationError));
-    }
-
-    if (!validate) return false;
-
-    // Make backend call
-    const server = await createServer(validate);
-    if (!server) {
-      toaster.create({
-        title: `Creating server ${newServer.applicationName}/${newServer.containerName}`,
-        description: "Failed",
-        type: "error",
-        meta: {
-          closable: true,
-        },
-      });
-      return false;
-    }
-
-    toaster.create({
-      title: `Creating server ${newServer.applicationName}/${newServer.containerName}`,
-      description: "Finished",
-      type: "success",
-      meta: {
-        closable: true,
+    const title = `Creating server ${newServer.applicationName}/${newServer.containerName}`;
+    const server = await fetchWithValidateAndToast({
+      title,
+      setErrors: setCreateErrors,
+      validateCallback: () => {
+        return createServerSchema.validateSync(newServer, {
+          abortEarly: false,
+        });
       },
+      fetchCallback: async (validate) => await createServer(validate),
     });
+    if (!server) return false;
 
     // Update servers with new record
     setServers((prev) => {
@@ -118,32 +93,18 @@ export function ServerTabContent(props: {
   };
 
   const onServerEdit = async (newServer: Server): Promise<boolean> => {
-    // Validate input
-    let validate: InferType<typeof editServerSchema> | null = null;
-
-    try {
-      validate = editServerSchema.validateSync(newServer, {
-        abortEarly: false,
-      });
-      setEditErrors({});
-    } catch (err) {
-      setEditErrors(yupErrorsToMap(err as ValidationError));
-    }
-
-    if (!validate) return false;
-
-    // Make backend call
-    const server = await editServer(validate);
-    if (!server) {
-      toaster.create({
-        description: "Edit of server failed.",
-        type: "error",
-        meta: {
-          closable: true,
-        },
-      });
-      return false;
-    }
+    const title = `Editing server ${newServer.applicationName}/${newServer.containerName}`;
+    const server = await fetchWithValidateAndToast({
+      title,
+      setErrors: setEditErrors,
+      validateCallback: () => {
+        return editServerSchema.validateSync(newServer, {
+          abortEarly: false,
+        });
+      },
+      fetchCallback: async (validate) => await editServer(validate),
+    });
+    if (!server) return false;
 
     // Update servers with edited record if success
     setServers((prev) => {
@@ -156,174 +117,56 @@ export function ServerTabContent(props: {
   };
 
   const onServerDelete = async (serverToDelete: Server): Promise<boolean> => {
-    // Validate input
-    let validate: InferType<typeof deleteServerSchema> | null = null;
+    const title = `Deleting ${serverToDelete.applicationName}/${serverToDelete.containerName}`;
+    const server = await fetchWithValidateAndToast({
+      title,
+      setErrors: setEditErrors,
+      validateCallback: () => {
+        return deleteServerSchema.validateSync(serverToDelete, {
+          abortEarly: false,
+        });
+      },
+      fetchCallback: async (validate) => await deleteServer(validate),
+    });
+    if (!server) return false;
 
-    try {
-      validate = deleteServerSchema.validateSync(serverToDelete, {
-        abortEarly: false,
-      });
-    } catch {
-      toaster.create({
-        description: "Deletion of server failed.",
-        type: "error",
-        meta: {
-          closable: true,
-        },
-      });
-    }
-
-    if (!validate) return false;
-
-    // Make backend call
-    toaster.promise(
-      new Promise<void>(async (resolve, reject) => {
-        const server = await deleteServer(validate);
-        if (!server) reject();
-        else {
-          // Update servers to remove record if success
-          setServers((prev) => {
-            return prev.filter(
-              (currentServer) => currentServer.id !== server.id
-            );
-          });
-          resolve();
-        }
-      }),
-      {
-        success: {
-          title: `Deleting ${serverToDelete.applicationName}/${serverToDelete.containerName}`,
-          description: "Finished",
-          meta: {
-            closable: true,
-          },
-        },
-        error: {
-          title: `Deleting ${serverToDelete.applicationName}/${serverToDelete.containerName}`,
-          description: "Failed",
-          meta: {
-            closable: true,
-          },
-        },
-        loading: {
-          title: `Deleting ${serverToDelete.applicationName}/${serverToDelete.containerName}`,
-          description: "...",
-          meta: {
-            closable: true,
-          },
-        },
-      }
-    );
+    setServers((prev) => {
+      return prev.filter((currentServer) => currentServer.id !== server.id);
+    });
 
     return true;
   };
 
   const onServerReboot = async (serverToReboot: Server): Promise<boolean> => {
-    // Validate input
-    let validate: InferType<typeof rebootServerSchema> | null = null;
-
-    try {
-      validate = rebootServerSchema.validateSync(serverToReboot, {
-        abortEarly: false,
-      });
-    } catch {
-      toaster.create({
-        description: "Reboot of server failed.",
-        type: "error",
-        meta: {
-          closable: true,
-        },
-      });
-    }
-
-    if (!validate) return false;
-
-    // Make backend call
-    toaster.promise(
-      new Promise<void>(async (resolve, reject) => {
-        const server = await rebootServer(validate);
-        if (!server) reject();
-        resolve();
-      }),
-      {
-        success: {
-          title: `Rebooting ${serverToReboot.applicationName}/${serverToReboot.containerName}`,
-          description: "Finished",
-          meta: {
-            closable: true,
-          },
-        },
-        error: {
-          title: `Rebooting ${serverToReboot.applicationName}/${serverToReboot.containerName}`,
-          description: "Failed",
-          meta: {
-            closable: true,
-          },
-        },
-        loading: {
-          title: `Rebooting ${serverToReboot.applicationName}/${serverToReboot.containerName}`,
-          description: "...",
-          meta: {
-            closable: true,
-          },
-        },
-      }
-    );
+    const title = `Rebooting ${serverToReboot.applicationName}/${serverToReboot.containerName}`;
+    const server = await fetchWithValidateAndToast({
+      title,
+      setErrors: () => {},
+      validateCallback: () => {
+        return rebootServerSchema.validateSync(serverToReboot, {
+          abortEarly: false,
+        });
+      },
+      fetchCallback: async (validate) => await rebootServer(validate),
+    });
+    if (!server) return false;
 
     return true;
   };
 
   const onServerUpdate = async (serverToUpdate: Server): Promise<boolean> => {
-    // Validate input
-    let validate: InferType<typeof updateServerSchema> | null = null;
-
-    try {
-      validate = updateServerSchema.validateSync(serverToUpdate, {
-        abortEarly: false,
-      });
-    } catch {
-      toaster.create({
-        description: "Update of server failed.",
-        type: "error",
-        meta: {
-          closable: true,
-        },
-      });
-    }
-
-    if (!validate) return false;
-
-    // Make backend call
-    toaster.promise(
-      new Promise<void>(async (resolve, reject) => {
-        const server = await updateServer(validate);
-        if (!server) reject();
-        resolve();
-      }),
-      {
-        success: {
-          title: `Updating ${serverToUpdate.applicationName}/${serverToUpdate.containerName}`,
-          description: "Finished",
-          meta: {
-            closable: true,
-          },
-        },
-        error: {
-          title: `Updating ${serverToUpdate.applicationName}/${serverToUpdate.containerName}`,
-          description: "Failed",
-          meta: {
-            closable: true,
-          },
-        },
-        loading: {
-          title: `Updating ${serverToUpdate.applicationName}/${serverToUpdate.containerName}`,
-          description: "...",
-          meta: {
-            closable: true,
-          },
-        },
-      }
-    );
+    const title = `Updating ${serverToUpdate.applicationName}/${serverToUpdate.containerName}`;
+    const server = await fetchWithValidateAndToast({
+      title,
+      setErrors: () => {},
+      validateCallback: () => {
+        return updateServerSchema.validateSync(serverToUpdate, {
+          abortEarly: false,
+        });
+      },
+      fetchCallback: async (validate) => await updateServer(validate),
+    });
+    if (!server) return false;
 
     return true;
   };

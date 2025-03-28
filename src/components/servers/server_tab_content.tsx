@@ -1,4 +1,4 @@
-import { Spinner, Stack, Text } from "@chakra-ui/react";
+import { Skeleton, Stack, Text } from "@chakra-ui/react";
 import CRUDTable from "../ui/crud_table";
 import { Button } from "../recipes/button";
 import {
@@ -172,15 +172,13 @@ export function ServerTabContent(props: {
   };
 
   return isLoading ? (
-    <Spinner
-      color="blue"
-      size="xl"
-      borderWidth="thick"
-      marginLeft="45%"
-      marginTop="15%"
-    />
+    <Stack direction="column" marginLeft={2} marginRight={2}>
+      <Skeleton height={50} variant="shine" />
+      <Skeleton height={250} variant="shine" />
+      <Skeleton height={50} variant="shine" />
+    </Stack>
   ) : (
-    <>
+    <Stack direction="column">
       <CRUDTable
         records={servers}
         style={{}}
@@ -230,6 +228,6 @@ export function ServerTabContent(props: {
           confirmText="Update"
         />
       </Stack>
-    </>
+    </Stack>
   );
 }

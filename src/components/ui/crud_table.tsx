@@ -87,7 +87,7 @@ export default function CRUDTable<T extends object>(props: {
             confirmText="Delete"
           />
         </Stack>
-        <Box width="100%" overflowX="scroll">
+        <Box width="100%" overflowX="auto">
           <DataTable
             records={records}
             style={style}

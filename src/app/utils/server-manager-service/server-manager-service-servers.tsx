@@ -54,7 +54,7 @@ export async function createServer(
 export async function editServer(server: Server): Promise<Server | null> {
   const [username, password, url]: string[] = await getLoginCookies();
 
-  const response = await fetch(`${url}/${server.id}` || "", {
+  const response = await fetch(`${url}/${server.id}`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
@@ -76,7 +76,7 @@ export async function deleteServer(
 ): Promise<Server | null> {
   const [username, password, url]: string[] = await getLoginCookies();
 
-  const response = await fetch(`${url}/${server.id}` || "", {
+  const response = await fetch(`${url}/${server.id}`, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
@@ -97,7 +97,7 @@ export async function rebootServer(
 ): Promise<Server | null> {
   const [username, password, url]: string[] = await getLoginCookies();
 
-  const response = await fetch(`${url}/${server.id}/restart` || "", {
+  const response = await fetch(`${url}/${server.id}/restart`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -118,7 +118,7 @@ export async function updateServer(
 ): Promise<Server | null> {
   const [username, password, url] = await getLoginCookies();
 
-  const response = await fetch(`${url}/${server.id}/update` || "", {
+  const response = await fetch(`${url}/${server.id}/update`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

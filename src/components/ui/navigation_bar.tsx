@@ -32,16 +32,7 @@ export function NavigationBar(props: {
     >
       <Stack direction={{ base: "column", md: "row" }}>
         <NavigationDrawer />
-        <Tabs.List
-          // overflowX="scroll"
-          // overflowY="hidden"
-          //maxWidth="100%"
-          // width="100%"
-          // marginEnd="auto"
-          flex="auto"
-        >
-          {tabTriggers}
-        </Tabs.List>
+        <Tabs.List flex="auto">{tabTriggers}</Tabs.List>
         {actions}
       </Stack>
       {tabContents}

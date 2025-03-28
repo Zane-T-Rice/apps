@@ -1,12 +1,16 @@
 "use client";
 
-import { Box, Tabs, Text } from "@chakra-ui/react";
+import { Box, Tabs } from "@chakra-ui/react";
 import { NavigationBar } from "../ui/navigation_bar";
 import { FaServer } from "react-icons/fa";
 import { useState } from "react";
-import { Server } from "@/app/utils/server-manager-service/server-manager-service";
+import { Server } from "@/app/utils/server-manager-service/server-manager-service-servers";
 import { CiEdit } from "react-icons/ci";
-import { ServerTabContent } from "./server_tab_content";
+import { ServersTabContent } from "./servers_tab_content";
+import { PortsTabContent } from "./ports_tab_content";
+import { VolumesTabContent } from "./volumes_tab_content";
+import { EnvironmentVariablesTabContent } from "./environment_variables_tab_content";
+import { FilesTabContent } from "./files_tab_content";
 
 export default function ServersPageContent() {
   const [activeTab, setActiveTab] = useState<string>("servers");
@@ -52,22 +56,30 @@ export default function ServersPageContent() {
   const tabContents = (
     <>
       <Tabs.Content value="servers">
-        <ServerTabContent
+        <ServersTabContent
           selectedServer={selectedServer}
           setSelectedServer={setSelectedServer}
         />
       </Tabs.Content>
       <Tabs.Content value="ports">
-        {selectedServer ? <Text>{selectedServer.id}</Text> : null}
+        {selectedServer ? (
+          <PortsTabContent selectedServer={selectedServer} />
+        ) : null}
       </Tabs.Content>
       <Tabs.Content value="volumes">
-        {selectedServer ? <Text>{selectedServer.id}</Text> : null}
+        {selectedServer ? (
+          <VolumesTabContent selectedServer={selectedServer} />
+        ) : null}
       </Tabs.Content>
       <Tabs.Content value="environment_variables">
-        {selectedServer ? <Text>{selectedServer.id}</Text> : null}
+        {selectedServer ? (
+          <EnvironmentVariablesTabContent selectedServer={selectedServer} />
+        ) : null}
       </Tabs.Content>
       <Tabs.Content value="files">
-        {selectedServer ? <Text>{selectedServer.id}</Text> : null}
+        {selectedServer ? (
+          <FilesTabContent selectedServer={selectedServer} />
+        ) : null}
       </Tabs.Content>
     </>
   );

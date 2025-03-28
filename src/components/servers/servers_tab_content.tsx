@@ -9,7 +9,7 @@ import {
   rebootServer,
   updateServer,
   Server,
-} from "@/app/utils/server-manager-service/server-manager-service";
+} from "@/app/utils/server-manager-service/server-manager-service-servers";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { string, boolean, object } from "yup";
 import { AlertDialog } from "../ui/alert_dialog";
@@ -37,7 +37,7 @@ const deleteServerSchema = object({
 const rebootServerSchema = deleteServerSchema;
 const updateServerSchema = deleteServerSchema;
 
-export function ServerTabContent(props: {
+export function ServersTabContent(props: {
   selectedServer: Server | null;
   setSelectedServer: Dispatch<SetStateAction<Server | null>>;
 }) {
@@ -117,7 +117,7 @@ export function ServerTabContent(props: {
   };
 
   const onServerDelete = async (serverToDelete: Server): Promise<boolean> => {
-    const title = `Deleting ${serverToDelete.applicationName}/${serverToDelete.containerName}`;
+    const title = `Deleting server ${serverToDelete.applicationName}/${serverToDelete.containerName}`;
     const server = await fetchWithValidateAndToast({
       title,
       setErrors: setEditErrors,
@@ -133,12 +133,13 @@ export function ServerTabContent(props: {
     setServers((prev) => {
       return prev.filter((currentServer) => currentServer.id !== server.id);
     });
+    setSelectedServer(null);
 
     return true;
   };
 
   const onServerReboot = async (serverToReboot: Server): Promise<boolean> => {
-    const title = `Rebooting ${serverToReboot.applicationName}/${serverToReboot.containerName}`;
+    const title = `Rebooting server ${serverToReboot.applicationName}/${serverToReboot.containerName}`;
     const server = await fetchWithValidateAndToast({
       title,
       setErrors: () => {},
@@ -155,7 +156,7 @@ export function ServerTabContent(props: {
   };
 
   const onServerUpdate = async (serverToUpdate: Server): Promise<boolean> => {
-    const title = `Updating ${serverToUpdate.applicationName}/${serverToUpdate.containerName}`;
+    const title = `Updating server ${serverToUpdate.applicationName}/${serverToUpdate.containerName}`;
     const server = await fetchWithValidateAndToast({
       title,
       setErrors: () => {},

@@ -1,7 +1,7 @@
 "use server";
 
 import { ReactNode } from "react";
-import { getServers } from "./server-manager-service/server-manager-service-server";
+import { getServers } from "./server-manager-service/server-manager-service-servers-server-action";
 import { redirect as nextRedirect } from "next/navigation";
 import { cookies as nextCookies } from "next/headers";
 

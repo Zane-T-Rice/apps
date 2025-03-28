@@ -217,7 +217,11 @@ export function ServersTabContent(props: {
         <Box width="1/2">
           <AlertDialog
             trigger={
-              <Button variant="safe" disabled={!selectedServer} width="100%">
+              <Button
+                variant="safe"
+                disabled={!selectedServer || !selectedServer.isUpdatable}
+                width="100%"
+              >
                 Update
               </Button>
             }

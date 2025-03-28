@@ -50,9 +50,10 @@ export default function DataTable<T extends object>(props: {
               <Table.Cell
                 key={`data-row-${index}-cell-${cellIndex}`}
                 justifyItems="center"
-                textWrap="nowrap"
               >
-                <Text>{data.toString()}</Text>
+                <Text maxWidth={300} truncate>
+                  {data.toString()}
+                </Text>
               </Table.Cell>
             ))}
           </Table.Row>

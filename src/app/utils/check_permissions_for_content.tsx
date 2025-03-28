@@ -1,42 +1,28 @@
-"use server";
+"use client";
 
-import { ReactNode } from "react";
-import { getServers } from "./server-manager-service/server-manager-service-servers-server-action";
+import { ReactNode, useEffect, useState } from "react";
 import { redirect as nextRedirect } from "next/navigation";
-import { cookies as nextCookies } from "next/headers";
+import { useAuth0 } from "@auth0/auth0-react";
+import { usePermissions } from "./use_permissions";
 
-async function checkPermissions(requiredPermissions: string[]) {
-  const permissions: string[] = [];
-
-  if (requiredPermissions.includes("logged-in")) {
-    const cookies = await nextCookies();
-    const [username, password] = [
-      cookies.get("username"),
-      cookies.get("password"),
-    ];
-    if (username && password) permissions.push("logged-in");
-  }
-
-  if (requiredPermissions.includes("server-manager-service")) {
-    const servers = await getServers();
-    if (servers !== null) {
-      permissions.push("server-manager-service");
-    }
-  }
-
-  return requiredPermissions.every((permission) =>
-    permissions.includes(permission)
-  );
-}
-
-export default async function CheckPermissionsForContent(props: {
+export default function CheckPermissionsForContent(props: {
   children: ReactNode;
   requiredPermissions: string[];
   redirect?: string;
 }) {
   const { children, requiredPermissions, redirect } = props;
-  const hasPermissions = await checkPermissions(requiredPermissions);
+  const { isLoading, isAuthenticated } = useAuth0();
+  const { hasPermissions } = usePermissions();
+  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
 
-  if (!hasPermissions && redirect) nextRedirect(redirect);
-  return hasPermissions ? <>{children}</> : null;
+  useEffect(() => {
+    const getHasPermission = async () =>
+      setHasPermission(await hasPermissions(requiredPermissions));
+    getHasPermission();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoading, isAuthenticated]);
+
+  if (!hasPermission && hasPermission !== null && redirect)
+    nextRedirect(redirect);
+  return hasPermission ? <>{children}</> : null;
 }

@@ -10,6 +10,7 @@ import { string, boolean, object } from "yup";
 import { AlertDialog } from "../ui/alert_dialog";
 import { AutoDataList } from "../ui/auto_data_list";
 import { fetchWithValidateAndToast } from "@/app/utils/fetch/fetch_with_validate_and_toast";
+import { usePermissions } from "@/app/utils/use_permissions";
 
 const createServerSchema = object({
   applicationName: string().required(),
@@ -63,11 +64,23 @@ export function ServersTabContent(props: {
     updateServer,
   } = useServers();
 
+  const { hasPermissions } = usePermissions();
+  const [hasRebootPermission, setHasRebootPermission] =
+    useState<boolean>(false);
+  const [hasUpdatePermission, setHasUpdatePermission] =
+    useState<boolean>(false);
+
   useEffect(() => {
     getServers().then((responseServers) => {
       if (responseServers) setServers(responseServers);
       setIsLoading(false);
     });
+
+    const getPermissions = async () => {
+      setHasRebootPermission(await hasPermissions(["reboot:servers"]));
+      setHasUpdatePermission(await hasPermissions(["update:servers"]));
+    };
+    getPermissions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -198,12 +211,19 @@ export function ServersTabContent(props: {
         onDelete={onServerDelete}
         marginLeft={3}
         marginRight={3}
+        createPermission="write:servers"
+        editPermission="write:servers"
+        deletePermission="write:servers"
       />
       <Stack direction="row" gap={1} marginLeft={3} marginRight={3}>
         <Box width="1/2">
           <AlertDialog
             trigger={
-              <Button variant="safe" disabled={!selectedServer} width="100%">
+              <Button
+                variant="safe"
+                disabled={!selectedServer || !hasRebootPermission}
+                width="100%"
+              >
                 Reboot
               </Button>
             }
@@ -224,7 +244,11 @@ export function ServersTabContent(props: {
             trigger={
               <Button
                 variant="safe"
-                disabled={!selectedServer || !selectedServer.isUpdatable}
+                disabled={
+                  !selectedServer ||
+                  !selectedServer.isUpdatable ||
+                  !hasUpdatePermission
+                }
                 width="100%"
               >
                 Update

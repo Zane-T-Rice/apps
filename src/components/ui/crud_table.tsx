@@ -2,9 +2,10 @@ import { Box, Stack, StackProps, Text } from "@chakra-ui/react";
 import { Button } from "../recipes/button";
 import DataTable from "./data_table";
 import { AutoFormDrawer } from "./auto_form_drawer";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AlertDialog } from "./alert_dialog";
 import { AutoDataList } from "./auto_data_list";
+import { usePermissions } from "@/app/utils/use_permissions";
 
 export default function CRUDTable<T extends object>(
   props: {
@@ -14,10 +15,13 @@ export default function CRUDTable<T extends object>(
     onRowSelect: (record: T) => void;
     onCreate: (record: T) => Promise<boolean>;
     onCreateErrors: { [Property in keyof T]?: string };
+    createPermission: string;
     creationRecord: T;
     onEdit: (record: T) => Promise<boolean>;
     onEditErrors: { [Property in keyof T]?: string };
+    editPermission: string;
     onDelete: (record: T) => Promise<boolean>;
+    deletePermission: string;
   } & StackProps
 ) {
   const {
@@ -31,6 +35,9 @@ export default function CRUDTable<T extends object>(
     onCreateErrors,
     onEditErrors,
     onDelete,
+    createPermission,
+    editPermission,
+    deletePermission,
     ...stackProps
   } = props;
 
@@ -40,6 +47,22 @@ export default function CRUDTable<T extends object>(
     ? records.find((record) => record[idKey] === selectedRecordId) ?? null
     : null;
   const [createOmit] = useState<string[]>([idKey.toString()]);
+  const { hasPermissions } = usePermissions();
+  const [hasCreatePermission, setHasCreatePermission] =
+    useState<boolean>(false);
+  const [hasEditPermission, setHasEditPermission] = useState<boolean>(false);
+  const [hasDeletePermission, setHasDeletePermission] =
+    useState<boolean>(false);
+
+  useEffect(() => {
+    const getPermissions = async () => {
+      setHasCreatePermission(await hasPermissions([createPermission]));
+      setHasEditPermission(await hasPermissions([editPermission]));
+      setHasDeletePermission(await hasPermissions([deletePermission]));
+    };
+    getPermissions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const onCreateButton = () => {
     setIsCreateOpen(true);
@@ -59,12 +82,17 @@ export default function CRUDTable<T extends object>(
     <>
       <Stack direction="column" {...stackProps}>
         <Stack direction="row" gap={1}>
-          <Button variant="safe" width="1/3" onClick={() => onCreateButton()}>
+          <Button
+            variant="safe"
+            width="1/3"
+            onClick={() => onCreateButton()}
+            disabled={!hasCreatePermission}
+          >
             Create
           </Button>
           <Button
             variant="safe"
-            disabled={!selectedRecord}
+            disabled={!selectedRecord || !hasEditPermission}
             width="1/3"
             onClick={() => onEditButton()}
           >
@@ -75,7 +103,7 @@ export default function CRUDTable<T extends object>(
               trigger={
                 <Button
                   variant="unsafe"
-                  disabled={!selectedRecord}
+                  disabled={!selectedRecord || !hasDeletePermission}
                   width="100%"
                 >
                   Delete

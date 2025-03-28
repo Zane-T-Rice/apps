@@ -27,23 +27,21 @@ export function NavigationBar(props: {
 
   return (
     <>
-      {!isLoading && isAuthenticated ? (
-        <Tabs.Root
-          defaultValue={defaultTab}
-          value={activeTab && setActiveTab ? activeTab : undefined}
-          onValueChange={
-            activeTab && setActiveTab
-              ? (e) => setActiveTab?.(e.value)
-              : undefined
-          }
-          variant="line"
-          lazyMount
-          unmountOnExit
-        >
-          <Stack direction={{ base: "column", md: "row" }}>
-            <NavigationDrawer />
-            <Tabs.List flex="auto">{tabTriggers}</Tabs.List>
-            {actions}
+      <Tabs.Root
+        defaultValue={defaultTab}
+        value={activeTab && setActiveTab ? activeTab : undefined}
+        onValueChange={
+          activeTab && setActiveTab ? (e) => setActiveTab?.(e.value) : undefined
+        }
+        variant="line"
+        lazyMount
+        unmountOnExit
+      >
+        <Stack direction={{ base: "column", md: "row" }}>
+          <NavigationDrawer />
+          <Tabs.List flex="auto">{tabTriggers}</Tabs.List>
+          {actions}
+          {!isLoading && isAuthenticated ? (
             <Button
               variant="safe"
               onClick={() =>
@@ -56,15 +54,15 @@ export function NavigationBar(props: {
             >
               Logout
             </Button>
-          </Stack>
-          {tabContents}
-        </Tabs.Root>
-      ) : null}
-      {!isLoading && !isAuthenticated ? (
-        <Button width="100%" variant="safe" onClick={() => loginWithRedirect()}>
-          Login
-        </Button>
-      ) : null}
+          ) : null}
+          {!isLoading && !isAuthenticated ? (
+            <Button variant="safe" onClick={() => loginWithRedirect()}>
+              Login
+            </Button>
+          ) : null}
+        </Stack>
+        {tabContents}
+      </Tabs.Root>
     </>
   );
 }

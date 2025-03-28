@@ -1,6 +1,6 @@
 "use client";
 
-import { getLoginCookies } from "../login/login";
+import { useAuth0 } from "@auth0/auth0-react";
 import { Server } from "./server-manager-service-servers";
 
 export type File = {
@@ -9,89 +9,105 @@ export type File = {
   content: string;
 };
 
-export async function getFiles(server: Server): Promise<File[] | null> {
-  const [username, password, url]: string[] = await getLoginCookies();
+export function useFiles() {
+  const { getAccessTokenSilently } = useAuth0();
 
-  const response = await fetch(`${url}/${server.id}/files`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      owner: username,
-      "authorization-key": password,
-    },
-  });
+  async function getFiles(server: Server): Promise<File[] | null> {
+    const accessToken = await getAccessTokenSilently();
 
-  if (response.status !== 200) {
-    return null;
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_SERVER_MANAGER_SERVICE_DOMAIN}/servers/${server.id}/files`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: accessToken,
+        },
+      }
+    );
+
+    if (response.status !== 200) {
+      return null;
+    }
+
+    return await response.json();
   }
 
-  return await response.json();
-}
+  async function createFile(
+    server: Server,
+    file: Omit<File, "id">
+  ): Promise<File | null> {
+    const accessToken = await getAccessTokenSilently();
 
-export async function createFile(
-  server: Server,
-  file: Omit<File, "id">
-): Promise<File | null> {
-  const [username, password, url]: string[] = await getLoginCookies();
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_SERVER_MANAGER_SERVICE_DOMAIN}/servers/${server.id}/files`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: accessToken,
+        },
+        body: JSON.stringify(file),
+      }
+    );
 
-  const response = await fetch(`${url}/${server.id}/files`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      owner: username,
-      "authorization-key": password,
-    },
-    body: JSON.stringify(file),
-  });
+    if (response.status !== 200) {
+      return null;
+    }
 
-  if (response.status !== 200) {
-    return null;
+    return await response.json();
   }
 
-  return await response.json();
-}
+  async function editFile(server: Server, file: File): Promise<File | null> {
+    const accessToken = await getAccessTokenSilently();
 
-export async function editFile(
-  server: Server,
-  file: File
-): Promise<File | null> {
-  const [username, password, url]: string[] = await getLoginCookies();
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_SERVER_MANAGER_SERVICE_DOMAIN}/servers/${server.id}/files/${file.id}`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: accessToken,
+        },
+        body: JSON.stringify(file),
+      }
+    );
 
-  const response = await fetch(`${url}/${server.id}/files/${file.id}`, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-      owner: username,
-      "authorization-key": password,
-    },
-    body: JSON.stringify(file),
-  });
+    if (response.status !== 200) {
+      return null;
+    }
 
-  if (response.status !== 200) {
-    return null;
+    return await response.json();
   }
 
-  return await response.json();
-}
+  async function deleteFile(
+    server: Server,
+    file: Pick<File, "id">
+  ): Promise<File | null> {
+    const accessToken = await getAccessTokenSilently();
 
-export async function deleteFile(
-  server: Server,
-  file: Pick<File, "id">
-): Promise<File | null> {
-  const [username, password, url]: string[] = await getLoginCookies();
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_SERVER_MANAGER_SERVICE_DOMAIN}/servers/${server.id}/files/${file.id}`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: accessToken,
+        },
+      }
+    );
 
-  const response = await fetch(`${url}/${server.id}/files/${file.id}`, {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-      owner: username,
-      "authorization-key": password,
-    },
-  });
+    if (response.status !== 200) {
+      return null;
+    }
 
-  if (response.status !== 200) {
-    return null;
+    return await response.json();
   }
 
-  return await response.json();
+  return {
+    getFiles,
+    createFile,
+    editFile,
+    deleteFile,
+  };
 }

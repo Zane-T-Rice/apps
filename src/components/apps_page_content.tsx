@@ -15,6 +15,7 @@ import { HiHome } from "react-icons/hi";
 import { Link } from "@/components/ui/link";
 import NextImage from "next/image";
 import NextLink from "next/link";
+import CheckPermissionsForContent from "@/app/utils/check_permissions_for_content";
 
 const apps = [
   {
@@ -24,7 +25,7 @@ const apps = [
     link: "/calories",
     image: "/apps/calories_chart.png",
     imageDescription: "Calories pie chart.",
-    requiredPermissions: ["logged-in"],
+    requiredPermissions: [],
   },
   {
     name: "Server Manager",
@@ -32,7 +33,7 @@ const apps = [
     link: "/servers",
     image: "/apps/servers.png",
     imageDescription: "Servers.",
-    requiredPermissions: ["logged-in", "server-manager-service"],
+    requiredPermissions: ["read:servers"],
   },
 ];
 
@@ -55,47 +56,52 @@ const tabContents = (
     >
       {apps.map((app, index) => {
         return (
-          <GridItem
-            colSpan={1}
-            key={`navigation-bar-grid-item-${index}`}
-            justifyItems="center"
+          <CheckPermissionsForContent
+            key={`check-permissions-${index}`}
+            requiredPermissions={app.requiredPermissions}
           >
-            <Card.Root
-              variant="elevated"
-              width="95%"
-              height="95%"
-              key={`navigation-bar-${index}`}
+            <GridItem
+              colSpan={1}
+              key={`navigation-bar-grid-item-${index}`}
+              justifyItems="center"
             >
-              <LinkBox>
-                <Card.Body gap="2">
-                  <Card.Title mt="2">{app.name}</Card.Title>
-                  <Box justifyItems="center">
-                    <Image asChild alt={app.imageDescription}>
-                      <NextImage
-                        src={app.image}
-                        alt={app.imageDescription}
-                        priority
-                        width={250}
-                        height={250}
-                        style={{ width: 250, height: 250 }}
-                      />
-                    </Image>
-                  </Box>
-                  <Card.Description fontSize={18}>
-                    {app.description}
-                  </Card.Description>
-                </Card.Body>
-                <Card.Footer justifyContent="flex-end" marginBottom={2}>
-                  <Link href={app.link} variant="button">
-                    View
-                  </Link>
-                </Card.Footer>
-              </LinkBox>
-              <LinkOverlay asChild>
-                <NextLink href={app.link} />
-              </LinkOverlay>
-            </Card.Root>
-          </GridItem>
+              <Card.Root
+                variant="elevated"
+                width="95%"
+                height="95%"
+                key={`navigation-bar-${index}`}
+              >
+                <LinkBox>
+                  <Card.Body gap="2">
+                    <Card.Title mt="2">{app.name}</Card.Title>
+                    <Box justifyItems="center">
+                      <Image asChild alt={app.imageDescription}>
+                        <NextImage
+                          src={app.image}
+                          alt={app.imageDescription}
+                          priority
+                          width={250}
+                          height={250}
+                          style={{ width: 250, height: 250 }}
+                        />
+                      </Image>
+                    </Box>
+                    <Card.Description fontSize={18}>
+                      {app.description}
+                    </Card.Description>
+                  </Card.Body>
+                  <Card.Footer justifyContent="flex-end" marginBottom={2}>
+                    <Link href={app.link} variant="button">
+                      View
+                    </Link>
+                  </Card.Footer>
+                </LinkBox>
+                <LinkOverlay asChild>
+                  <NextLink href={app.link} />
+                </LinkOverlay>
+              </Card.Root>
+            </GridItem>
+          </CheckPermissionsForContent>
         );
       })}
     </Grid>

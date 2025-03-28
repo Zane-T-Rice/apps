@@ -1,16 +1,11 @@
 import { Skeleton, Stack } from "@chakra-ui/react";
 import CRUDTable from "../ui/crud_table";
-import {
-  createEnvironmentVariable,
-  deleteEnvironmentVariable,
-  editEnvironmentVariable,
-  getEnvironmentVariables,
-  EnvironmentVariable,
-} from "@/app/utils/server-manager-service/server-manager-service-environment-variables";
+import { EnvironmentVariable } from "@/app/utils/server-manager-service/server_manager_service_environment_variables";
 import { useEffect, useState } from "react";
 import { string, object } from "yup";
 import { fetchWithValidateAndToast } from "@/app/utils/fetch/fetch_with_validate_and_toast";
-import { Server } from "@/app/utils/server-manager-service/server-manager-service-servers";
+import { Server } from "@/app/utils/server-manager-service/server_manager_service_servers";
+import { useEnvironmentVariables } from "@/app/utils/server-manager-service/server_manager_service_environment_variables";
 
 const createEnvironmentVariableSchema = object({
   name: string().required(),
@@ -52,16 +47,21 @@ export function EnvironmentVariablesTabContent(props: {
     value: "",
   });
 
+  const {
+    getAllREST: getEnvironmentVariables,
+    createREST: createEnvironmentVariable,
+    editREST: editEnvironmentVariable,
+    deleteREST: deleteEnvironmentVariable,
+  } = useEnvironmentVariables(selectedServer);
+
   useEffect(() => {
     if (!selectedServer) return;
 
-    getEnvironmentVariables(selectedServer).then(
-      (responseEnvironmentVariables) => {
-        if (responseEnvironmentVariables)
-          setEnvironmentVariables(responseEnvironmentVariables);
-        setIsLoading(false);
-      }
-    );
+    getEnvironmentVariables().then((responseEnvironmentVariables) => {
+      if (responseEnvironmentVariables)
+        setEnvironmentVariables(responseEnvironmentVariables);
+      setIsLoading(false);
+    });
   }, [selectedServer]);
 
   const onEnvironmentVariableSelect = (
@@ -86,7 +86,7 @@ export function EnvironmentVariablesTabContent(props: {
         );
       },
       fetchCallback: async (validate) =>
-        await createEnvironmentVariable(selectedServer, validate),
+        await createEnvironmentVariable(validate),
     });
     if (!environmentVariable) return false;
 
@@ -114,7 +114,7 @@ export function EnvironmentVariablesTabContent(props: {
         );
       },
       fetchCallback: async (validate) =>
-        await editEnvironmentVariable(selectedServer, validate),
+        await editEnvironmentVariable(validate),
     });
     if (!environmentVariable) return false;
 
@@ -146,7 +146,7 @@ export function EnvironmentVariablesTabContent(props: {
         );
       },
       fetchCallback: async (validate) =>
-        await deleteEnvironmentVariable(selectedServer, validate),
+        await deleteEnvironmentVariable(validate),
     });
     if (!environmentVariable) return false;
 

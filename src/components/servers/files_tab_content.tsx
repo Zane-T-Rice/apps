@@ -1,16 +1,13 @@
 import { Skeleton, Stack } from "@chakra-ui/react";
 import CRUDTable from "../ui/crud_table";
 import {
-  createFile,
-  deleteFile,
-  editFile,
-  getFiles,
   File,
-} from "@/app/utils/server-manager-service/server-manager-service-files";
+  useFiles,
+} from "@/app/utils/server-manager-service/server_manager_service_files";
 import { useEffect, useState } from "react";
 import { string, object } from "yup";
 import { fetchWithValidateAndToast } from "@/app/utils/fetch/fetch_with_validate_and_toast";
-import { Server } from "@/app/utils/server-manager-service/server-manager-service-servers";
+import { Server } from "@/app/utils/server-manager-service/server_manager_service_servers";
 
 const createFileSchema = object({
   name: string().required(),
@@ -47,10 +44,17 @@ export function FilesTabContent(props: { selectedServer: Server }) {
     content: "",
   });
 
+  const {
+    getAllREST: getFiles,
+    createREST: createFile,
+    editREST: editFile,
+    deleteREST: deleteFile,
+  } = useFiles(selectedServer);
+
   useEffect(() => {
     if (!selectedServer) return;
 
-    getFiles(selectedServer).then((responseFiles) => {
+    getFiles().then((responseFiles) => {
       if (responseFiles) setFiles(responseFiles);
       setIsLoading(false);
     });
@@ -70,8 +74,7 @@ export function FilesTabContent(props: { selectedServer: Server }) {
           abortEarly: false,
         });
       },
-      fetchCallback: async (validate) =>
-        await createFile(selectedServer, validate),
+      fetchCallback: async (validate) => await createFile(validate),
     });
     if (!file) return false;
 
@@ -93,8 +96,7 @@ export function FilesTabContent(props: { selectedServer: Server }) {
           abortEarly: false,
         });
       },
-      fetchCallback: async (validate) =>
-        await editFile(selectedServer, validate),
+      fetchCallback: async (validate) => await editFile(validate),
     });
     if (!file) return false;
 
@@ -118,8 +120,7 @@ export function FilesTabContent(props: { selectedServer: Server }) {
           abortEarly: false,
         });
       },
-      fetchCallback: async (validate) =>
-        await deleteFile(selectedServer, validate),
+      fetchCallback: async (validate) => await deleteFile(validate),
     });
     if (!file) return false;
 

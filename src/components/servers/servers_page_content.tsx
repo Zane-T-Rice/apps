@@ -4,7 +4,7 @@ import { Box, Tabs } from "@chakra-ui/react";
 import { NavigationBar } from "../ui/navigation_bar";
 import { FaServer } from "react-icons/fa";
 import { useState } from "react";
-import { Server } from "@/app/utils/server-manager-service/server-manager-service-servers";
+import { Server } from "@/app/utils/server-manager-service/server_manager_service_servers";
 import { CiEdit } from "react-icons/ci";
 import { ServersTabContent } from "./servers_tab_content";
 import { PortsTabContent } from "./ports_tab_content";

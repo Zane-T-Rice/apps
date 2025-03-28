@@ -4,7 +4,7 @@ import { Button } from "../recipes/button";
 import {
   Server,
   useServers,
-} from "@/app/utils/server-manager-service/server-manager-service-servers";
+} from "@/app/utils/server-manager-service/server_manager_service_servers";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { string, boolean, object } from "yup";
 import { AlertDialog } from "../ui/alert_dialog";
@@ -56,12 +56,11 @@ export function ServersTabContent(props: {
   });
 
   const {
-    createServer,
-    deleteServer,
-    editServer,
-    getServers,
-    rebootServer,
-    updateServer,
+    getAllREST: getServers,
+    createREST: createServer,
+    editREST: editServer,
+    deleteREST: deleteServer,
+    actionREST: actionServer,
   } = useServers();
 
   const { hasPermissions } = usePermissions();
@@ -166,7 +165,8 @@ export function ServersTabContent(props: {
           abortEarly: false,
         });
       },
-      fetchCallback: async (validate) => await rebootServer(validate),
+      fetchCallback: async (validate) =>
+        await actionServer(validate, "restart"),
     });
     if (!server) return false;
 
@@ -183,7 +183,7 @@ export function ServersTabContent(props: {
           abortEarly: false,
         });
       },
-      fetchCallback: async (validate) => await updateServer(validate),
+      fetchCallback: async (validate) => await actionServer(validate, "update"),
     });
     if (!server) return false;
 

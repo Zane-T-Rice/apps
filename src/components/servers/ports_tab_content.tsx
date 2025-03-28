@@ -1,16 +1,13 @@
 import { Skeleton, Stack } from "@chakra-ui/react";
 import CRUDTable from "../ui/crud_table";
 import {
-  createPort,
-  deletePort,
-  editPort,
-  getPorts,
   Port,
-} from "@/app/utils/server-manager-service/server-manager-service-ports";
+  usePorts,
+} from "@/app/utils/server-manager-service/server_manager_service_ports";
 import { useEffect, useState } from "react";
 import { string, object, number } from "yup";
 import { fetchWithValidateAndToast } from "@/app/utils/fetch/fetch_with_validate_and_toast";
-import { Server } from "@/app/utils/server-manager-service/server-manager-service-servers";
+import { Server } from "@/app/utils/server-manager-service/server_manager_service_servers";
 
 const createPortSchema = object({
   number: number().required(),
@@ -47,10 +44,17 @@ export function PortsTabContent(props: { selectedServer: Server }) {
     protocol: "tcp",
   });
 
+  const {
+    getAllREST: getPorts,
+    createREST: createPort,
+    editREST: editPort,
+    deleteREST: deletePort,
+  } = usePorts(selectedServer);
+
   useEffect(() => {
     if (!selectedServer) return;
 
-    getPorts(selectedServer).then((responsePorts) => {
+    getPorts().then((responsePorts) => {
       if (responsePorts) setPorts(responsePorts);
       setIsLoading(false);
     });
@@ -70,8 +74,7 @@ export function PortsTabContent(props: { selectedServer: Server }) {
           abortEarly: false,
         });
       },
-      fetchCallback: async (validate) =>
-        await createPort(selectedServer, validate),
+      fetchCallback: async (validate) => await createPort(validate),
     });
     if (!port) return false;
 
@@ -93,8 +96,7 @@ export function PortsTabContent(props: { selectedServer: Server }) {
           abortEarly: false,
         });
       },
-      fetchCallback: async (validate) =>
-        await editPort(selectedServer, validate),
+      fetchCallback: async (validate) => await editPort(validate),
     });
     if (!port) return false;
 
@@ -118,8 +120,7 @@ export function PortsTabContent(props: { selectedServer: Server }) {
           abortEarly: false,
         });
       },
-      fetchCallback: async (validate) =>
-        await deletePort(selectedServer, validate),
+      fetchCallback: async (validate) => await deletePort(validate),
     });
     if (!port) return false;
 

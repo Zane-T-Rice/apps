@@ -1,16 +1,13 @@
 import { Skeleton, Stack } from "@chakra-ui/react";
 import CRUDTable from "../ui/crud_table";
 import {
-  createVolume,
-  deleteVolume,
-  editVolume,
-  getVolumes,
+  useVolumes,
   Volume,
-} from "@/app/utils/server-manager-service/server-manager-service-volumes";
+} from "@/app/utils/server-manager-service/server_manager_service_volumes";
 import { useEffect, useState } from "react";
 import { string, object } from "yup";
 import { fetchWithValidateAndToast } from "@/app/utils/fetch/fetch_with_validate_and_toast";
-import { Server } from "@/app/utils/server-manager-service/server-manager-service-servers";
+import { Server } from "@/app/utils/server-manager-service/server_manager_service_servers";
 
 const createVolumeSchema = object({
   hostPath: string().required(),
@@ -47,10 +44,17 @@ export function VolumesTabContent(props: { selectedServer: Server }) {
     containerPath: "",
   });
 
+  const {
+    getAllREST: getVolumes,
+    createREST: createVolume,
+    editREST: editVolume,
+    deleteREST: deleteVolume,
+  } = useVolumes(selectedServer);
+
   useEffect(() => {
     if (!selectedServer) return;
 
-    getVolumes(selectedServer).then((responseVolumes) => {
+    getVolumes().then((responseVolumes) => {
       if (responseVolumes) setVolumes(responseVolumes);
       setIsLoading(false);
     });
@@ -70,8 +74,7 @@ export function VolumesTabContent(props: { selectedServer: Server }) {
           abortEarly: false,
         });
       },
-      fetchCallback: async (validate) =>
-        await createVolume(selectedServer, validate),
+      fetchCallback: async (validate) => await createVolume(validate),
     });
     if (!volume) return false;
 
@@ -93,8 +96,7 @@ export function VolumesTabContent(props: { selectedServer: Server }) {
           abortEarly: false,
         });
       },
-      fetchCallback: async (validate) =>
-        await editVolume(selectedServer, validate),
+      fetchCallback: async (validate) => await editVolume(validate),
     });
     if (!volume) return false;
 
@@ -118,8 +120,7 @@ export function VolumesTabContent(props: { selectedServer: Server }) {
           abortEarly: false,
         });
       },
-      fetchCallback: async (validate) =>
-        await deleteVolume(selectedServer, validate),
+      fetchCallback: async (validate) => await deleteVolume(validate),
     });
     if (!volume) return false;
 

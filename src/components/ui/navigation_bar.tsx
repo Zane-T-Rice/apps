@@ -3,8 +3,6 @@
 import { ReactNode } from "react";
 import { Stack, Tabs } from "@chakra-ui/react";
 import { NavigationDrawer } from "./navigation_drawer";
-import { useAuth0 } from "@auth0/auth0-react";
-import { Button } from "../recipes/button";
 
 export function NavigationBar(props: {
   defaultTab: string;
@@ -23,8 +21,6 @@ export function NavigationBar(props: {
     setActiveTab,
   } = props;
 
-  const { loginWithRedirect, logout, isAuthenticated, isLoading } = useAuth0();
-
   return (
     <>
       <Tabs.Root
@@ -41,25 +37,6 @@ export function NavigationBar(props: {
           <NavigationDrawer />
           <Tabs.List flex="auto">{tabTriggers}</Tabs.List>
           {actions}
-          {!isLoading && isAuthenticated ? (
-            <Button
-              variant="safe"
-              onClick={() =>
-                logout({
-                  logoutParams: {
-                    returnTo: `${process.env.NEXT_PUBLIC_WEBSITE_DOMAIN}/apps`,
-                  },
-                })
-              }
-            >
-              Logout
-            </Button>
-          ) : null}
-          {!isLoading && !isAuthenticated ? (
-            <Button variant="safe" onClick={() => loginWithRedirect()}>
-              Login
-            </Button>
-          ) : null}
         </Stack>
         {tabContents}
       </Tabs.Root>

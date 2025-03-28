@@ -10,8 +10,12 @@ import {
 import { GiHamburgerMenu } from "react-icons/gi";
 import { Link } from "./link";
 import CheckPermissionsForContent from "@/app/utils/check_permissions_for_content";
+import { Button } from "../recipes/button";
+import { useAuth0 } from "@auth0/auth0-react";
 
 export function NavigationDrawer() {
+  const { loginWithRedirect, logout, isAuthenticated, isLoading } = useAuth0();
+
   return (
     <Drawer.Root placement="start">
       <Drawer.Trigger asChild>
@@ -49,6 +53,25 @@ export function NavigationDrawer() {
                     Server Manager
                   </Link>
                 </CheckPermissionsForContent>
+                {!isLoading && isAuthenticated ? (
+                  <Button
+                    variant="safe"
+                    onClick={() =>
+                      logout({
+                        logoutParams: {
+                          returnTo: `${process.env.NEXT_PUBLIC_WEBSITE_DOMAIN}/apps`,
+                        },
+                      })
+                    }
+                  >
+                    Logout
+                  </Button>
+                ) : null}
+                {!isLoading && !isAuthenticated ? (
+                  <Button variant="safe" onClick={() => loginWithRedirect()}>
+                    Login
+                  </Button>
+                ) : null}
               </Stack>
             </Drawer.Body>
             <Drawer.CloseTrigger asChild justifyItems="center">

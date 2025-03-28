@@ -1,7 +1,7 @@
-"use server";
+"use client";
 
 import LoginPageContent from "@/components/login/login_page_content";
 
-export default async function LoginPage() {
+export default function LoginPage() {
   return <LoginPageContent />;
 }

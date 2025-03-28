@@ -15,6 +15,7 @@ import { string, boolean, object } from "yup";
 import { AlertDialog } from "../ui/alert_dialog";
 import { AutoDataList } from "../ui/auto_data_list";
 import { fetchWithValidateAndToast } from "@/app/utils/fetch/fetch_with_validate_and_toast";
+import { useAuth0 } from "@auth0/auth0-react";
 
 const createServerSchema = object({
   applicationName: string().required(),
@@ -59,12 +60,16 @@ export function ServersTabContent(props: {
     isUpdatable: true,
   });
 
+  const { getAccessTokenSilently } = useAuth0();
+
   useEffect(() => {
-    getServers().then((responseServers) => {
-      if (responseServers) setServers(responseServers);
-      setIsLoading(false);
-    });
-  }, []);
+    const fetchServers = async () =>
+      getServers(await getAccessTokenSilently()).then((responseServers) => {
+        if (responseServers) setServers(responseServers);
+        setIsLoading(false);
+      });
+    fetchServers();
+  }, [getAccessTokenSilently]);
 
   const onServerSelect = (server: Server) => {
     setSelectedServer(server);
@@ -80,7 +85,8 @@ export function ServersTabContent(props: {
           abortEarly: false,
         });
       },
-      fetchCallback: async (validate) => await createServer(validate),
+      fetchCallback: async (validate) =>
+        await createServer(await getAccessTokenSilently(), validate),
     });
     if (!server) return false;
 
@@ -102,7 +108,8 @@ export function ServersTabContent(props: {
           abortEarly: false,
         });
       },
-      fetchCallback: async (validate) => await editServer(validate),
+      fetchCallback: async (validate) =>
+        await editServer(await getAccessTokenSilently(), validate),
     });
     if (!server) return false;
 
@@ -126,7 +133,8 @@ export function ServersTabContent(props: {
           abortEarly: false,
         });
       },
-      fetchCallback: async (validate) => await deleteServer(validate),
+      fetchCallback: async (validate) =>
+        await deleteServer(await getAccessTokenSilently(), validate),
     });
     if (!server) return false;
 
@@ -148,7 +156,8 @@ export function ServersTabContent(props: {
           abortEarly: false,
         });
       },
-      fetchCallback: async (validate) => await rebootServer(validate),
+      fetchCallback: async (validate) =>
+        await rebootServer(await getAccessTokenSilently(), validate),
     });
     if (!server) return false;
 
@@ -165,7 +174,8 @@ export function ServersTabContent(props: {
           abortEarly: false,
         });
       },
-      fetchCallback: async (validate) => await updateServer(validate),
+      fetchCallback: async (validate) =>
+        await updateServer(await getAccessTokenSilently(), validate),
     });
     if (!server) return false;
 

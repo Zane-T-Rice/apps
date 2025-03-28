@@ -1,9 +1,10 @@
-"use server";
+"use client";
 
 import { Provider } from "@/components/ui/provider";
 import { Toaster } from "@/components/ui/toaster";
+import { Auth0Provider } from "@auth0/auth0-react";
 
-export default async function DashboardLayout({
+export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -12,10 +13,20 @@ export default async function DashboardLayout({
     <html lang="en" suppressHydrationWarning>
       <body>
         <main>
-          <Provider>
-            <Toaster />
-            {children}
-          </Provider>
+          <Auth0Provider
+            domain="dev-7n448ak2gn3oqctx.us.auth0.com"
+            clientId="9gbYkOK0QacEul9QHfidMwhRurXbnPS1"
+            authorizationParams={{
+              redirect_uri: `${process.env.NEXT_PUBLIC_WEBSITE_DOMAIN}/apps`,
+              audience: process.env.NEXT_PUBLIC_SERVER_MANAGER_SERVICE_DOMAIN,
+              scope: "read:servers write:servers reboot:servers update:servers",
+            }}
+          >
+            <Provider>
+              <Toaster />
+              {children}
+            </Provider>
+          </Auth0Provider>
         </main>
       </body>
     </html>

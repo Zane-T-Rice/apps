@@ -1,7 +1,5 @@
 "use client";
 
-import { getLoginCookies } from "../login/login";
-
 export type Server = {
   id: string;
   applicationName: string;
@@ -10,17 +8,19 @@ export type Server = {
   isUpdatable: boolean;
 };
 
-export async function getServers(): Promise<Server[] | null> {
-  const [username, password, url]: string[] = await getLoginCookies();
-
-  const response = await fetch(url, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      owner: username,
-      "authorization-key": password,
-    },
-  });
+export async function getServers(
+  accessToken: string
+): Promise<Server[] | null> {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_SERVER_MANAGER_SERVICE_DOMAIN}/servers`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    }
+  );
 
   if (response.status !== 200) {
     return null;
@@ -30,19 +30,20 @@ export async function getServers(): Promise<Server[] | null> {
 }
 
 export async function createServer(
+  accessToken: string,
   server: Omit<Server, "id">
 ): Promise<Server | null> {
-  const [username, password, url]: string[] = await getLoginCookies();
-
-  const response = await fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      owner: username,
-      "authorization-key": password,
-    },
-    body: JSON.stringify(server),
-  });
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_SERVER_MANAGER_SERVICE_DOMAIN}/servers`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify(server),
+    }
+  );
 
   if (response.status !== 200) {
     return null;
@@ -51,18 +52,21 @@ export async function createServer(
   return await response.json();
 }
 
-export async function editServer(server: Server): Promise<Server | null> {
-  const [username, password, url]: string[] = await getLoginCookies();
-
-  const response = await fetch(`${url}/${server.id}`, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-      owner: username,
-      "authorization-key": password,
-    },
-    body: JSON.stringify(server),
-  });
+export async function editServer(
+  accessToken: string,
+  server: Server
+): Promise<Server | null> {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_SERVER_MANAGER_SERVICE_DOMAIN}/servers/${server.id}`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify(server),
+    }
+  );
 
   if (response.status !== 200) {
     return null;
@@ -72,18 +76,19 @@ export async function editServer(server: Server): Promise<Server | null> {
 }
 
 export async function deleteServer(
+  accessToken: string,
   server: Pick<Server, "id">
 ): Promise<Server | null> {
-  const [username, password, url]: string[] = await getLoginCookies();
-
-  const response = await fetch(`${url}/${server.id}`, {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-      owner: username,
-      "authorization-key": password,
-    },
-  });
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_SERVER_MANAGER_SERVICE_DOMAIN}/servers/${server.id}`,
+    {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    }
+  );
 
   if (response.status !== 200) {
     return null;
@@ -93,18 +98,19 @@ export async function deleteServer(
 }
 
 export async function rebootServer(
+  accessToken: string,
   server: Pick<Server, "id">
 ): Promise<Server | null> {
-  const [username, password, url]: string[] = await getLoginCookies();
-
-  const response = await fetch(`${url}/${server.id}/restart`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      owner: username,
-      "authorization-key": password,
-    },
-  });
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_SERVER_MANAGER_SERVICE_DOMAIN}/servers/${server.id}/restart`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    }
+  );
 
   if (response.status !== 200) {
     return null;
@@ -114,18 +120,19 @@ export async function rebootServer(
 }
 
 export async function updateServer(
+  accessToken: string,
   server: Pick<Server, "id">
 ): Promise<Server | null> {
-  const [username, password, url] = await getLoginCookies();
-
-  const response = await fetch(`${url}/${server.id}/update`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      owner: username,
-      "authorization-key": password,
-    },
-  });
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_SERVER_MANAGER_SERVICE_DOMAIN}/servers/${server.id}/update`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    }
+  );
 
   if (response.status !== 200) {
     return null;

@@ -1,4 +1,4 @@
-"use server";
+"use client";
 
 import { NavigationBar } from "@/components/ui/navigation_bar";
 import {
@@ -15,7 +15,6 @@ import { HiHome } from "react-icons/hi";
 import { Link } from "@/components/ui/link";
 import NextImage from "next/image";
 import NextLink from "next/link";
-import CheckPermissionsForContent from "@/app/utils/check_permissions_for_content";
 
 const apps = [
   {
@@ -56,59 +55,54 @@ const tabContents = (
     >
       {apps.map((app, index) => {
         return (
-          <CheckPermissionsForContent
-            requiredPermissions={app.requiredPermissions}
-            key={`check-permissions-${index}`}
+          <GridItem
+            colSpan={1}
+            key={`navigation-bar-grid-item-${index}`}
+            justifyItems="center"
           >
-            <GridItem
-              colSpan={1}
-              key={`navigation-bar-grid-item-${index}`}
-              justifyItems="center"
+            <Card.Root
+              variant="elevated"
+              width="95%"
+              height="95%"
+              key={`navigation-bar-${index}`}
             >
-              <Card.Root
-                variant="elevated"
-                width="95%"
-                height="95%"
-                key={`navigation-bar-${index}`}
-              >
-                <LinkBox>
-                  <Card.Body gap="2">
-                    <Card.Title mt="2">{app.name}</Card.Title>
-                    <Box justifyItems="center">
-                      <Image asChild alt={app.imageDescription}>
-                        <NextImage
-                          src={app.image}
-                          alt={app.imageDescription}
-                          priority
-                          width={250}
-                          height={250}
-                          style={{ width: 250, height: 250 }}
-                        />
-                      </Image>
-                    </Box>
-                    <Card.Description fontSize={18}>
-                      {app.description}
-                    </Card.Description>
-                  </Card.Body>
-                  <Card.Footer justifyContent="flex-end" marginBottom={2}>
-                    <Link href={app.link} variant="button">
-                      View
-                    </Link>
-                  </Card.Footer>
-                </LinkBox>
-                <LinkOverlay asChild>
-                  <NextLink href={app.link} />
-                </LinkOverlay>
-              </Card.Root>
-            </GridItem>
-          </CheckPermissionsForContent>
+              <LinkBox>
+                <Card.Body gap="2">
+                  <Card.Title mt="2">{app.name}</Card.Title>
+                  <Box justifyItems="center">
+                    <Image asChild alt={app.imageDescription}>
+                      <NextImage
+                        src={app.image}
+                        alt={app.imageDescription}
+                        priority
+                        width={250}
+                        height={250}
+                        style={{ width: 250, height: 250 }}
+                      />
+                    </Image>
+                  </Box>
+                  <Card.Description fontSize={18}>
+                    {app.description}
+                  </Card.Description>
+                </Card.Body>
+                <Card.Footer justifyContent="flex-end" marginBottom={2}>
+                  <Link href={app.link} variant="button">
+                    View
+                  </Link>
+                </Card.Footer>
+              </LinkBox>
+              <LinkOverlay asChild>
+                <NextLink href={app.link} />
+              </LinkOverlay>
+            </Card.Root>
+          </GridItem>
         );
       })}
     </Grid>
   </Tabs.Content>
 );
 
-export default async function AppsPageContent() {
+export default function AppsPageContent() {
   return (
     <NavigationBar
       tabTriggers={tabTriggers}

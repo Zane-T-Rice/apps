@@ -87,12 +87,11 @@ export function useREST<T extends { id: string }>(baseUrl: string) {
     const accessToken = await getAccessTokenSilently();
 
     const response = await fetch(`${baseUrl}/${resource.id}/${action}`, {
-      method: "PATCH",
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
         authorization: `Bearer ${accessToken}`,
       },
-      body: JSON.stringify(resource),
     });
 
     if (response.status !== 200) {

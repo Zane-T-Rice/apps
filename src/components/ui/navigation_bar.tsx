@@ -33,7 +33,7 @@ export function NavigationBar(props: {
         lazyMount
         unmountOnExit
       >
-        <Stack direction={{ base: "column", md: "row" }}>
+        <Stack direction={{ base: "column", md: "row" }} gapY={0}>
           <NavigationDrawer />
           <Tabs.List flex="auto">{tabTriggers}</Tabs.List>
           {actions}

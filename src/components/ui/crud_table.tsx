@@ -126,7 +126,7 @@ export default function CRUDTable<T extends object>(
             />
           </Box>
         </Stack>
-        <Box overflowX="auto" overflowY="auto" height="32rem">
+        <Box overflowX="auto" overflowY="auto" maxHeight="32rem">
           <DataTable
             records={records}
             style={{}}

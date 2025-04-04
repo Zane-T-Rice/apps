@@ -7,6 +7,7 @@ import {
   defineConfig,
 } from "@chakra-ui/react";
 import { ThemeProvider, ThemeProviderProps } from "next-themes";
+import { ColorModeProvider } from "./color-mode";
 
 const customConfig = defineConfig({});
 
@@ -15,7 +16,9 @@ export const system = createSystem(defaultConfig, customConfig);
 export function Provider(props: ThemeProviderProps) {
   return (
     <ChakraProvider value={system}>
-      <ThemeProvider attribute="class" disableTransitionOnChange {...props} />
+      <ColorModeProvider>
+        <ThemeProvider attribute="class" disableTransitionOnChange {...props} />
+      </ColorModeProvider>
     </ChakraProvider>
   );
 }

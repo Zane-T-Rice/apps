@@ -10,9 +10,9 @@ import {
   LinkBox,
   LinkOverlay,
   Tabs,
+  Text,
 } from "@chakra-ui/react";
 import { HiHome } from "react-icons/hi";
-import { Link } from "@/components/ui/link";
 import NextImage from "next/image";
 import NextLink from "next/link";
 import CheckPermissionsForContent from "@/app/utils/check_permissions_for_content";
@@ -20,8 +20,7 @@ import CheckPermissionsForContent from "@/app/utils/check_permissions_for_conten
 const apps = [
   {
     name: "Calories",
-    description: `Daily calorie goal tracking app. Although, I suppose you could use
-            it for any numerical goal.`,
+    description: `Daily calorie goal tracker.`,
     link: "/calories",
     image: "/apps/calories_chart.png",
     imageDescription: "Calories pie chart.",
@@ -29,7 +28,7 @@ const apps = [
   },
   {
     name: "Server Manager",
-    description: "UI for the Server Manager Service.",
+    description: "Server Manager Service UI.",
     link: "/servers",
     image: "/apps/servers.png",
     imageDescription: "Servers.",
@@ -70,6 +69,12 @@ const tabContents = (
                 width="95%"
                 height="95%"
                 key={`navigation-bar-${index}`}
+                _hover={{
+                  bg: { base: "blackAlpha.400", _dark: "whiteAlpha.400" },
+                }}
+                _focusWithin={{
+                  bg: { base: "blackAlpha.400", _dark: "whiteAlpha.400" },
+                }}
               >
                 <LinkBox>
                   <Card.Body gap="2">
@@ -86,15 +91,12 @@ const tabContents = (
                         />
                       </Image>
                     </Box>
-                    <Card.Description fontSize={18}>
-                      {app.description}
+                    <Card.Description fontSize={18} justifyItems="center">
+                      <Text truncate width={350} textAlign="center">
+                        {app.description}
+                      </Text>
                     </Card.Description>
                   </Card.Body>
-                  <Card.Footer justifyContent="flex-end" marginBottom={2}>
-                    <Link href={app.link} variant="button">
-                      View
-                    </Link>
-                  </Card.Footer>
                 </LinkBox>
                 <LinkOverlay asChild>
                   <NextLink href={app.link} />

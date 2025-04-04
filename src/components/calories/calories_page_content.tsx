@@ -8,6 +8,7 @@ import { Cell, Pie, PieChart } from "recharts";
 import { useLocalStorage } from "@/app/utils/use_local_storage";
 import { QuickAddRemoveButton } from "./quick_add_remove_button";
 import { NavigationBar } from "../ui/navigation_bar";
+import { useColorModeValue } from "../ui/color-mode";
 
 export type Item = {
   name: string;
@@ -23,6 +24,7 @@ export default function CaloriesPageContent() {
     "target",
     1500
   );
+  const textFillColor = useColorModeValue("black", "white");
 
   const isLoading = itemsLoading || targetLoading;
 
@@ -124,18 +126,23 @@ export default function CaloriesPageContent() {
                 nameKey="name"
                 labelLine={false}
                 isAnimationActive={true}
+                stroke="none"
               >
                 {data.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={sectorColor(index)} />
                 ))}
               </Pie>
-              <text x={cx - 54} y={cy} style={{ fontSize }}>
+              <text
+                x={cx - 54}
+                y={cy}
+                style={{ fontSize, fill: textFillColor }}
+              >
                 Calories Left
               </text>
               <text
                 x={cx - ((target - value).toString().length - 1) * 4.5}
                 y={cy + 20}
-                style={{ fontSize }}
+                style={{ fontSize, fill: textFillColor }}
               >
                 {target - value}
               </text>

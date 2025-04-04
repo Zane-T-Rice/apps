@@ -12,6 +12,7 @@ import { Link } from "./link";
 import CheckPermissionsForContent from "@/app/utils/check_permissions_for_content";
 import { Button } from "../recipes/button";
 import { useAuth0 } from "@auth0/auth0-react";
+import { ColorModeButton } from "./color-mode";
 
 export function NavigationDrawer() {
   const { loginWithRedirect, logout, isAuthenticated, isLoading } = useAuth0();
@@ -21,10 +22,11 @@ export function NavigationDrawer() {
       <Drawer.Trigger asChild>
         <IconButton
           aria-label="main menu"
-          bg="white"
-          _hover={{ bg: "blackAlpha.400" }}
+          bg={{ base: "white", _dark: "black" }}
+          color={{ base: "black", _dark: "white" }}
+          _hover={{ bg: { base: "blackAlpha.400", _dark: "whiteAlpha.400" } }}
         >
-          <GiHamburgerMenu color="black" />
+          <GiHamburgerMenu />
         </IconButton>
       </Drawer.Trigger>
       <Portal>
@@ -53,27 +55,30 @@ export function NavigationDrawer() {
                     Server Manager
                   </Link>
                 </CheckPermissionsForContent>
-                {!isLoading && isAuthenticated ? (
-                  <Button
-                    variant="safe"
-                    onClick={() =>
-                      logout({
-                        logoutParams: {
-                          returnTo: `${process.env.NEXT_PUBLIC_WEBSITE_DOMAIN}/apps`,
-                        },
-                      })
-                    }
-                  >
-                    Logout
-                  </Button>
-                ) : null}
-                {!isLoading && !isAuthenticated ? (
-                  <Button variant="safe" onClick={() => loginWithRedirect()}>
-                    Login
-                  </Button>
-                ) : null}
+                <ColorModeButton />
               </Stack>
             </Drawer.Body>
+            <Drawer.Footer>
+              {!isLoading && isAuthenticated ? (
+                <Button
+                  variant="safe"
+                  onClick={() =>
+                    logout({
+                      logoutParams: {
+                        returnTo: `${process.env.NEXT_PUBLIC_WEBSITE_DOMAIN}/apps`,
+                      },
+                    })
+                  }
+                >
+                  Logout
+                </Button>
+              ) : null}
+              {!isLoading && !isAuthenticated ? (
+                <Button variant="safe" onClick={() => loginWithRedirect()}>
+                  Login
+                </Button>
+              ) : null}
+            </Drawer.Footer>
             <Drawer.CloseTrigger asChild justifyItems="center">
               <CloseButton size="sm" marginTop={2} />
             </Drawer.CloseTrigger>

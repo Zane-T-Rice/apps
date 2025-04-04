@@ -58,6 +58,7 @@ export function VolumesTabContent(props: { selectedServer: Server }) {
       if (responseVolumes) setVolumes(responseVolumes);
       setIsLoading(false);
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedServer]);
 
   const onVolumeSelect = (volume: Volume) => {

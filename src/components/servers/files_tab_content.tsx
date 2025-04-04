@@ -58,6 +58,7 @@ export function FilesTabContent(props: { selectedServer: Server }) {
       if (responseFiles) setFiles(responseFiles);
       setIsLoading(false);
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedServer]);
 
   const onFileSelect = (file: File) => {

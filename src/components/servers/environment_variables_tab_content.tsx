@@ -62,6 +62,7 @@ export function EnvironmentVariablesTabContent(props: {
         setEnvironmentVariables(responseEnvironmentVariables);
       setIsLoading(false);
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedServer]);
 
   const onEnvironmentVariableSelect = (

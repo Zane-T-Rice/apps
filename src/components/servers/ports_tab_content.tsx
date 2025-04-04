@@ -58,6 +58,7 @@ export function PortsTabContent(props: { selectedServer: Server }) {
       if (responsePorts) setPorts(responsePorts);
       setIsLoading(false);
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedServer]);
 
   const onPortSelect = (port: Port) => {

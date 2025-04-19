@@ -16,6 +16,9 @@ jobs:
     #   - test
     environment: production
     runs-on: ubuntu-latest
+    outputs:
+      auth-response: ${{ steps.get-access-token.outputs.auth-response }}
+      access-token: ${{ steps.parse-access-token.outputs.access-token }}
     steps:
       # Step 1: Get Access Token
       - id: get-access-token

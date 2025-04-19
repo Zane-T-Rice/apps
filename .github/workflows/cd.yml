@@ -16,9 +16,6 @@ jobs:
     #   - test
     environment: production
     runs-on: ubuntu-latest
-    outputs:
-      auth-response: ${{ steps.get-access-token.outputs.auth-response }}
-      access-token: ${{ steps.parse-access-token.outputs.access-token }}
     steps:
       # Step 1: Get Access Token
       - id: get-access-token
@@ -29,10 +26,10 @@ jobs:
           AUTH_CLIENT_SECRET: ${{ secrets.AUTH_CLIENT_SECRET }}
           AUTH_AUDIENCE: ${{ secrets.AUTH_AUDIENCE }}
         run: |
-          auth_response=$(curl --request POST \
+          auth_response="$(curl --silent --request POST \
           --url "$ACCESS_TOKEN_URL" \
           --header 'content-type: application/json' \
-          --data '{"client_id":"$AUTH_CLIENT_ID","client_secret":"$AUTH_CLIENT_SECRET","audience":"$AUTH_AUDIENCE","grant_type":"client_credentials"}')
+          --data '{"client_id":"$AUTH_CLIENT_ID","client_secret":"$AUTH_CLIENT_SECRET","audience":"$AUTH_AUDIENCE","grant_type":"client_credentials"}')"
           echo "::add-mask::$auth_response"
           echo "auth-response=$auth_response" >> "$GITHUB_OUTPUT"
       # Step 2: Parse Access Token

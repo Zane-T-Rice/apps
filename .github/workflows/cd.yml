@@ -7,12 +7,12 @@ on:
       - main
 
 jobs:
-  #test:
-  #  name: Build and Test
-  #  uses: Zane-T-Rice/apps/.github/workflows/ci.yml@main
+  test:
+    name: Build and Test
+    uses: Zane-T-Rice/apps/.github/workflows/ci.yml@main
   deploy:
-    # needs:
-    #   - test
+    needs:
+      - test
     environment: production
     runs-on: ubuntu-latest
     steps:
@@ -32,8 +32,8 @@ jobs:
           echo "::add-mask::$auth_token"
           echo "auth-token=$auth_token" >> "$GITHUB_OUTPUT"
       # Step 2: Deploy
-      - id: parse-access-token
-        name: Parse Access Token
+      - id: deploy
+        name: deploy
         env:
           SERVER_ID: ${{ secrets.SERVER_ID }}
           SERVER_MANAGER_SERVICE_URL: ${{ secrets.SERVER_MANAGER_SERVICE_URL }}

@@ -1,0 +1,43 @@
+name: Continuous Integration
+
+# Trigger the CI pipeline on push or pull request (main branch)
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  node-application-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Node.js (for a Node.js example)
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "22"
+
+      # Step 3: Install dependencies
+      - name: Install Dependencies
+        run: npm install
+
+      # Step 5: Build the project (if applicable)
+      - name: Lint the Project
+        run: npm run lint
+
+      # Yeah, this repository doesn't have any tests yet XD.
+      # It was just supposed to be a small project, I swear.
+      # Step 4: Run tests
+      # - name: Run Tests
+      #   run: npm test
+
+      # Step 6: Build the project (if applicable)
+      - name: Build the Project
+        run: npm run build

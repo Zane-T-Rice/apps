@@ -31,7 +31,6 @@ jobs:
           --url "$ACCESS_TOKEN_URL" \
           --header 'content-type: application/json' \
           --data '{"client_id":"$AUTH_CLIENT_ID","client_secret":"$AUTH_CLIENT_SECRET","audience":"$AUTH_AUDIENCE","grant_type":"client_credentials"}' | jq --raw-output .access_token)
-          echo "::add-mask::$auth_token"
           curl --request POST \
           --url $SERVER_MANAGER_SERVICE_URL/servers/$SERVER_ID/update/ \
           --header 'Content-Type: application/json' \

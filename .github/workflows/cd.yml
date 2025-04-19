@@ -32,9 +32,10 @@ jobs:
           --header 'content-type: application/json' \
           --data '{"client_id":"$AUTH_CLIENT_ID","client_secret":"$AUTH_CLIENT_SECRET","audience":"$AUTH_AUDIENCE","grant_type":"client_credentials"}')
           echo "::add-mask::$auth_response"
-          access_token=${{fromJson('$auth_response').access_token}}
+          echo "auth-response=$auth_response" >> "$GITHUB_OUTPUT"
+          access_token=${{fromJson(steps.get-access-token.outputs.auth-response).access_token}}
           echo "::add-mask::$access_token"
-          curl --silent --request POST \
+          curl --request POST \
           --url $SERVER_MANAGER_SERVICE_URL/servers/$SERVER_ID/update/ \
           --header 'Content-Type: application/json' \
           --header 'Authorization: Bearer $access_token' \

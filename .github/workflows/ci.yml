@@ -1,13 +1,13 @@
 name: Continuous Integration
 
-# Trigger the CI pipeline on push or pull request (main branch)
+# Trigger the CI pipeline on push or pull request (development branch)
 on:
   push:
     branches:
-      - main
+      - development
   pull_request:
     branches:
-      - main
+      - development
 
 jobs:
   node-application-build:

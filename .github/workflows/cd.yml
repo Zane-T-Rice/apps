@@ -12,6 +12,8 @@ jobs:
     uses: Zane-T-Rice/apps/.github/workflows/ci.yml@main
 
   deploy:
+    needs:
+      - test
     runs-on: ubuntu-latest
     steps:
       # Step 1: Get Access Token

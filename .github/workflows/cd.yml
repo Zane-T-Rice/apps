@@ -24,8 +24,6 @@ jobs:
           AUTH_CLIENT_ID: ${{ secrets.AUTH_CLIENT_ID }}
           AUTH_CLIENT_SECRET: ${{ secrets.AUTH_CLIENT_SECRET }}
           AUTH_AUDIENCE: ${{ secrets.AUTH_AUDIENCE }}
-          SERVER_MANAGER_SERVICE_URL: ${{ secrets.SERVER_MANAGER_SERVICE_URL }}
-          SERVER_ID: ${{ secrets.SERVER_ID }}
         run: |
           auth_response=$(curl --silent --request POST \
           --url "$ACCESS_TOKEN_URL" \
@@ -33,11 +31,15 @@ jobs:
           --data '{"client_id":"$AUTH_CLIENT_ID","client_secret":"$AUTH_CLIENT_SECRET","audience":"$AUTH_AUDIENCE","grant_type":"client_credentials"}')
           echo "::add-mask::$auth_response"
           echo "auth-response=$auth_response" >> "$GITHUB_OUTPUT"
-          access_token=${{fromJson(steps.get-access-token.outputs.auth-response).access_token}}
-          echo "::add-mask::$access_token"
-          echo "access-token=$access_token" >> "$GITHUB_OUTPUT"
+      # Step 2: Parse Access Token
+      - id: parse-access-token
+        name: Parse Access Token
+        env:
+          SERVER_MANAGER_SERVICE_URL: ${{ secrets.SERVER_MANAGER_SERVICE_URL }}
+          SERVER_ID: ${{ secrets.SERVER_ID }}
+        run: |
           curl --request POST \
           --url $SERVER_MANAGER_SERVICE_URL/servers/$SERVER_ID/update/ \
           --header 'Content-Type: application/json' \
-          --header 'Authorization: Bearer ${{ steps.get-access-token.outputs.access-token }}' \
+          --header 'Authorization: Bearer ${{ fromJson(steps.get-access-token.outputs.auth-response).access_token }}' \
           --data '{}'

@@ -14,6 +14,7 @@ jobs:
   deploy:
     # needs:
     #   - test
+    environment: production
     runs-on: ubuntu-latest
     steps:
       # Step 1: Get Access Token

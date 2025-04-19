@@ -35,5 +35,5 @@ jobs:
           curl --request POST \
           --url $SERVER_MANAGER_SERVICE_URL/servers/$SERVER_ID/update/ \
           --header 'Content-Type: application/json' \
-          --header 'Authorization: Bearer $auth_token' \
+          --header "Authorization: Bearer $auth_token" \
           --data '{}'

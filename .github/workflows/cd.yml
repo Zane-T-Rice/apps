@@ -7,7 +7,6 @@ on:
       - main
 
 jobs:
-  # Comment for change.
   #test:
   #  name: Build and Test
   #  uses: Zane-T-Rice/apps/.github/workflows/ci.yml@main

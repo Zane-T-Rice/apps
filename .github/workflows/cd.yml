@@ -53,4 +53,4 @@ jobs:
           --url $SERVER_MANAGER_SERVICE_URL/servers/$SERVER_ID/update/ \
           --header 'Content-Type: application/json' \
           --header 'Authorization: Bearer ${{ steps.parse-access-token.outputs.access-token }}' \
-          --data '{}''
+          --data '{}'

@@ -7,9 +7,12 @@ on:
       - main
 
 jobs:
+  test:
+    name: Build and Test
+    uses: Zane-T-Rice/apps/.github/workflows/ci.yml@main
+
   deploy:
     runs-on: ubuntu-latest
-
     steps:
       # Step 1: Get Access Token
       - id: get-access-token

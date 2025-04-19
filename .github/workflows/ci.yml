@@ -8,6 +8,7 @@ on:
   pull_request:
     branches:
       - development
+  workflow_call:
 
 jobs:
   node-application-build:

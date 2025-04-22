@@ -10,7 +10,6 @@ import {
   LinkBox,
   LinkOverlay,
   Tabs,
-  Text,
 } from "@chakra-ui/react";
 import { HiHome } from "react-icons/hi";
 import NextImage from "next/image";
@@ -91,10 +90,13 @@ const tabContents = (
                         />
                       </Image>
                     </Box>
-                    <Card.Description fontSize={18} justifyItems="center">
-                      <Text truncate width={350} textAlign="center">
-                        {app.description}
-                      </Text>
+                    <Card.Description
+                      fontSize={18}
+                      truncate
+                      width="100%"
+                      textAlign="center"
+                    >
+                      {app.description}
                     </Card.Description>
                   </Card.Body>
                 </LinkBox>

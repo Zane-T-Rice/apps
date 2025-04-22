@@ -17,6 +17,7 @@ const createServerSchema = object({
   containerName: string().required(),
   isInResponseChain: boolean().required(),
   isUpdatable: boolean().required(),
+  hostId: string().required(),
 }).stripUnknown();
 
 const editServerSchema = createServerSchema
@@ -53,6 +54,7 @@ export function ServersTabContent(props: {
     containerName: "",
     isInResponseChain: false,
     isUpdatable: true,
+    hostId: "",
   });
 
   const {

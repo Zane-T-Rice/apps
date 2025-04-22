@@ -52,7 +52,7 @@ export default function DataTable<T extends object>(props: {
                 justifyItems="center"
               >
                 <Text maxWidth={300} truncate>
-                  {data.toString()}
+                  {data !== null && data !== undefined ? data.toString() : ""}
                 </Text>
               </Table.Cell>
             ))}

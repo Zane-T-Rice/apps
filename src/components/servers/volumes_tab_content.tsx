@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { string, object } from "yup";
 import { fetchWithValidateAndToast } from "@/app/utils/fetch/fetch_with_validate_and_toast";
 import { Server } from "@/app/utils/server-manager-service/server_manager_service_servers";
+import { Host } from "@/app/utils/server-manager-service/server_manager_service_hosts";
 
 const createVolumeSchema = object({
   hostPath: string().required(),
@@ -26,8 +27,11 @@ const deleteVolumeSchema = object({
   id: string().required(),
 }).stripUnknown();
 
-export function VolumesTabContent(props: { selectedServer: Server }) {
-  const { selectedServer } = props;
+export function VolumesTabContent(props: {
+  selectedHost: Host;
+  selectedServer: Server;
+}) {
+  const { selectedHost, selectedServer } = props;
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [volumes, setVolumes] = useState<Volume[]>([]);
   const [selectedVolume, setSelectedVolume] = useState<Volume | null>(null);
@@ -49,7 +53,7 @@ export function VolumesTabContent(props: { selectedServer: Server }) {
     createREST: createVolume,
     editREST: editVolume,
     deleteREST: deleteVolume,
-  } = useVolumes(selectedServer);
+  } = useVolumes(selectedHost, selectedServer);
 
   useEffect(() => {
     if (!selectedServer) return;

@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { string, object, number } from "yup";
 import { fetchWithValidateAndToast } from "@/app/utils/fetch/fetch_with_validate_and_toast";
 import { Server } from "@/app/utils/server-manager-service/server_manager_service_servers";
+import { Host } from "@/app/utils/server-manager-service/server_manager_service_hosts";
 
 const createPortSchema = object({
   number: number().required(),
@@ -26,8 +27,11 @@ const deletePortSchema = object({
   id: string().required(),
 }).stripUnknown();
 
-export function PortsTabContent(props: { selectedServer: Server }) {
-  const { selectedServer } = props;
+export function PortsTabContent(props: {
+  selectedHost: Host;
+  selectedServer: Server;
+}) {
+  const { selectedHost, selectedServer } = props;
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [ports, setPorts] = useState<Port[]>([]);
   const [selectedPort, setSelectedPort] = useState<Port | null>(null);
@@ -49,7 +53,7 @@ export function PortsTabContent(props: { selectedServer: Server }) {
     createREST: createPort,
     editREST: editPort,
     deleteREST: deletePort,
-  } = usePorts(selectedServer);
+  } = usePorts(selectedHost, selectedServer);
 
   useEffect(() => {
     if (!selectedServer) return;

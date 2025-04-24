@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { string, object } from "yup";
 import { fetchWithValidateAndToast } from "@/app/utils/fetch/fetch_with_validate_and_toast";
 import { Server } from "@/app/utils/server-manager-service/server_manager_service_servers";
+import { Host } from "@/app/utils/server-manager-service/server_manager_service_hosts";
 
 const createFileSchema = object({
   name: string().required(),
@@ -26,8 +27,11 @@ const deleteFileSchema = object({
   id: string().required(),
 }).stripUnknown();
 
-export function FilesTabContent(props: { selectedServer: Server }) {
-  const { selectedServer } = props;
+export function FilesTabContent(props: {
+  selectedHost: Host;
+  selectedServer: Server;
+}) {
+  const { selectedHost, selectedServer } = props;
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [files, setFiles] = useState<File[]>([]);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -49,7 +53,7 @@ export function FilesTabContent(props: { selectedServer: Server }) {
     createREST: createFile,
     editREST: editFile,
     deleteREST: deleteFile,
-  } = useFiles(selectedServer);
+  } = useFiles(selectedHost, selectedServer);
 
   useEffect(() => {
     if (!selectedServer) return;

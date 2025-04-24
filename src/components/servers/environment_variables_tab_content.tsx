@@ -6,6 +6,7 @@ import { string, object } from "yup";
 import { fetchWithValidateAndToast } from "@/app/utils/fetch/fetch_with_validate_and_toast";
 import { Server } from "@/app/utils/server-manager-service/server_manager_service_servers";
 import { useEnvironmentVariables } from "@/app/utils/server-manager-service/server_manager_service_environment_variables";
+import { Host } from "@/app/utils/server-manager-service/server_manager_service_hosts";
 
 const createEnvironmentVariableSchema = object({
   name: string().required(),
@@ -25,9 +26,10 @@ const deleteEnvironmentVariableSchema = object({
 }).stripUnknown();
 
 export function EnvironmentVariablesTabContent(props: {
+  selectedHost: Host;
   selectedServer: Server;
 }) {
-  const { selectedServer } = props;
+  const { selectedHost, selectedServer } = props;
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [environmentVariables, setEnvironmentVariables] = useState<
     EnvironmentVariable[]
@@ -52,7 +54,7 @@ export function EnvironmentVariablesTabContent(props: {
     createREST: createEnvironmentVariable,
     editREST: editEnvironmentVariable,
     deleteREST: deleteEnvironmentVariable,
-  } = useEnvironmentVariables(selectedServer);
+  } = useEnvironmentVariables(selectedHost, selectedServer);
 
   useEffect(() => {
     if (!selectedServer) return;

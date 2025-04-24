@@ -11,6 +11,7 @@ import { AlertDialog } from "../ui/alert_dialog";
 import { AutoDataList } from "../ui/auto_data_list";
 import { fetchWithValidateAndToast } from "@/app/utils/fetch/fetch_with_validate_and_toast";
 import { usePermissions } from "@/app/utils/use_permissions";
+import { Host } from "@/app/utils/server-manager-service/server_manager_service_hosts";
 
 const createServerSchema = object({
   applicationName: string().required(),
@@ -35,10 +36,11 @@ const rebootServerSchema = deleteServerSchema;
 const updateServerSchema = deleteServerSchema;
 
 export function ServersTabContent(props: {
+  selectedHost: Host;
   selectedServer: Server | null;
   setSelectedServer: Dispatch<SetStateAction<Server | null>>;
 }) {
-  const { selectedServer, setSelectedServer } = props;
+  const { selectedHost, selectedServer, setSelectedServer } = props;
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [servers, setServers] = useState<Server[]>([]);
   const [createErrors, setCreateErrors] = useState<{
@@ -63,7 +65,7 @@ export function ServersTabContent(props: {
     editREST: editServer,
     deleteREST: deleteServer,
     actionREST: actionServer,
-  } = useServers();
+  } = useServers(selectedHost);
 
   const { hasPermissions } = usePermissions();
   const [hasRebootPermission, setHasRebootPermission] = useState<
@@ -74,6 +76,8 @@ export function ServersTabContent(props: {
   >(false);
 
   useEffect(() => {
+    if (!selectedHost) return;
+
     getServers().then((responseServers) => {
       if (responseServers) setServers(responseServers);
       setIsLoading(false);
@@ -85,7 +89,7 @@ export function ServersTabContent(props: {
     };
     getPermissions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [selectedHost]);
 
   const onServerSelect = (server: Server) => {
     setSelectedServer(server);

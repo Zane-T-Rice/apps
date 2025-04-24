@@ -66,30 +66,28 @@ export default function CaloriesPageContent() {
   };
 
   const actions = (
-    <HStack mdDown={{ marginLeft: 1 }}>
-      <HStack>
-        <Field.Root>
-          <HStack>
-            <Field.Label>Calorie Target</Field.Label>
-            <Input
-              placeholder="1600"
-              onChange={(event) => {
-                const newValue = event.target.value.replace(/\D/g, "");
-                setTarget(newValue !== "" ? parseInt(newValue) : 0);
-              }}
-              value={target}
-              minWidth={`${Math.max(4, target.toString().length * 14)}px`}
-            />
-          </HStack>
-        </Field.Root>
-        <AddItemButtonGroup
-          clearItems={() => {
-            setItems([]);
-          }}
-          addItem={addItem}
-          items={items}
-        />
-      </HStack>
+    <HStack marginLeft={3} marginRight={3}>
+      <Field.Root>
+        <HStack>
+          <Field.Label>Calorie Target</Field.Label>
+          <Input
+            placeholder="1600"
+            onChange={(event) => {
+              const newValue = event.target.value.replace(/\D/g, "");
+              setTarget(newValue !== "" ? parseInt(newValue) : 0);
+            }}
+            value={target}
+            maxWidth={"80px"}
+          />
+        </HStack>
+      </Field.Root>
+      <AddItemButtonGroup
+        clearItems={() => {
+          setItems([]);
+        }}
+        addItem={addItem}
+        items={items}
+      />
     </HStack>
   );
 
@@ -108,7 +106,7 @@ export default function CaloriesPageContent() {
 
   const tabContents = (
     <>
-      <Tabs.Content value="charts">
+      <Tabs.Content value="charts" marginLeft={3} marginRight={3}>
         <Stack>
           {!isLoading ? (
             <PieChart
@@ -165,7 +163,7 @@ export default function CaloriesPageContent() {
         </Stack>
       </Tabs.Content>
       <Tabs.Content value="raw_data">
-        <DataTable records={items} style={{ marginLeft: 10 }} />
+        <DataTable records={items} />
       </Tabs.Content>
     </>
   );

@@ -1,6 +1,7 @@
 "use client";
 
 import { useREST } from "../rest/use_rest";
+import { Host } from "./server_manager_service_hosts";
 
 export type Server = {
   id: string;
@@ -11,7 +12,7 @@ export type Server = {
   hostId: string;
 };
 
-export function useServers() {
-  const baseUrl = `${process.env.NEXT_PUBLIC_SERVER_MANAGER_SERVICE_DOMAIN}/servers`;
+export function useServers(host: Host) {
+  const baseUrl = `${process.env.NEXT_PUBLIC_SERVER_MANAGER_SERVICE_DOMAIN}/hosts/${host.id}/servers`;
   return useREST<Server>(baseUrl);
 }

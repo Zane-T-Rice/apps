@@ -2,7 +2,7 @@ import { Table, Text } from "@chakra-ui/react";
 
 export default function DataTable<T extends object>(props: {
   records: T[];
-  style: React.CSSProperties;
+  style?: React.CSSProperties;
   onRowSelect?: (record: T) => void;
   idKey?: keyof T;
   selectedRecordId?: string;

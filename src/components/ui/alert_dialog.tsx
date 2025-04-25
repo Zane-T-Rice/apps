@@ -9,9 +9,17 @@ export function AlertDialog(props: {
   titleText?: string;
   cancelText?: string;
   confirmText?: string;
+  confirmVariant?: "caution" | "unsafe" | "safe";
 }) {
-  const { trigger, body, onConfirm, titleText, cancelText, confirmText } =
-    props;
+  const {
+    trigger,
+    body,
+    onConfirm,
+    titleText,
+    cancelText,
+    confirmText,
+    confirmVariant,
+  } = props;
 
   return (
     <Dialog.Root role="alertdialog">
@@ -35,7 +43,7 @@ export function AlertDialog(props: {
                       {cancelText ?? "Cancel"}
                     </Button>
                     <Button
-                      variant="unsafe"
+                      variant={confirmVariant ?? "unsafe"}
                       onClick={() => {
                         onConfirm();
                         store.setOpen(false);

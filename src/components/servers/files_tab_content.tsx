@@ -157,9 +157,9 @@ export function FilesTabContent(props: {
       onDelete={onFileDelete}
       marginLeft={3}
       marginRight={3}
-      createPermission="write:servers"
-      editPermission="write:servers"
-      deletePermission="write:servers"
+      createPermission="admin:servers"
+      editPermission="admin:servers"
+      deletePermission="admin:servers"
     />
   );
 }

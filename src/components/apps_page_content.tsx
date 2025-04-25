@@ -6,32 +6,44 @@ import {
   Card,
   Grid,
   GridItem,
-  Image,
   LinkBox,
   LinkOverlay,
   Tabs,
 } from "@chakra-ui/react";
 import { HiHome } from "react-icons/hi";
-import NextImage from "next/image";
 import NextLink from "next/link";
 import CheckPermissionsForContent from "@/app/utils/check_permissions_for_content";
+import { FaChartPie, FaGhost, FaServer } from "react-icons/fa";
+
+const iconSize = 250;
 
 const apps = [
   {
     name: "Calories",
     description: `Daily calorie goal tracker.`,
     link: "/calories",
-    image: "/apps/calories_chart.png",
+    icon: <FaChartPie size={iconSize} />,
     imageDescription: "Calories pie chart.",
-    requiredPermissions: [],
+    requiredPermissions: ["admin:servers"],
+    requiresOneOfPermissions: [],
   },
   {
-    name: "Server Manager",
-    description: "Server Manager Service UI.",
+    name: "Server Manager Admin Console",
+    description: "Server Manager Service Admin UI.",
     link: "/servers",
-    image: "/apps/servers.png",
+    icon: <FaGhost size={iconSize} />,
     imageDescription: "Servers.",
-    requiredPermissions: ["read:servers"],
+    requiredPermissions: ["admin:servers"],
+    requiresOneOfPermissions: [],
+  },
+  {
+    name: "My Servers",
+    description: "Manage my servers.",
+    link: "/myservers",
+    icon: <FaServer size={iconSize} />,
+    imageDescription: "Servers.",
+    requiredPermissions: [],
+    requiresOneOfPermissions: ["admin:servers", "user:servers"],
   },
 ];
 
@@ -57,6 +69,7 @@ const tabContents = (
           <CheckPermissionsForContent
             key={`check-permissions-${index}`}
             requiredPermissions={app.requiredPermissions}
+            requiresOneOfPermissions={app.requiresOneOfPermissions}
           >
             <GridItem
               colSpan={1}
@@ -78,18 +91,7 @@ const tabContents = (
                 <LinkBox>
                   <Card.Body gap="2">
                     <Card.Title mt="2">{app.name}</Card.Title>
-                    <Box justifyItems="center">
-                      <Image asChild alt={app.imageDescription}>
-                        <NextImage
-                          src={app.image}
-                          alt={app.imageDescription}
-                          priority
-                          width={250}
-                          height={250}
-                          style={{ width: 250, height: 250 }}
-                        />
-                      </Image>
-                    </Box>
+                    <Box justifyItems="center">{app.icon}</Box>
                     <Card.Description
                       fontSize={18}
                       truncate

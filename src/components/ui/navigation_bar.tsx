@@ -30,6 +30,7 @@ export function NavigationBar(props: {
           activeTab && setActiveTab ? (e) => setActiveTab?.(e.value) : undefined
         }
         variant="line"
+        lazyMount
       >
         <Stack direction={{ base: "column", md: "row" }} gapY={0}>
           <NavigationDrawer />

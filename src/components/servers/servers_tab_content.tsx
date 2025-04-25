@@ -1,17 +1,19 @@
-import { Box, Skeleton, Stack, Text } from "@chakra-ui/react";
+import { Box, HStack, Skeleton, Stack } from "@chakra-ui/react";
 import CRUDTable from "../ui/crud_table";
-import { Button } from "../recipes/button";
 import {
   Server,
   useServers,
 } from "@/app/utils/server-manager-service/server_manager_service_servers";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { string, boolean, object } from "yup";
-import { AlertDialog } from "../ui/alert_dialog";
-import { AutoDataList } from "../ui/auto_data_list";
 import { fetchWithValidateAndToast } from "@/app/utils/fetch/fetch_with_validate_and_toast";
-import { usePermissions } from "@/app/utils/use_permissions";
 import { Host } from "@/app/utils/server-manager-service/server_manager_service_hosts";
+import { ServerActionsButtons } from "./server_actions_buttons";
+import {
+  UserServerLink,
+  useUserServerLinks,
+} from "@/app/utils/server-manager-service/server_manager_service_user_server_links";
+import { UserIdDialog } from "./user_id_dialog";
 
 const createServerSchema = object({
   applicationName: string().required(),
@@ -33,7 +35,10 @@ const deleteServerSchema = object({
   id: string().required(),
 }).stripUnknown();
 const rebootServerSchema = deleteServerSchema;
+const stopServerSchema = deleteServerSchema;
 const updateServerSchema = deleteServerSchema;
+const createUserServerLinkSchema = deleteServerSchema;
+const deleteUserServerLinkSchema = deleteServerSchema;
 
 export function ServersTabContent(props: {
   selectedHost: Host;
@@ -67,13 +72,8 @@ export function ServersTabContent(props: {
     actionREST: actionServer,
   } = useServers(selectedHost);
 
-  const { hasPermissions } = usePermissions();
-  const [hasRebootPermission, setHasRebootPermission] = useState<
-    boolean | null
-  >(false);
-  const [hasUpdatePermission, setHasUpdatePermission] = useState<
-    boolean | null
-  >(false);
+  const { editREST: editUserServerLink, deleteREST: deleteUserServerLink } =
+    useUserServerLinks(selectedHost, selectedServer);
 
   useEffect(() => {
     if (!selectedHost) return;
@@ -83,11 +83,6 @@ export function ServersTabContent(props: {
       setIsLoading(false);
     });
 
-    const getPermissions = async () => {
-      setHasRebootPermission(await hasPermissions(["reboot:servers"]));
-      setHasUpdatePermission(await hasPermissions(["update:servers"]));
-    };
-    getPermissions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedHost]);
 
@@ -198,6 +193,63 @@ export function ServersTabContent(props: {
     return true;
   };
 
+  const onServerStop = async (serverToStop: Server): Promise<boolean> => {
+    const title = `Stopping server ${serverToStop.applicationName}/${serverToStop.containerName}`;
+    const server = await fetchWithValidateAndToast({
+      title,
+      setErrors: () => {},
+      validateCallback: () => {
+        return stopServerSchema.validateSync(serverToStop, {
+          abortEarly: false,
+        });
+      },
+      fetchCallback: async (validate) => await actionServer(validate, "stop"),
+    });
+    if (!server) return false;
+
+    return true;
+  };
+
+  const onCreateUserServerLink = async (
+    serverToLink: Server,
+    userServerLink: UserServerLink
+  ): Promise<boolean> => {
+    const title = `Linking server ${serverToLink.applicationName}/${serverToLink.containerName} to user ${userServerLink.id}`;
+    const userServerLinkResponse = await fetchWithValidateAndToast({
+      title,
+      setErrors: setCreateErrors,
+      validateCallback: () => {
+        return createUserServerLinkSchema.validateSync(userServerLink, {
+          abortEarly: false,
+        });
+      },
+      fetchCallback: async (validate) => await editUserServerLink(validate),
+    });
+    if (!userServerLinkResponse) return false;
+
+    return true;
+  };
+
+  const onDeleteUserServerLink = async (
+    serverToUnlink: Server,
+    userServerLink: UserServerLink
+  ): Promise<boolean> => {
+    const title = `Unlinking server ${serverToUnlink.applicationName}/${serverToUnlink.containerName} from user ${userServerLink.id}`;
+    const userServerUnlinkResponse = await fetchWithValidateAndToast({
+      title,
+      setErrors: setEditErrors,
+      validateCallback: () => {
+        return deleteUserServerLinkSchema.validateSync(userServerLink, {
+          abortEarly: false,
+        });
+      },
+      fetchCallback: async (validate) => await deleteUserServerLink(validate),
+    });
+    if (!userServerUnlinkResponse) return false;
+
+    return true;
+  };
+
   return isLoading ? (
     <Stack direction="column" marginLeft={2} marginRight={2}>
       <Skeleton height={50} variant="shine" />
@@ -205,7 +257,7 @@ export function ServersTabContent(props: {
       <Skeleton height={50} variant="shine" />
     </Stack>
   ) : (
-    <Stack direction="column">
+    <Stack direction="column" gapY={1.5}>
       <CRUDTable
         records={servers}
         onRowSelect={onServerSelect}
@@ -219,62 +271,38 @@ export function ServersTabContent(props: {
         onDelete={onServerDelete}
         marginLeft={3}
         marginRight={3}
-        createPermission="write:servers"
-        editPermission="write:servers"
-        deletePermission="write:servers"
+        createPermission="admin:servers"
+        editPermission="admin:servers"
+        deletePermission="admin:servers"
       />
-      <Stack direction="row" gap={1} marginLeft={3} marginRight={3}>
-        <Box width="1/2">
-          <AlertDialog
-            trigger={
-              <Button
-                variant="safe"
-                disabled={!selectedServer || !hasRebootPermission}
-                width="100%"
-              >
-                Reboot
-              </Button>
-            }
-            body={
-              selectedServer ? (
-                <Stack direction="column">
-                  <Text>Are you sure that you want to reboot:</Text>
-                  <AutoDataList record={selectedServer} />
-                </Stack>
-              ) : null
-            }
-            onConfirm={() => selectedServer && onServerReboot(selectedServer)}
-            confirmText="Reboot"
+      <ServerActionsButtons
+        selectedServer={selectedServer}
+        onServerReboot={onServerReboot}
+        onServerUpdate={onServerUpdate}
+        onServerStop={onServerStop}
+      />
+      <HStack marginLeft={3} marginRight={3}>
+        <Box width={"1/2"}>
+          <UserIdDialog
+            triggerButtonText="Link User"
+            description={`The following user will be given access to ${selectedServer?.applicationName}/${selectedServer?.containerName}:`}
+            confirmText="Link User"
+            selectedServer={selectedServer}
+            onConfirm={onCreateUserServerLink}
+            confirmVariant="caution"
           />
         </Box>
-        <Box width="1/2">
-          <AlertDialog
-            trigger={
-              <Button
-                variant="safe"
-                disabled={
-                  !selectedServer ||
-                  !selectedServer.isUpdatable ||
-                  !hasUpdatePermission
-                }
-                width="100%"
-              >
-                Update
-              </Button>
-            }
-            body={
-              selectedServer ? (
-                <Stack direction="column">
-                  <Text>Are you sure that you want to update:</Text>
-                  <AutoDataList record={selectedServer} />
-                </Stack>
-              ) : null
-            }
-            onConfirm={() => selectedServer && onServerUpdate(selectedServer)}
-            confirmText="Update"
+        <Box width={"1/2"}>
+          <UserIdDialog
+            triggerButtonText="Unlink User"
+            description={`The following user will have their access to ${selectedServer?.applicationName}/${selectedServer?.containerName} revoked:`}
+            confirmText="Unlink User"
+            selectedServer={selectedServer}
+            onConfirm={onDeleteUserServerLink}
+            confirmVariant="unsafe"
           />
         </Box>
-      </Stack>
+      </HStack>
     </Stack>
   );
 }

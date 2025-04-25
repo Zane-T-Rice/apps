@@ -13,15 +13,15 @@ export default function CRUDTable<T extends object>(
     idKey: keyof T;
     selectedRecordId?: string; // Should this just be selectedRecord: T (and update DataTable also)
     onRowSelect: (record: T) => void;
-    onCreate: (record: T) => Promise<boolean>;
-    onCreateErrors: { [Property in keyof T]?: string };
-    createPermission: string;
-    creationRecord: T;
-    onEdit: (record: T) => Promise<boolean>;
-    onEditErrors: { [Property in keyof T]?: string };
-    editPermission: string;
-    onDelete: (record: T) => Promise<boolean>;
-    deletePermission: string;
+    onCreate?: (record: T) => Promise<boolean>;
+    onCreateErrors?: { [Property in keyof T]?: string };
+    createPermission?: string;
+    creationRecord?: T;
+    onEdit?: (record: T) => Promise<boolean>;
+    onEditErrors?: { [Property in keyof T]?: string };
+    editPermission?: string;
+    onDelete?: (record: T) => Promise<boolean>;
+    deletePermission?: string;
   } & StackProps
 ) {
   const {
@@ -60,9 +60,12 @@ export default function CRUDTable<T extends object>(
 
   useEffect(() => {
     const getPermissions = async () => {
-      setHasCreatePermission(await hasPermissions([createPermission]));
-      setHasEditPermission(await hasPermissions([editPermission]));
-      setHasDeletePermission(await hasPermissions([deletePermission]));
+      if (createPermission)
+        setHasCreatePermission(await hasPermissions([createPermission]));
+      if (editPermission)
+        setHasEditPermission(await hasPermissions([editPermission]));
+      if (deletePermission)
+        setHasDeletePermission(await hasPermissions([deletePermission]));
     };
     getPermissions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -79,52 +82,64 @@ export default function CRUDTable<T extends object>(
   };
 
   const onDeleteConfirm = () => {
-    if (selectedRecord) onDelete(selectedRecord);
+    if (selectedRecord && onDelete) onDelete(selectedRecord);
   };
+
+  const createEditDeleteWidth = `${
+    4 -
+    [createPermission, editPermission, deletePermission].filter((e) => !!e)
+      .length
+  }/3`;
 
   return (
     <>
       <Stack direction="column" {...stackProps}>
         <Stack direction="row" gap={1}>
-          <Button
-            variant="safe"
-            width="1/3"
-            onClick={() => onCreateButton()}
-            disabled={!hasCreatePermission}
-          >
-            Create
-          </Button>
-          <Button
-            variant="safe"
-            disabled={!selectedRecord || !hasEditPermission}
-            width="1/3"
-            onClick={() => onEditButton()}
-          >
-            Edit
-          </Button>
-          <Box width="1/3">
-            <AlertDialog
-              trigger={
-                <Button
-                  variant="unsafe"
-                  disabled={!selectedRecord || !hasDeletePermission}
-                  width="100%"
-                >
-                  Delete
-                </Button>
-              }
-              body={
-                selectedRecord ? (
-                  <Stack direction="column">
-                    <Text>Are you sure that you want to delete:</Text>
-                    <AutoDataList record={selectedRecord} />
-                  </Stack>
-                ) : null
-              }
-              onConfirm={onDeleteConfirm}
-              confirmText="Delete"
-            />
-          </Box>
+          {createPermission !== undefined ? (
+            <Button
+              variant="safe"
+              width={createEditDeleteWidth}
+              onClick={() => onCreateButton()}
+              disabled={!hasCreatePermission}
+            >
+              Create
+            </Button>
+          ) : null}
+          {editPermission !== undefined ? (
+            <Button
+              variant="safe"
+              disabled={!selectedRecord || !hasEditPermission}
+              width={createEditDeleteWidth}
+              onClick={() => onEditButton()}
+            >
+              Edit
+            </Button>
+          ) : null}
+          {deletePermission ? (
+            <Box width={createEditDeleteWidth}>
+              <AlertDialog
+                trigger={
+                  <Button
+                    variant="unsafe"
+                    disabled={!selectedRecord || !hasDeletePermission}
+                    width="100%"
+                  >
+                    Delete
+                  </Button>
+                }
+                body={
+                  selectedRecord ? (
+                    <Stack direction="column">
+                      <Text>Are you sure that you want to delete:</Text>
+                      <AutoDataList record={selectedRecord} />
+                    </Stack>
+                  ) : null
+                }
+                onConfirm={onDeleteConfirm}
+                confirmText="Delete"
+              />
+            </Box>
+          ) : null}
         </Stack>
         <Box overflowX="auto" overflowY="auto" maxHeight="32rem">
           <DataTable
@@ -136,23 +151,30 @@ export default function CRUDTable<T extends object>(
           />
         </Box>
       </Stack>
-      <AutoFormDrawer<T>
-        record={creationRecord}
-        title={"Create"}
-        isOpen={isCreateOpen}
-        setIsOpen={setIsCreateOpen}
-        onSubmit={onCreate}
-        errors={onCreateErrors}
-        omit={createOmit}
-      />
-      <AutoFormDrawer<T>
-        record={selectedRecord}
-        title={"Edit"}
-        isOpen={isEditOpen}
-        setIsOpen={setIsEditOpen}
-        onSubmit={onEdit}
-        errors={onEditErrors}
-      />
+      {creationRecord &&
+      onCreate &&
+      onCreateErrors &&
+      createPermission !== undefined ? (
+        <AutoFormDrawer<T>
+          record={creationRecord}
+          title={"Create"}
+          isOpen={isCreateOpen}
+          setIsOpen={setIsCreateOpen}
+          onSubmit={onCreate}
+          errors={onCreateErrors}
+          omit={createOmit}
+        />
+      ) : null}
+      {onEdit && onEditErrors && editPermission !== undefined ? (
+        <AutoFormDrawer<T>
+          record={selectedRecord}
+          title={"Edit"}
+          isOpen={isEditOpen}
+          setIsOpen={setIsEditOpen}
+          onSubmit={onEdit}
+          errors={onEditErrors}
+        />
+      ) : null}
     </>
   );
 }

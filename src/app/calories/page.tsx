@@ -5,7 +5,10 @@ import CheckPermissionsForContent from "../utils/check_permissions_for_content";
 
 export default function CaloriesPage() {
   return (
-    <CheckPermissionsForContent requiredPermissions={[]} redirect="/">
+    <CheckPermissionsForContent
+      requiredPermissions={["admin:servers"]}
+      redirect="/"
+    >
       <CaloriesPageContent />
     </CheckPermissionsForContent>
   );

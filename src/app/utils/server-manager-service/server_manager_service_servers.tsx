@@ -9,7 +9,6 @@ export type Server = {
   containerName: string;
   isInResponseChain: boolean;
   isUpdatable: boolean;
-  hostId: string;
 };
 
 export function useServers(host: Host) {

@@ -1,6 +1,6 @@
 ## What is this?
 
-A front-end for the [server-manager-service](https://github.com/Zane-T-Rice/server-manager-service). Has seperate apps for admins and users to be able to control servers managed by an instance of the server-manage-service.
+A front-end for the [server-manager-service](https://github.com/Zane-T-Rice/server-manager-service). Has seperate apps for admins and users to be able to control servers managed by an instance of the server-manager-service.
 
 ## Requirements
 

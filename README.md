@@ -27,8 +27,8 @@ docker network create \
 
 ## Deployment
 
-NEXT_PUBLIC_SERVER_MANAGER_SERVICE_DOMAIN is the URL to the server-manager-service.
-NEXT_PUBLIC_WEBSITE_DOMAIN is the URL to the host of this application.
+- NEXT_PUBLIC_SERVER_MANAGER_SERVICE_DOMAIN is the URL to the server-manager-service.
+- NEXT_PUBLIC_WEBSITE_DOMAIN is the URL to the host of this application.
 
 ```sh
 (

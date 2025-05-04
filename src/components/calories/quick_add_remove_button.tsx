@@ -39,7 +39,12 @@ export function QuickAddRemoveButton(props: {
 
   return quickItems.map((quickItem) => {
     return (
-      <HStack key={quickItem.name} width="400px" style={style}>
+      <HStack
+        key={quickItem.name}
+        width="400px"
+        mdDown={{ width: "100%", maxWidth: "420px" }}
+        style={style}
+      >
         <Center
           width="3/6"
           bgColor="black"

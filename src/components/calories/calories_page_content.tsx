@@ -66,7 +66,7 @@ export default function CaloriesPageContent() {
   };
 
   const actions = (
-    <HStack>
+    <HStack mdDown={{ maxWidth: "420px" }}>
       <Field.Root width="fit-content">
         <HStack>
           <Field.Label>Calorie Target</Field.Label>
@@ -158,7 +158,6 @@ export default function CaloriesPageContent() {
             items={items}
             addItem={addItem}
             removeItem={removeItem}
-            style={{ marginLeft: 10 }}
           />
         </Stack>
       </Tabs.Content>

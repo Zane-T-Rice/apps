@@ -10,7 +10,7 @@ export function QuickAddRemoveButton(props: {
   items: Item[];
   addItem: (item: Item) => void;
   removeItem: (item: Item) => void;
-  style: CSSProperties | undefined;
+  style?: CSSProperties | undefined;
 }) {
   const { items, addItem, removeItem, style } = props;
 

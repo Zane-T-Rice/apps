@@ -34,7 +34,7 @@ export function NavigationBar(props: {
       >
         <Stack direction={{ base: "column", md: "row" }} gapY={0}>
           <NavigationDrawer />
-          <Tabs.List flex="auto">{tabTriggers}</Tabs.List>
+          <Tabs.List>{tabTriggers}</Tabs.List>
           {actions}
         </Stack>
         {tabContents}

@@ -66,8 +66,8 @@ export default function CaloriesPageContent() {
   };
 
   const actions = (
-    <HStack marginLeft={3} marginRight={3}>
-      <Field.Root>
+    <HStack>
+      <Field.Root width="fit-content">
         <HStack>
           <Field.Label>Calorie Target</Field.Label>
           <Input
@@ -106,7 +106,7 @@ export default function CaloriesPageContent() {
 
   const tabContents = (
     <>
-      <Tabs.Content value="charts" marginLeft={3} marginRight={3}>
+      <Tabs.Content value="charts">
         <Stack>
           {!isLoading ? (
             <PieChart
@@ -158,7 +158,7 @@ export default function CaloriesPageContent() {
             items={items}
             addItem={addItem}
             removeItem={removeItem}
-            style={{ marginLeft: 5 }}
+            style={{ marginLeft: 10 }}
           />
         </Stack>
       </Tabs.Content>

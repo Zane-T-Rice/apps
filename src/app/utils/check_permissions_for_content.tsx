@@ -13,13 +13,12 @@ export default function CheckPermissionsForContent(props: {
 }) {
   const { children, requiredPermissions, requiresOneOfPermissions, redirect } =
     props;
-  const { isLoading, isAuthenticated } = useAuth0();
+  const { isLoading } = useAuth0();
   const { hasPermissions } = usePermissions();
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
 
   useEffect(() => {
     const getHasPermission = async () => {
-      if (isLoading) setHasPermission(null);
       const hasRequiredPermissions = await hasPermissions(requiredPermissions);
       const hasOneOfRequiredPermissions =
         requiresOneOfPermissions && requiresOneOfPermissions.length
@@ -33,9 +32,10 @@ export default function CheckPermissionsForContent(props: {
           : true;
       setHasPermission(!!hasRequiredPermissions && hasOneOfRequiredPermissions);
     };
-    getHasPermission();
+    if (isLoading) setHasPermission(null);
+    else getHasPermission();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoading, isAuthenticated]);
+  }, [isLoading]);
 
   if (!isLoading && !hasPermission && hasPermission !== null && redirect)
     nextRedirect(redirect);

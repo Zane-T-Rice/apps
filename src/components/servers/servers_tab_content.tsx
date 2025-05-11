@@ -1,4 +1,4 @@
-import { Box, HStack, Skeleton, Stack } from "@chakra-ui/react";
+import { Skeleton, Stack } from "@chakra-ui/react";
 import CRUDTable from "../ui/crud_table";
 import {
   Server,
@@ -9,11 +9,6 @@ import { string, boolean, object } from "yup";
 import { fetchWithValidateAndToast } from "@/app/utils/fetch/fetch_with_validate_and_toast";
 import { Host } from "@/app/utils/server-manager-service/server_manager_service_hosts";
 import { ServerActionsButtons } from "./server_actions_buttons";
-import {
-  UserServerLink,
-  useUserServerLinks,
-} from "@/app/utils/server-manager-service/server_manager_service_user_server_links";
-import { UserIdDialog } from "./user_id_dialog";
 
 const createServerSchema = object({
   applicationName: string().required(),
@@ -36,8 +31,6 @@ const deleteServerSchema = object({
 const rebootServerSchema = deleteServerSchema;
 const stopServerSchema = deleteServerSchema;
 const updateServerSchema = deleteServerSchema;
-const createUserServerLinkSchema = deleteServerSchema;
-const deleteUserServerLinkSchema = deleteServerSchema;
 
 export function ServersTabContent(props: {
   selectedHost: Host;
@@ -69,9 +62,6 @@ export function ServersTabContent(props: {
     deleteREST: deleteServer,
     actionREST: actionServer,
   } = useServers(selectedHost);
-
-  const { editREST: editUserServerLink, deleteREST: deleteUserServerLink } =
-    useUserServerLinks(selectedHost, selectedServer);
 
   useEffect(() => {
     if (!selectedHost) return;
@@ -208,46 +198,6 @@ export function ServersTabContent(props: {
     return true;
   };
 
-  const onCreateUserServerLink = async (
-    serverToLink: Server,
-    userServerLink: UserServerLink
-  ): Promise<boolean> => {
-    const title = `Linking server ${serverToLink.applicationName}/${serverToLink.containerName} to user ${userServerLink.id}`;
-    const userServerLinkResponse = await fetchWithValidateAndToast({
-      title,
-      setErrors: setCreateErrors,
-      validateCallback: () => {
-        return createUserServerLinkSchema.validateSync(userServerLink, {
-          abortEarly: false,
-        });
-      },
-      fetchCallback: async (validate) => await editUserServerLink(validate),
-    });
-    if (!userServerLinkResponse) return false;
-
-    return true;
-  };
-
-  const onDeleteUserServerLink = async (
-    serverToUnlink: Server,
-    userServerLink: UserServerLink
-  ): Promise<boolean> => {
-    const title = `Unlinking server ${serverToUnlink.applicationName}/${serverToUnlink.containerName} from user ${userServerLink.id}`;
-    const userServerUnlinkResponse = await fetchWithValidateAndToast({
-      title,
-      setErrors: setEditErrors,
-      validateCallback: () => {
-        return deleteUserServerLinkSchema.validateSync(userServerLink, {
-          abortEarly: false,
-        });
-      },
-      fetchCallback: async (validate) => await deleteUserServerLink(validate),
-    });
-    if (!userServerUnlinkResponse) return false;
-
-    return true;
-  };
-
   return isLoading ? (
     <Stack direction="column" marginLeft={2} marginRight={2}>
       <Skeleton height={50} variant="shine" />
@@ -279,28 +229,6 @@ export function ServersTabContent(props: {
         onServerUpdate={onServerUpdate}
         onServerStop={onServerStop}
       />
-      <HStack marginLeft={3} marginRight={3}>
-        <Box width={"1/2"}>
-          <UserIdDialog
-            triggerButtonText="Link User"
-            description={`The following user will be given access to ${selectedServer?.applicationName}/${selectedServer?.containerName}:`}
-            confirmText="Link User"
-            selectedServer={selectedServer}
-            onConfirm={onCreateUserServerLink}
-            confirmVariant="caution"
-          />
-        </Box>
-        <Box width={"1/2"}>
-          <UserIdDialog
-            triggerButtonText="Unlink User"
-            description={`The following user will have their access to ${selectedServer?.applicationName}/${selectedServer?.containerName} revoked:`}
-            confirmText="Unlink User"
-            selectedServer={selectedServer}
-            onConfirm={onDeleteUserServerLink}
-            confirmVariant="unsafe"
-          />
-        </Box>
-      </HStack>
     </Stack>
   );
 }

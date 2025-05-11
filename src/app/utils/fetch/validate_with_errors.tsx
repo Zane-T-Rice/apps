@@ -3,7 +3,7 @@ import { yupErrorsToMap } from "../yup_errors_to_map";
 
 export function validateWithErrors<T extends object, V extends object>(
   validateCallback: () => V,
-  setErrors: (value: {
+  setErrors?: (value: {
     [Property in keyof T]?: string;
   }) => void
 ): V | null {
@@ -11,9 +11,9 @@ export function validateWithErrors<T extends object, V extends object>(
 
   try {
     validate = validateCallback();
-    setErrors({});
+    setErrors?.({});
   } catch (err) {
-    setErrors(yupErrorsToMap(err as ValidationError));
+    setErrors?.(yupErrorsToMap(err as ValidationError));
   }
 
   return validate;

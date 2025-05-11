@@ -85,11 +85,10 @@ export default function CRUDTable<T extends object>(
     if (selectedRecord && onDelete) onDelete(selectedRecord);
   };
 
-  const createEditDeleteWidth = `${
-    4 -
+  const createEditDeleteWidth = `1/${
     [createPermission, editPermission, deletePermission].filter((e) => !!e)
       .length
-  }/3`;
+  }`;
 
   return (
     <>

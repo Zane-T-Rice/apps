@@ -6,7 +6,7 @@ export async function fetchWithValidateAndToast<
   F extends object
 >(params: {
   validateCallback: () => V;
-  setErrors: (value: {
+  setErrors?: (value: {
     [Property in keyof F]?: string;
   }) => void;
   title: string;

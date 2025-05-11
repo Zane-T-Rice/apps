@@ -13,6 +13,7 @@ import { EnvironmentVariablesTabContent } from "./environment_variables_tab_cont
 import { FilesTabContent } from "./files_tab_content";
 import { Host } from "@/app/utils/server-manager-service/server_manager_service_hosts";
 import { HostsTabContent } from "./hosts_tab_content";
+import { UserServerLinksTabContent } from "./users_tab_content";
 
 export default function ServersPageContent() {
   const [activeTab, setActiveTab] = useState<string>();
@@ -66,6 +67,12 @@ export default function ServersPageContent() {
         </Box>
         Files
       </Tabs.Trigger>
+      <Tabs.Trigger value="users" disabled={!selectedHost || !selectedServer}>
+        <Box hideBelow="sm">
+          <CiEdit />
+        </Box>
+        Users
+      </Tabs.Trigger>
     </>
   );
 
@@ -113,6 +120,14 @@ export default function ServersPageContent() {
       <Tabs.Content value="files">
         {selectedHost && selectedServer ? (
           <FilesTabContent
+            selectedHost={selectedHost}
+            selectedServer={selectedServer}
+          />
+        ) : null}
+      </Tabs.Content>
+      <Tabs.Content value="users">
+        {selectedHost && selectedServer ? (
+          <UserServerLinksTabContent
             selectedHost={selectedHost}
             selectedServer={selectedServer}
           />

@@ -27,24 +27,6 @@ export function MyServersTabContent() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const onServerReboot = async (serverToReboot: Server): Promise<boolean> => {
-    const title = `Rebooting server ${serverToReboot.applicationName}/${serverToReboot.containerName}`;
-    const server = await fetchWithValidateAndToast({
-      title,
-      setErrors: () => {},
-      validateCallback: () => {
-        return rebootServerSchema.validateSync(serverToReboot, {
-          abortEarly: false,
-        });
-      },
-      fetchCallback: async (validate) =>
-        await actionServer(validate, "restart"),
-    });
-    if (!server) return false;
-
-    return true;
-  };
-
   const onServerUpdate = async (serverToUpdate: Server): Promise<boolean> => {
     const title = `Updating server ${serverToUpdate.applicationName}/${serverToUpdate.containerName}`;
     const server = await fetchWithValidateAndToast({
@@ -122,7 +104,6 @@ export function MyServersTabContent() {
                   <AutoDataList record={serverToServerInfo(server)} />
                   <ServerActionsButtons
                     selectedServer={server}
-                    onServerReboot={onServerReboot}
                     onServerUpdate={onServerUpdate}
                     onServerStop={onServerStop}
                     marginLeft={0}

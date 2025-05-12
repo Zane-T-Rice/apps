@@ -5,18 +5,11 @@ export function ServerActionsButtons<T extends { isUpdatable: boolean }>(
   props: {
     selectedServer?: T | null;
     onServerUpdate?: (selectedServer: T) => Promise<boolean>;
-    onServerReboot?: (selectedServer: T) => Promise<boolean>;
     onServerStop?: (selectedServer: T) => Promise<boolean>;
   } & StackProps
 ) {
-  const {
-    selectedServer,
-    onServerUpdate,
-    onServerReboot,
-    onServerStop,
-    ...stackProps
-  } = props;
-  const rebootStopWidth = `${onServerReboot && onServerStop ? "1/2" : "100%"}`;
+  const { selectedServer, onServerUpdate, onServerStop, ...stackProps } = props;
+  const updateStopWidth = `${onServerUpdate && onServerStop ? "1/2" : "100%"}`;
   return (
     <Stack
       direction="column"
@@ -25,33 +18,21 @@ export function ServerActionsButtons<T extends { isUpdatable: boolean }>(
       marginRight={3}
       {...stackProps}
     >
-      {onServerUpdate ? (
-        <Box width="100%">
-          <Button
-            variant="safe"
-            disabled={!selectedServer || !selectedServer.isUpdatable}
-            width="100%"
-            onClick={() => selectedServer && onServerUpdate(selectedServer)}
-          >
-            Update / Start
-          </Button>
-        </Box>
-      ) : null}
       <HStack gap={1}>
-        {onServerReboot ? (
-          <Box width={rebootStopWidth}>
+        {onServerUpdate ? (
+          <Box width={updateStopWidth}>
             <Button
               variant="safe"
-              disabled={!selectedServer}
+              disabled={!selectedServer || !selectedServer.isUpdatable}
               width="100%"
-              onClick={() => selectedServer && onServerReboot(selectedServer)}
+              onClick={() => selectedServer && onServerUpdate(selectedServer)}
             >
-              Reboot
+              Start + Update
             </Button>
           </Box>
         ) : null}
         {onServerStop ? (
-          <Box width={rebootStopWidth}>
+          <Box width={updateStopWidth}>
             <Button
               variant="safe"
               disabled={!selectedServer}

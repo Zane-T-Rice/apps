@@ -28,7 +28,6 @@ const editServerSchema = createServerSchema
 const deleteServerSchema = object({
   id: string().required(),
 }).stripUnknown();
-const rebootServerSchema = deleteServerSchema;
 const stopServerSchema = deleteServerSchema;
 const updateServerSchema = deleteServerSchema;
 
@@ -146,24 +145,6 @@ export function ServersTabContent(props: {
     return true;
   };
 
-  const onServerReboot = async (serverToReboot: Server): Promise<boolean> => {
-    const title = `Rebooting server ${serverToReboot.applicationName}/${serverToReboot.containerName}`;
-    const server = await fetchWithValidateAndToast({
-      title,
-      setErrors: () => {},
-      validateCallback: () => {
-        return rebootServerSchema.validateSync(serverToReboot, {
-          abortEarly: false,
-        });
-      },
-      fetchCallback: async (validate) =>
-        await actionServer(validate, "restart"),
-    });
-    if (!server) return false;
-
-    return true;
-  };
-
   const onServerUpdate = async (serverToUpdate: Server): Promise<boolean> => {
     const title = `Updating server ${serverToUpdate.applicationName}/${serverToUpdate.containerName}`;
     const server = await fetchWithValidateAndToast({
@@ -225,7 +206,6 @@ export function ServersTabContent(props: {
       />
       <ServerActionsButtons
         selectedServer={selectedServer}
-        onServerReboot={onServerReboot}
         onServerUpdate={onServerUpdate}
         onServerStop={onServerStop}
       />

@@ -11,7 +11,7 @@ import { Server } from "@/app/utils/server-manager-service/server_manager_servic
 import { Host } from "@/app/utils/server-manager-service/server_manager_service_hosts";
 
 const createUserServerLinkSchema = object({
-  userId: string().required(),
+  username: string().required(),
 }).stripUnknown();
 
 const deleteUserServerLinkSchema = object({
@@ -33,7 +33,7 @@ export function UserServerLinksTabContent(props: {
 
   const [createUserServerLinkRecord] = useState<UserServerLink>({
     id: "",
-    userId: "",
+    username: "",
   });
 
   const {
@@ -74,6 +74,7 @@ export function UserServerLinksTabContent(props: {
 
     // Update userServerLinks with new record
     setUserServerLinks((prev) => {
+      if (prev.find((link) => link.id === userServerLink.id)) return prev;
       return [...prev, userServerLink];
     });
 

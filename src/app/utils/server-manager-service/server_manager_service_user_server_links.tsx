@@ -8,8 +8,8 @@ export type Server = {
 };
 
 export type UserServerLink = {
-  id: string; // auth0 user id
-  userId: string; // auth0 user id
+  id: string;
+  username: string; // auth0 user id
 };
 
 export function useUserServerLinks(host: Host, server: Server | null) {

@@ -25,33 +25,19 @@ export function ServerActionsButtons<T extends { isUpdatable: boolean }>(
       marginRight={3}
       {...stackProps}
     >
-      <HStack>
-        {onServerUpdate ? (
-          <Box width={"1/2"}>
-            <Button
-              variant="safe"
-              disabled={!selectedServer || !selectedServer.isUpdatable}
-              width="100%"
-              onClick={() => selectedServer && onServerUpdate(selectedServer)}
-            >
-              Start
-            </Button>
-          </Box>
-        ) : null}
-        {onServerUpdate ? (
-          <Box width={"1/2"}>
-            <Button
-              variant="safe"
-              disabled={!selectedServer || !selectedServer.isUpdatable}
-              width="100%"
-              onClick={() => selectedServer && onServerUpdate(selectedServer)}
-            >
-              Update
-            </Button>
-          </Box>
-        ) : null}
-      </HStack>
-      <HStack>
+      {onServerUpdate ? (
+        <Box width="100%">
+          <Button
+            variant="safe"
+            disabled={!selectedServer || !selectedServer.isUpdatable}
+            width="100%"
+            onClick={() => selectedServer && onServerUpdate(selectedServer)}
+          >
+            Update / Start
+          </Button>
+        </Box>
+      ) : null}
+      <HStack gap={1}>
         {onServerReboot ? (
           <Box width={rebootStopWidth}>
             <Button

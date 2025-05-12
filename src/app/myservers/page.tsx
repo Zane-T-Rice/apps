@@ -10,7 +10,7 @@ export default function ServersPage() {
       requiresOneOfPermissions={["admin:servers", "user:servers"]}
       redirect="/"
     >
-      <MyServersPageContent />;
+      <MyServersPageContent />
     </CheckPermissionsForContent>
   );
 }

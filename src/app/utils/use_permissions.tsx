@@ -14,7 +14,6 @@ export function usePermissions() {
     const permissions = accessToken
       ? (jwtDecode(accessToken) as { permissions: string[] }).permissions
       : [];
-    console.log("permissions: ", permissions)
     return requiredPermissions.every((requiredPermission) =>
       permissions.includes(requiredPermission)
     );

@@ -123,6 +123,7 @@ export function GloomhavenCompanionTabContent() {
       fetchCallback: async (validate) => await deleteCampaign(validate),
     });
     if (!campaign) return false;
+    hydrateId(campaign)
 
     setCampaigns((prev) => {
       return prev.filter((currentCampaign) => currentCampaign.id !== campaign.id);

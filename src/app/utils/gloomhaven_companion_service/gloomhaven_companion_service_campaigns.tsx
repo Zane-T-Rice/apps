@@ -5,6 +5,8 @@ import { useREST } from "../rest/use_rest";
 export type Campaign = {
   id: string;
   name: string;
+  parent: string;
+  entity: string;
 };
 
 export function useCampaigns() {

@@ -29,7 +29,7 @@ export type FormFields<T> = {
 };
 
 export function AutoFormDrawer<T extends object>(props: {
-  record: T | null;
+  record?: T;
   title: string;
   isOpen: boolean;
   setIsOpen: (value: boolean) => void;

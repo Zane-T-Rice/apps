@@ -12,7 +12,7 @@ export function usePermissions() {
     const accessToken =
       !isLoading && isAuthenticated ? await getAccessTokenSilently() : "";
     const permissions = accessToken
-      ? (jwtDecode(accessToken) as { permissions: string[] }).permissions
+      ? (jwtDecode(accessToken) as { scope: string }).scope.split(' ')
       : [];
     return requiredPermissions.every((requiredPermission) =>
       permissions.includes(requiredPermission)

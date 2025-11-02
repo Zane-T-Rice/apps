@@ -157,9 +157,9 @@ export function PortsTabContent(props: {
       onDelete={onPortDelete}
       marginLeft={3}
       marginRight={3}
-      createPermission="admin:servers"
-      editPermission="admin:servers"
-      deletePermission="admin:servers"
+      createPermission="server-manager:admin"
+      editPermission="server-manager:admin"
+      deletePermission="server-manager:admin"
     />
   );
 }

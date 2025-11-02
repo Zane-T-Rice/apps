@@ -149,7 +149,7 @@ export function ServersTabContent(props: {
     const title = `Updating server ${serverToUpdate.applicationName}/${serverToUpdate.containerName}`;
     const server = await fetchWithValidateAndToast({
       title,
-      setErrors: () => {},
+      setErrors: () => { },
       validateCallback: () => {
         return updateServerSchema.validateSync(serverToUpdate, {
           abortEarly: false,
@@ -166,7 +166,7 @@ export function ServersTabContent(props: {
     const title = `Stopping server ${serverToStop.applicationName}/${serverToStop.containerName}`;
     const server = await fetchWithValidateAndToast({
       title,
-      setErrors: () => {},
+      setErrors: () => { },
       validateCallback: () => {
         return stopServerSchema.validateSync(serverToStop, {
           abortEarly: false,
@@ -200,9 +200,9 @@ export function ServersTabContent(props: {
         onDelete={onServerDelete}
         marginLeft={3}
         marginRight={3}
-        createPermission="admin:servers"
-        editPermission="admin:servers"
-        deletePermission="admin:servers"
+        createPermission="server-manager:admin"
+        editPermission="server-manager:admin"
+        deletePermission="server-manager:admin"
       />
       <ServerActionsButtons
         selectedServer={selectedServer}

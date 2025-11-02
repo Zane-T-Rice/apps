@@ -125,8 +125,8 @@ export function UserServerLinksTabContent(props: {
       onDelete={onUserServerLinkDelete}
       marginLeft={3}
       marginRight={3}
-      createPermission="admin:servers"
-      deletePermission="admin:servers"
+      createPermission="server-manager:admin"
+      deletePermission="server-manager:admin"
     />
   );
 }

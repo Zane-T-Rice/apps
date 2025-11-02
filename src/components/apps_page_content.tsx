@@ -24,7 +24,7 @@ const apps = [
     link: "/calories",
     icon: <FaChartPie size={iconSize} />,
     imageDescription: "Calories pie chart.",
-    requiredPermissions: ["admin:servers"],
+    requiredPermissions: ["server-manager:admin"],
     requiresOneOfPermissions: [],
   },
   {
@@ -33,7 +33,7 @@ const apps = [
     link: "/servers",
     icon: <FaGhost size={iconSize} />,
     imageDescription: "Servers.",
-    requiredPermissions: ["admin:servers"],
+    requiredPermissions: ["server-manager:admin"],
     requiresOneOfPermissions: [],
   },
   {
@@ -43,7 +43,7 @@ const apps = [
     icon: <FaServer size={iconSize} />,
     imageDescription: "Servers.",
     requiredPermissions: [],
-    requiresOneOfPermissions: ["admin:servers", "user:servers"],
+    requiresOneOfPermissions: ["server-manager:admin", "server-manager:public"],
   },
 ];
 

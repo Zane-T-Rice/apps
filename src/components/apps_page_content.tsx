@@ -14,6 +14,7 @@ import { HiHome } from "react-icons/hi";
 import NextLink from "next/link";
 import CheckPermissionsForContent from "@/app/utils/check_permissions_for_content";
 import { FaChartPie, FaGhost, FaServer } from "react-icons/fa";
+import { GiCompanionCube } from "react-icons/gi";
 
 const iconSize = 250;
 
@@ -44,6 +45,15 @@ const apps = [
     imageDescription: "Servers.",
     requiredPermissions: [],
     requiresOneOfPermissions: ["server-manager:admin", "server-manager:public"],
+  },
+  {
+    name: "Gloomahaven Companion",
+    description: "Tools for playing the board game Gloomhaven.",
+    link: "/gloomhaven_companion",
+    icon: <GiCompanionCube size={iconSize} />,
+    imageDescription: "Gloomhaven Companion Cube.",
+    requiredPermissions: [],
+    requiresOneOfPermissions: ["gloomhaven-companion:admin", "gloomhaven-companion:public"],
   },
 ];
 

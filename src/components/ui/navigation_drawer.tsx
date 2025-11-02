@@ -65,6 +65,14 @@ export function NavigationDrawer() {
                     Server Manager
                   </Link>
                 </CheckPermissionsForContent>
+                <CheckPermissionsForContent
+                  requiredPermissions={[]}
+                  requiresOneOfPermissions={["gloomhaven-companion:public", "gloomhaven-companion:admin"]}
+                >
+                  <Link href="/gloomhaven_companion" variant="button">
+                    Gloomhaven Companion
+                  </Link>
+                </CheckPermissionsForContent>
                 <ColorModeButton />
               </Stack>
             </Drawer.Body>

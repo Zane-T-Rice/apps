@@ -29,6 +29,10 @@ docker network create \
 
 - NEXT_PUBLIC_SERVER_MANAGER_SERVICE_DOMAIN is the URL to the server-manager-service.
 - NEXT_PUBLIC_WEBSITE_DOMAIN is the URL to the host of this application.
+- NEXT_PUBLIC_AUTH0_DOMAIN is the URL to the Auth0 Issuer.
+- NEXT_PUBLIC_AUTH0_CLIENT_ID is the id of this application in Auth0.
+- NEXT_PUBLIC_AUTH0_AUDIENCE is the identifier of the Auth0 API.
+- NEXT_PUBLIC_AUTH0_SCOPES are the scopes that may be needed by the user.
 
 ```sh
 (
@@ -43,6 +47,10 @@ docker run --name=apps -d \
  --network server-manager-service-network \
  --env NEXT_PUBLIC_SERVER_MANAGER_SERVICE_DOMAIN="" \
  --env NEXT_PUBLIC_WEBSITE_DOMAIN="" \
+ --env NEXT_PUBLIC_AUTH0_DOMAIN="" \
+ --env NEXT_PUBLIC_AUTH0_CLIENT_ID="" \
+ --env NEXT_PUBLIC_AUTH0_AUDIENCE="" \
+ --env NEXT_PUBLIC_AUTH0_SCOPES="" \
  apps
 )
 ```

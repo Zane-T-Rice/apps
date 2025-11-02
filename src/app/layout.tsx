@@ -19,6 +19,7 @@ export default function DashboardLayout({
             authorizationParams={{
               redirect_uri: `${process.env.NEXT_PUBLIC_WEBSITE_DOMAIN}/apps`,
               audience: process.env.NEXT_PUBLIC_AUTH0_AUDIENCE,
+              scope: process.env.NEXT_PUBLIC_AUTH0_SCOPES
             }}
           >
             <Provider>

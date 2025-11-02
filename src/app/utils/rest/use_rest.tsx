@@ -2,7 +2,10 @@
 
 import { useAuth0 } from "@auth0/auth0-react";
 
-export function useREST<T extends { id: string }>(baseUrl: string) {
+export function useREST<T extends { id: string }>(
+  baseUrl: string,
+  responseTransformer?: (response: T | T[]) => T | T[]
+) {
   const { getAccessTokenSilently } = useAuth0();
 
   async function getAllREST(): Promise<T[] | null> {
@@ -20,7 +23,8 @@ export function useREST<T extends { id: string }>(baseUrl: string) {
       return null;
     }
 
-    return await response.json();
+    const parsedResponse = await response.json();
+    return responseTransformer?.(parsedResponse) || parsedResponse;
   }
 
   async function createREST(resource: Omit<T, "id">): Promise<T | null> {
@@ -39,7 +43,8 @@ export function useREST<T extends { id: string }>(baseUrl: string) {
       return null;
     }
 
-    return await response.json();
+    const parsedResponse = await response.json();
+    return responseTransformer?.(parsedResponse) || parsedResponse;
   }
 
   async function editREST(resource: T): Promise<T | null> {
@@ -58,7 +63,8 @@ export function useREST<T extends { id: string }>(baseUrl: string) {
       return null;
     }
 
-    return await response.json();
+    const parsedResponse = await response.json();
+    return responseTransformer?.(parsedResponse) || parsedResponse;
   }
 
   async function deleteREST(resource: Pick<T, "id">): Promise<T | null> {
@@ -76,7 +82,8 @@ export function useREST<T extends { id: string }>(baseUrl: string) {
       return null;
     }
 
-    return await response.json();
+    const parsedResponse = await response.json();
+    return responseTransformer?.(parsedResponse) || parsedResponse;
   }
 
   // Special function to do actions on a resource (such as reboot or update for Server).
@@ -98,7 +105,8 @@ export function useREST<T extends { id: string }>(baseUrl: string) {
       return null;
     }
 
-    return await response.json();
+    const parsedResponse = await response.json();
+    return responseTransformer?.(parsedResponse) || parsedResponse;
   }
 
   return {

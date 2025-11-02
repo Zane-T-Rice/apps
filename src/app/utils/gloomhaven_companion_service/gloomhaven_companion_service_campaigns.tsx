@@ -9,7 +9,7 @@ export type Campaign = {
   entity: string;
 };
 
-export function useCampaigns() {
+export function useCampaigns(responseTransformer?: (response: Campaign | Campaign[]) => Campaign | Campaign[]) {
   const baseUrl = `${process.env.NEXT_PUBLIC_GLOOMHAVEN_COMPANION_SERVICE_DOMAIN}/campaigns`;
-  return useREST<Campaign>(baseUrl);
+  return useREST<Campaign>(baseUrl, responseTransformer);
 }

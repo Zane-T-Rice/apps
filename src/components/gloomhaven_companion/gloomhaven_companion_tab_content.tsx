@@ -5,6 +5,7 @@ import { Campaign, useCampaigns } from "@/app/utils/gloomhaven_companion_service
 import { object, string } from "yup";
 import { fetchWithValidateAndToast } from "@/app/utils/fetch/fetch_with_validate_and_toast";
 import CRUDButtons from "../ui/crud_buttons";
+import { hydrateId } from "@/app/utils/gloomhaven_companion_service/hydrate_id";
 
 const createCampaignSchema = object({
   name: string().required(),
@@ -50,7 +51,7 @@ export function GloomhavenCompanionTabContent() {
 
   useEffect(() => {
     getCampaigns().then((responseCampaigns) => {
-      if (responseCampaigns) setCampaigns(responseCampaigns);
+      if (responseCampaigns) setCampaigns(responseCampaigns.map(hydrateId));
       setIsLoading(false);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -73,6 +74,7 @@ export function GloomhavenCompanionTabContent() {
       fetchCallback: async (validate) => await createCampaign(validate),
     });
     if (!campaign) return false;
+    hydrateId(campaign)
 
     // Update campaigns with new record
     setCampaigns((prev) => {
@@ -95,6 +97,7 @@ export function GloomhavenCompanionTabContent() {
       fetchCallback: async (validate) => await editCampaign(validate),
     });
     if (!campaign) return false;
+    hydrateId(campaign)
 
     // Update campaigns with edited record if success
     setCampaigns((prev) => {
@@ -102,6 +105,7 @@ export function GloomhavenCompanionTabContent() {
         currentCampaign.id === campaign.id ? campaign : currentCampaign
       );
     });
+    setSelectedCampaign(campaign)
 
     return true;
   };

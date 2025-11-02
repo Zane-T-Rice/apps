@@ -14,12 +14,11 @@ export default function DashboardLayout({
       <body>
         <main>
           <Auth0Provider
-            domain="dev-7n448ak2gn3oqctx.us.auth0.com"
-            clientId="9gbYkOK0QacEul9QHfidMwhRurXbnPS1"
+            domain={`${process.env.NEXT_PUBLIC_AUTH0_DOMAIN}`}
+            clientId={`${process.env.NEXT_PUBLIC_AUTH0_CLIENT_ID}`}
             authorizationParams={{
               redirect_uri: `${process.env.NEXT_PUBLIC_WEBSITE_DOMAIN}/apps`,
-              audience: process.env.NEXT_PUBLIC_SERVER_MANAGER_SERVICE_DOMAIN,
-              scope: "admin:servers user:servers",
+              audience: process.env.NEXT_PUBLIC_AUTH0_AUDIENCE,
             }}
           >
             <Provider>

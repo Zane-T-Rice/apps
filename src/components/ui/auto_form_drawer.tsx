@@ -35,9 +35,9 @@ export function AutoFormDrawer<T extends object>(props: {
   setIsOpen: (value: boolean) => void;
   onSubmit: (value: T) => Promise<boolean>;
   errors: { [Property in keyof T]?: string };
-  omit?: string[];
+  omitFields?: (keyof T)[];
 }) {
-  const { isOpen, setIsOpen, title, record, onSubmit, errors, omit } = props;
+  const { isOpen, setIsOpen, title, record, onSubmit, errors, omitFields } = props;
 
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [submittedOnce, setSubmittedOnce] = useState<boolean>(false);
@@ -55,7 +55,7 @@ export function AutoFormDrawer<T extends object>(props: {
         return !(record[fieldName] instanceof Object);
       })
       // Filter out any fields which are in the omit array.
-      .filter((fieldName) => !omit?.find((name) => name === fieldName))
+      .filter((fieldName) => !omitFields?.find((name) => name === fieldName))
       .map((fieldName, index) => ({
         id: index,
         invalid: false,
@@ -77,7 +77,7 @@ export function AutoFormDrawer<T extends object>(props: {
       }));
 
     setFields(newFields);
-  }, [record, omit]);
+  }, [record, omitFields]);
 
   // When a new record comes in, set the default state of the input fields.
   useEffect(() => {
@@ -107,10 +107,15 @@ export function AutoFormDrawer<T extends object>(props: {
 
     setIsSubmitting(true);
     (async () => {
+      const combinedFields = fields.reduce((a, b) => ({ ...a, [b.name]: b.value }), {}) as T;
+      if (record) {
+        omitFields?.forEach(field => {
+          combinedFields[field] = record[field]
+        })
+      }
+
       if (
-        await onSubmit(
-          fields.reduce((a, b) => ({ ...a, [b.name]: b.value }), {}) as T
-        )
+        await onSubmit(combinedFields)
       ) {
         resetFields();
         setIsOpen(false);

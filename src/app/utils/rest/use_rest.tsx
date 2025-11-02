@@ -2,10 +2,16 @@
 
 import { useAuth0 } from "@auth0/auth0-react";
 
-export function useREST<T extends { id: string }>(
-  baseUrl: string,
-  responseTransformer?: (response: T | T[]) => T | T[]
-) {
+export function useREST<
+  T extends { id: string }, // The main resource type
+  // Any keys to exclude from create and edit.
+  // Edit will still receive "id" even if you include it here.
+  K extends keyof T = "id"
+>
+  (
+    baseUrl: string,
+    responseTransformer?: (response: T | T[]) => T | T[],
+  ) {
   const { getAccessTokenSilently } = useAuth0();
 
   async function getAllREST(): Promise<T[] | null> {
@@ -27,7 +33,7 @@ export function useREST<T extends { id: string }>(
     return responseTransformer?.(parsedResponse) || parsedResponse;
   }
 
-  async function createREST(resource: Omit<T, "id">): Promise<T | null> {
+  async function createREST(resource: Omit<T, K>): Promise<T | null> {
     const accessToken = await getAccessTokenSilently();
 
     const response = await fetch(baseUrl, {
@@ -47,7 +53,7 @@ export function useREST<T extends { id: string }>(
     return responseTransformer?.(parsedResponse) || parsedResponse;
   }
 
-  async function editREST(resource: T): Promise<T | null> {
+  async function editREST(resource: Omit<T, K> & { id: string }): Promise<T | null> {
     const accessToken = await getAccessTokenSilently();
 
     const response = await fetch(`${baseUrl}/${resource.id}`, {

@@ -9,8 +9,6 @@ import { responseTransformer } from "@/app/utils/gloomhaven_companion_service/re
 
 const createCampaignSchema = object({
   name: string().required(),
-  parent: string().required(),
-  entity: string().required(),
 }).stripUnknown();
 
 const editCampaignSchema = createCampaignSchema
@@ -145,7 +143,7 @@ export function GloomhavenCompanionTabContent() {
       ) : (
         <Stack>
           <CRUDButtons
-            idKey="id"
+            omitKeys={["id", "parent", "entity"]}
             selectedRecord={selectedCampaign}
             onCreate={onCampaignCreate}
             creationRecord={createCampaignRecord}

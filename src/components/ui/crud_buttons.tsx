@@ -7,7 +7,7 @@ import { AutoFormDrawer } from "./auto_form_drawer";
 import { Button } from "../recipes/button";
 
 export default function CRUDButtons<T extends object>(props: {
-    idKey: keyof T;
+    omitKeys?: (keyof T)[];
     selectedRecord?: T;
     onCreate?: (record: T) => Promise<boolean>;
     onCreateErrors?: { [Property in keyof T]?: string };
@@ -20,7 +20,7 @@ export default function CRUDButtons<T extends object>(props: {
     deletePermission?: string;
 } & StackProps) {
     const {
-        idKey,
+        omitKeys,
         selectedRecord,
         onCreate,
         creationRecord,
@@ -36,7 +36,6 @@ export default function CRUDButtons<T extends object>(props: {
 
     const [isEditOpen, setIsEditOpen] = useState<boolean>(false);
     const [isCreateOpen, setIsCreateOpen] = useState<boolean>(false);
-    const [createOmit] = useState<string[]>([idKey.toString()]);
 
     const { hasPermissions } = usePermissions();
     const [hasCreatePermission, setHasCreatePermission] = useState<
@@ -139,7 +138,7 @@ export default function CRUDButtons<T extends object>(props: {
                 setIsOpen={setIsCreateOpen}
                 onSubmit={onCreate}
                 errors={onCreateErrors}
-                omit={createOmit}
+                omitFields={omitKeys}
             />
         ) : null}
         {onEdit && onEditErrors && editPermission !== undefined ? (
@@ -150,6 +149,7 @@ export default function CRUDButtons<T extends object>(props: {
                 setIsOpen={setIsEditOpen}
                 onSubmit={onEdit}
                 errors={onEditErrors}
+                omitFields={omitKeys}
             />
         ) : null}
     </>

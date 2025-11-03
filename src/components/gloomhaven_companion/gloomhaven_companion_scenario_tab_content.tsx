@@ -1,5 +1,5 @@
 import { Card, Grid, GridItem, Skeleton, Stack } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { AutoDataList } from "../ui/auto_data_list";
 import { Scenario, useScenarios } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_scenarios";
 import { object, string } from "yup";
@@ -25,12 +25,13 @@ const deleteScenarioSchema = object({
 }).stripUnknown();
 
 export function GloomhavenCompanionScenarioTabContent(props: {
-  campaign: Campaign;
+  selectedCampaign: Campaign;
+  selectedScenario?: Scenario;
+  setSelectedScenario: Dispatch<SetStateAction<Scenario | undefined>>;
 }) {
-  const { campaign } = props;
+  const { selectedCampaign, selectedScenario, setSelectedScenario } = props;
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
-  const [selectedScenario, setSelectedScenario] = useState<Scenario>();
   const [createErrors, setCreateErrors] = useState<{
     [Property in keyof Scenario]?: string;
   }>({});
@@ -49,7 +50,7 @@ export function GloomhavenCompanionScenarioTabContent(props: {
     createREST: createScenario,
     editREST: editScenario,
     deleteREST: deleteScenario,
-  } = useScenarios(campaign.id, responseTransformer);
+  } = useScenarios(selectedCampaign.id, responseTransformer);
 
   useEffect(() => {
     getScenarios().then((responseScenarios) => {
@@ -57,7 +58,7 @@ export function GloomhavenCompanionScenarioTabContent(props: {
       setIsLoading(false);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [campaign]);
+  }, [selectedCampaign]);
 
   const onScenarioSelect = (scenario: Scenario) => {
     setSelectedScenario(scenario);

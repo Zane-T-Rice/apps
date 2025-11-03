@@ -3,14 +3,21 @@
 import { Box, Tabs } from "@chakra-ui/react";
 import { NavigationBar } from "../ui/navigation_bar";
 import { FaServer } from "react-icons/fa";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { GloomhavenCompanionCampaignTabContent } from "./gloomhaven_companion_campaign_tab_content";
 import { GloomhavenCompanionScenarioTabContent } from "./gloomhaven_companion_scenario_tab_content";
 import { Campaign } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_campaigns";
+import { Scenario } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_scenarios";
+import { GloomhavenCompanionFigureTabContent } from "./gloomhaven_companion_figure_tab_content";
 
 export default function GloomhavenCompanionPageContent() {
   const [activeTab, setActiveTab] = useState<string>();
   const [selectedCampaign, setSelectedCampaign] = useState<Campaign>();
+  const [selectedScenario, setSelectedScenario] = useState<Scenario>();
+
+  useEffect(() => {
+    setSelectedScenario(undefined);
+  }, [selectedCampaign]);
 
   const actions = <></>;
 
@@ -28,6 +35,12 @@ export default function GloomhavenCompanionPageContent() {
         </Box>
         Scenarios
       </Tabs.Trigger>
+      <Tabs.Trigger value="figures" disabled={!selectedCampaign || !selectedScenario}>
+        <Box hideBelow="sm">
+          <FaServer />
+        </Box>
+        Figures
+      </Tabs.Trigger>
     </>
   );
 
@@ -37,9 +50,11 @@ export default function GloomhavenCompanionPageContent() {
         <GloomhavenCompanionCampaignTabContent selectedCampaign={selectedCampaign} setSelectedCampaign={setSelectedCampaign} />
       </Tabs.Content>
       {selectedCampaign && <Tabs.Content value="scenarios">
-        <GloomhavenCompanionScenarioTabContent campaign={selectedCampaign} />
-      </Tabs.Content>
-      }
+        <GloomhavenCompanionScenarioTabContent selectedCampaign={selectedCampaign} selectedScenario={selectedScenario} setSelectedScenario={setSelectedScenario} />
+      </Tabs.Content>}
+      {selectedCampaign && selectedScenario && <Tabs.Content value="figures">
+        <GloomhavenCompanionFigureTabContent selectedCampaign={selectedCampaign} selectedScenario={selectedScenario} />
+      </Tabs.Content>}
     </>
   );
 

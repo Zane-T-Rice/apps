@@ -3,10 +3,10 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { AutoDataList } from "../ui/auto_data_list";
 import { Scenario, useScenarios } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_scenarios";
 import { object, string } from "yup";
-import { fetchWithValidateAndToast } from "@/app/utils/fetch/fetch_with_validate_and_toast";
 import CRUDButtons from "../ui/crud_buttons";
 import { responseTransformer } from "@/app/utils/gloomhaven_companion_service/response_transformer";
 import { Campaign } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_campaigns";
+import { useOnCRUD } from "@/app/utils/rest/use_on_crud";
 
 const createScenarioSchema = object({
   name: string().required(),
@@ -64,74 +64,28 @@ export function GloomhavenCompanionScenarioTabContent(props: {
     setSelectedScenario(scenario);
   };
 
-  const onScenarioCreate = async (newScenario: Scenario): Promise<boolean> => {
-    const title = `Creating scenario ${newScenario.name}`;
-    const scenario = await fetchWithValidateAndToast({
-      title,
-      setErrors: setCreateErrors,
-      validateCallback: () => {
-        return createScenarioSchema.validateSync(newScenario, {
-          abortEarly: false,
-        });
-      },
-      fetchCallback: async (validate) => await createScenario(validate),
-    });
-    if (!scenario) return false;
-
-    // Update scenarios with new record
-    setScenarios((prev) => {
-      return [...prev, scenario];
-    });
-
-    return true;
-  };
-
-  const onScenarioEdit = async (newScenario: Scenario): Promise<boolean> => {
-    const title = `Editing scenario ${newScenario.name}`;
-    const scenario = await fetchWithValidateAndToast({
-      title,
-      setErrors: setEditErrors,
-      validateCallback: () => {
-        return editScenarioSchema.validateSync(newScenario, {
-          abortEarly: false,
-        });
-      },
-      fetchCallback: async (validate) => await editScenario(validate),
-    });
-    if (!scenario) return false;
-
-    // Update scenarios with edited record if success
-    setScenarios((prev) => {
-      return prev.map((currentScenario) =>
-        currentScenario.id === scenario.id ? scenario : currentScenario
-      );
-    });
-    setSelectedScenario(scenario)
-
-    return true;
-  };
-
-  const onScenarioDelete = async (scenarioToDelete: Scenario): Promise<boolean> => {
-    const title = `Deleting scenario ${scenarioToDelete.name}`;
-    const scenario = await fetchWithValidateAndToast({
-      title,
-      setErrors: setEditErrors,
-      validateCallback: () => {
-        return deleteScenarioSchema.validateSync(scenarioToDelete, {
-          abortEarly: false,
-        });
-      },
-      fetchCallback: async (validate) => await deleteScenario(validate),
-    });
-    if (!scenario) return false;
-
-    setScenarios((prev) => {
-      return prev.filter((currentScenario) => currentScenario.id !== scenario.id);
-    });
-    setSelectedScenario(undefined);
-
-    return true;
-  };
+  const {
+    onResourceCreate: onScenarioCreate,
+    onResourceEdit: onScenarioEdit,
+    onResourceDelete: onScenarioDelete
+  } = useOnCRUD<
+    Scenario,
+    typeof createScenarioSchema,
+    typeof editScenarioSchema,
+    typeof deleteScenarioSchema
+  >({
+    resourceNameKey: "name",
+    setCreateErrors,
+    setEditErrors,
+    createResourceSchema: createScenarioSchema,
+    editResourceSchema: editScenarioSchema,
+    deleteResourceSchema: deleteScenarioSchema,
+    createResource: createScenario,
+    editResource: editScenario,
+    deleteResource: deleteScenario,
+    setResources: setScenarios,
+    setSelectedResource: setSelectedScenario,
+  })
 
   const scenarioToScenarioInfo = (scenario: Scenario) => ({
     Name: scenario.name,

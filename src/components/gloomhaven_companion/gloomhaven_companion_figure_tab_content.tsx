@@ -3,11 +3,11 @@ import { useEffect, useState } from "react";
 import { AutoDataList } from "../ui/auto_data_list";
 import { Figure, useFigures } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_figures";
 import { number, object, string } from "yup";
-import { fetchWithValidateAndToast } from "@/app/utils/fetch/fetch_with_validate_and_toast";
 import CRUDButtons from "../ui/crud_buttons";
 import { responseTransformer } from "@/app/utils/gloomhaven_companion_service/response_transformer";
 import { Campaign } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_campaigns";
 import { Scenario } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_scenarios";
+import { useOnCRUD } from "@/app/utils/rest/use_on_crud";
 
 const createFigureSchema = object({
   name: string().required(),
@@ -69,74 +69,28 @@ export function GloomhavenCompanionFigureTabContent(props: {
     setSelectedFigure(figure);
   };
 
-  const onFigureCreate = async (newFigure: Figure): Promise<boolean> => {
-    const title = `Creating figure ${newFigure.name}`;
-    const figure = await fetchWithValidateAndToast({
-      title,
-      setErrors: setCreateErrors,
-      validateCallback: () => {
-        return createFigureSchema.validateSync(newFigure, {
-          abortEarly: false,
-        });
-      },
-      fetchCallback: async (validate) => await createFigure(validate),
-    });
-    if (!figure) return false;
-
-    // Update figures with new record
-    setFigures((prev) => {
-      return [...prev, figure];
-    });
-
-    return true;
-  };
-
-  const onFigureEdit = async (newFigure: Figure): Promise<boolean> => {
-    const title = `Editing figure ${newFigure.name}`;
-    const figure = await fetchWithValidateAndToast({
-      title,
-      setErrors: setEditErrors,
-      validateCallback: () => {
-        return editFigureSchema.validateSync(newFigure, {
-          abortEarly: false,
-        });
-      },
-      fetchCallback: async (validate) => await editFigure(validate),
-    });
-    if (!figure) return false;
-
-    // Update figures with edited record if success
-    setFigures((prev) => {
-      return prev.map((currentFigure) =>
-        currentFigure.id === figure.id ? figure : currentFigure
-      );
-    });
-    setSelectedFigure(figure)
-
-    return true;
-  };
-
-  const onFigureDelete = async (figureToDelete: Figure): Promise<boolean> => {
-    const title = `Deleting figure ${figureToDelete.name}`;
-    const figure = await fetchWithValidateAndToast({
-      title,
-      setErrors: setEditErrors,
-      validateCallback: () => {
-        return deleteFigureSchema.validateSync(figureToDelete, {
-          abortEarly: false,
-        });
-      },
-      fetchCallback: async (validate) => await deleteFigure(validate),
-    });
-    if (!figure) return false;
-
-    setFigures((prev) => {
-      return prev.filter((currentFigure) => currentFigure.id !== figure.id);
-    });
-    setSelectedFigure(undefined);
-
-    return true;
-  };
+  const {
+    onResourceCreate: onFigureCreate,
+    onResourceEdit: onFigureEdit,
+    onResourceDelete: onFigureDelete
+  } = useOnCRUD<
+    Figure,
+    typeof createFigureSchema,
+    typeof editFigureSchema,
+    typeof deleteFigureSchema
+  >({
+    resourceNameKey: "name",
+    setCreateErrors,
+    setEditErrors,
+    createResourceSchema: createFigureSchema,
+    editResourceSchema: editFigureSchema,
+    deleteResourceSchema: deleteFigureSchema,
+    createResource: createFigure,
+    editResource: editFigure,
+    deleteResource: deleteFigure,
+    setResources: setFigures,
+    setSelectedResource: setSelectedFigure,
+  })
 
   const figureToFigureInfo = (figure: Figure) => ({
     HP: `${figure.maximumHP - figure.damage} / ${figure.maximumHP}`

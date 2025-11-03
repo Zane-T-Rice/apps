@@ -3,9 +3,9 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { AutoDataList } from "../ui/auto_data_list";
 import { Campaign, useCampaigns } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_campaigns";
 import { object, string } from "yup";
-import { fetchWithValidateAndToast } from "@/app/utils/fetch/fetch_with_validate_and_toast";
 import CRUDButtons from "../ui/crud_buttons";
 import { responseTransformer } from "@/app/utils/gloomhaven_companion_service/response_transformer";
+import { useOnCRUD } from "@/app/utils/rest/use_on_crud";
 
 const createCampaignSchema = object({
   name: string().required(),
@@ -62,74 +62,28 @@ export function GloomhavenCompanionCampaignTabContent(props: {
     setSelectedCampaign(campaign);
   };
 
-  const onCampaignCreate = async (newCampaign: Campaign): Promise<boolean> => {
-    const title = `Creating campaign ${newCampaign.name}`;
-    const campaign = await fetchWithValidateAndToast({
-      title,
-      setErrors: setCreateErrors,
-      validateCallback: () => {
-        return createCampaignSchema.validateSync(newCampaign, {
-          abortEarly: false,
-        });
-      },
-      fetchCallback: async (validate) => await createCampaign(validate),
-    });
-    if (!campaign) return false;
-
-    // Update campaigns with new record
-    setCampaigns((prev) => {
-      return [...prev, campaign];
-    });
-
-    return true;
-  };
-
-  const onCampaignEdit = async (newCampaign: Campaign): Promise<boolean> => {
-    const title = `Editing campaign ${newCampaign.name}`;
-    const campaign = await fetchWithValidateAndToast({
-      title,
-      setErrors: setEditErrors,
-      validateCallback: () => {
-        return editCampaignSchema.validateSync(newCampaign, {
-          abortEarly: false,
-        });
-      },
-      fetchCallback: async (validate) => await editCampaign(validate),
-    });
-    if (!campaign) return false;
-
-    // Update campaigns with edited record if success
-    setCampaigns((prev) => {
-      return prev.map((currentCampaign) =>
-        currentCampaign.id === campaign.id ? campaign : currentCampaign
-      );
-    });
-    setSelectedCampaign(campaign)
-
-    return true;
-  };
-
-  const onCampaignDelete = async (campaignToDelete: Campaign): Promise<boolean> => {
-    const title = `Deleting campaign ${campaignToDelete.name}`;
-    const campaign = await fetchWithValidateAndToast({
-      title,
-      setErrors: setEditErrors,
-      validateCallback: () => {
-        return deleteCampaignSchema.validateSync(campaignToDelete, {
-          abortEarly: false,
-        });
-      },
-      fetchCallback: async (validate) => await deleteCampaign(validate),
-    });
-    if (!campaign) return false;
-
-    setCampaigns((prev) => {
-      return prev.filter((currentCampaign) => currentCampaign.id !== campaign.id);
-    });
-    setSelectedCampaign(undefined);
-
-    return true;
-  };
+  const {
+    onResourceCreate: onCampaignCreate,
+    onResourceEdit: onCampaignEdit,
+    onResourceDelete: onCampaignDelete
+  } = useOnCRUD<
+    Campaign,
+    typeof createCampaignSchema,
+    typeof editCampaignSchema,
+    typeof deleteCampaignSchema
+  >({
+    resourceNameKey: "name",
+    setCreateErrors,
+    setEditErrors,
+    createResourceSchema: createCampaignSchema,
+    editResourceSchema: editCampaignSchema,
+    deleteResourceSchema: deleteCampaignSchema,
+    createResource: createCampaign,
+    editResource: editCampaign,
+    deleteResource: deleteCampaign,
+    setResources: setCampaigns,
+    setSelectedResource: setSelectedCampaign,
+  })
 
   const campaignToCampaignInfo = (campaign: Campaign) => ({
     Name: campaign.name,

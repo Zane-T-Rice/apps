@@ -3,10 +3,10 @@ import CRUDTable from "../ui/crud_table";
 import { EnvironmentVariable } from "@/app/utils/server-manager-service/server_manager_service_environment_variables";
 import { useEffect, useState } from "react";
 import { string, object } from "yup";
-import { fetchWithValidateAndToast } from "@/app/utils/fetch/fetch_with_validate_and_toast";
 import { Server } from "@/app/utils/server-manager-service/server_manager_service_servers";
 import { useEnvironmentVariables } from "@/app/utils/server-manager-service/server_manager_service_environment_variables";
 import { Host } from "@/app/utils/server-manager-service/server_manager_service_hosts";
+import { useOnCRUD } from "@/app/utils/rest/use_on_crud";
 
 const createEnvironmentVariableSchema = object({
   name: string().required(),
@@ -35,7 +35,7 @@ export function EnvironmentVariablesTabContent(props: {
     EnvironmentVariable[]
   >([]);
   const [selectedEnvironmentVariable, setSelectedEnvironmentVariable] =
-    useState<EnvironmentVariable | null>(null);
+    useState<EnvironmentVariable>();
   const [createErrors, setCreateErrors] = useState<{
     [Property in keyof EnvironmentVariable]?: string;
   }>({});
@@ -73,96 +73,28 @@ export function EnvironmentVariablesTabContent(props: {
     setSelectedEnvironmentVariable(environmentVariable);
   };
 
-  const onEnvironmentVariableCreate = async (
-    newEnvironmentVariable: EnvironmentVariable
-  ): Promise<boolean> => {
-    const title = `Creating environment variable ${newEnvironmentVariable.name}:${newEnvironmentVariable.value}`;
-    const environmentVariable = await fetchWithValidateAndToast({
-      title,
-      setErrors: setCreateErrors,
-      validateCallback: () => {
-        return createEnvironmentVariableSchema.validateSync(
-          newEnvironmentVariable,
-          {
-            abortEarly: false,
-          }
-        );
-      },
-      fetchCallback: async (validate) =>
-        await createEnvironmentVariable(validate),
-    });
-    if (!environmentVariable) return false;
-
-    // Update environmentVariables with new record
-    setEnvironmentVariables((prev) => {
-      return [...prev, environmentVariable];
-    });
-
-    return true;
-  };
-
-  const onEnvironmentVariableEdit = async (
-    newEnvironmentVariable: EnvironmentVariable
-  ): Promise<boolean> => {
-    const title = `Editing environment variable ${newEnvironmentVariable.name}:${newEnvironmentVariable.value}`;
-    const environmentVariable = await fetchWithValidateAndToast({
-      title,
-      setErrors: setEditErrors,
-      validateCallback: () => {
-        return editEnvironmentVariableSchema.validateSync(
-          newEnvironmentVariable,
-          {
-            abortEarly: false,
-          }
-        );
-      },
-      fetchCallback: async (validate) =>
-        await editEnvironmentVariable(validate),
-    });
-    if (!environmentVariable) return false;
-
-    // Update environmentVariables with edited record if success
-    setEnvironmentVariables((prev) => {
-      return prev.map((currentEnvironmentVariable) =>
-        currentEnvironmentVariable.id === environmentVariable.id
-          ? environmentVariable
-          : currentEnvironmentVariable
-      );
-    });
-
-    return true;
-  };
-
-  const onEnvironmentVariableDelete = async (
-    environmentVariableToDelete: EnvironmentVariable
-  ): Promise<boolean> => {
-    const title = `Deleting environment variable ${environmentVariableToDelete.name}:${environmentVariableToDelete.value}`;
-    const environmentVariable = await fetchWithValidateAndToast({
-      title,
-      setErrors: setEditErrors,
-      validateCallback: () => {
-        return deleteEnvironmentVariableSchema.validateSync(
-          environmentVariableToDelete,
-          {
-            abortEarly: false,
-          }
-        );
-      },
-      fetchCallback: async (validate) =>
-        await deleteEnvironmentVariable(validate),
-    });
-    if (!environmentVariable) return false;
-
-    setEnvironmentVariables((prev) => {
-      return prev.filter(
-        (currentEnvironmentVariable) =>
-          currentEnvironmentVariable.id !== environmentVariable.id
-      );
-    });
-    setSelectedEnvironmentVariable(null);
-
-    return true;
-  };
+  const {
+    onResourceCreate: onEnvironmentVariableCreate,
+    onResourceEdit: onEnvironmentVariableEdit,
+    onResourceDelete: onEnvironmentVariableDelete
+  } = useOnCRUD<
+    EnvironmentVariable,
+    typeof createEnvironmentVariableSchema,
+    typeof editEnvironmentVariableSchema,
+    typeof deleteEnvironmentVariableSchema
+  >({
+    resourceNameKey: "name",
+    setCreateErrors,
+    setEditErrors,
+    createResourceSchema: createEnvironmentVariableSchema,
+    editResourceSchema: editEnvironmentVariableSchema,
+    deleteResourceSchema: deleteEnvironmentVariableSchema,
+    createResource: createEnvironmentVariable,
+    editResource: editEnvironmentVariable,
+    deleteResource: deleteEnvironmentVariable,
+    setResources: setEnvironmentVariables,
+    setSelectedResource: setSelectedEnvironmentVariable,
+  })
 
   return isLoading ? (
     <Stack direction="column" marginLeft={2} marginRight={2}>

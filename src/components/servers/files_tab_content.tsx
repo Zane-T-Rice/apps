@@ -6,9 +6,9 @@ import {
 } from "@/app/utils/server-manager-service/server_manager_service_files";
 import { useEffect, useState } from "react";
 import { string, object } from "yup";
-import { fetchWithValidateAndToast } from "@/app/utils/fetch/fetch_with_validate_and_toast";
 import { Server } from "@/app/utils/server-manager-service/server_manager_service_servers";
 import { Host } from "@/app/utils/server-manager-service/server_manager_service_hosts";
+import { useOnCRUD } from "@/app/utils/rest/use_on_crud";
 
 const createFileSchema = object({
   name: string().required(),
@@ -34,7 +34,7 @@ export function FilesTabContent(props: {
   const { selectedHost, selectedServer } = props;
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [files, setFiles] = useState<File[]>([]);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File>();
   const [createErrors, setCreateErrors] = useState<{
     [Property in keyof File]?: string;
   }>({});
@@ -69,73 +69,28 @@ export function FilesTabContent(props: {
     setSelectedFile(file);
   };
 
-  const onFileCreate = async (newFile: File): Promise<boolean> => {
-    const title = `Creating file ${newFile.name}`;
-    const file = await fetchWithValidateAndToast({
-      title,
-      setErrors: setCreateErrors,
-      validateCallback: () => {
-        return createFileSchema.validateSync(newFile, {
-          abortEarly: false,
-        });
-      },
-      fetchCallback: async (validate) => await createFile(validate),
-    });
-    if (!file) return false;
-
-    // Update files with new record
-    setFiles((prev) => {
-      return [...prev, file];
-    });
-
-    return true;
-  };
-
-  const onFileEdit = async (newFile: File): Promise<boolean> => {
-    const title = `Editing file ${newFile.name}`;
-    const file = await fetchWithValidateAndToast({
-      title,
-      setErrors: setEditErrors,
-      validateCallback: () => {
-        return editFileSchema.validateSync(newFile, {
-          abortEarly: false,
-        });
-      },
-      fetchCallback: async (validate) => await editFile(validate),
-    });
-    if (!file) return false;
-
-    // Update files with edited record if success
-    setFiles((prev) => {
-      return prev.map((currentFile) =>
-        currentFile.id === file.id ? file : currentFile
-      );
-    });
-
-    return true;
-  };
-
-  const onFileDelete = async (fileToDelete: File): Promise<boolean> => {
-    const title = `Deleting file ${fileToDelete.name}`;
-    const file = await fetchWithValidateAndToast({
-      title,
-      setErrors: setEditErrors,
-      validateCallback: () => {
-        return deleteFileSchema.validateSync(fileToDelete, {
-          abortEarly: false,
-        });
-      },
-      fetchCallback: async (validate) => await deleteFile(validate),
-    });
-    if (!file) return false;
-
-    setFiles((prev) => {
-      return prev.filter((currentFile) => currentFile.id !== file.id);
-    });
-    setSelectedFile(null);
-
-    return true;
-  };
+  const {
+    onResourceCreate: onFileCreate,
+    onResourceEdit: onFileEdit,
+    onResourceDelete: onFileDelete
+  } = useOnCRUD<
+    File,
+    typeof createFileSchema,
+    typeof editFileSchema,
+    typeof deleteFileSchema
+  >({
+    resourceNameKey: "name",
+    setCreateErrors,
+    setEditErrors,
+    createResourceSchema: createFileSchema,
+    editResourceSchema: editFileSchema,
+    deleteResourceSchema: deleteFileSchema,
+    createResource: createFile,
+    editResource: editFile,
+    deleteResource: deleteFile,
+    setResources: setFiles,
+    setSelectedResource: setSelectedFile,
+  })
 
   return isLoading ? (
     <Stack direction="column" marginLeft={2} marginRight={2}>

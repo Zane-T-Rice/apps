@@ -9,6 +9,7 @@ import { string, boolean, object } from "yup";
 import { fetchWithValidateAndToast } from "@/app/utils/fetch/fetch_with_validate_and_toast";
 import { Host } from "@/app/utils/server-manager-service/server_manager_service_hosts";
 import { ServerActionsButtons } from "./server_actions_buttons";
+import { useOnCRUD } from "@/app/utils/rest/use_on_crud";
 
 const createServerSchema = object({
   applicationName: string().required(),
@@ -33,8 +34,8 @@ const updateServerSchema = deleteServerSchema;
 
 export function ServersTabContent(props: {
   selectedHost: Host;
-  selectedServer: Server | null;
-  setSelectedServer: Dispatch<SetStateAction<Server | null>>;
+  selectedServer?: Server;
+  setSelectedServer: Dispatch<SetStateAction<Server | undefined>>;
 }) {
   const { selectedHost, selectedServer, setSelectedServer } = props;
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -77,73 +78,28 @@ export function ServersTabContent(props: {
     setSelectedServer(server);
   };
 
-  const onServerCreate = async (newServer: Server): Promise<boolean> => {
-    const title = `Creating server ${newServer.applicationName}/${newServer.containerName}`;
-    const server = await fetchWithValidateAndToast({
-      title,
-      setErrors: setCreateErrors,
-      validateCallback: () => {
-        return createServerSchema.validateSync(newServer, {
-          abortEarly: false,
-        });
-      },
-      fetchCallback: async (validate) => await createServer(validate),
-    });
-    if (!server) return false;
-
-    // Update servers with new record
-    setServers((prev) => {
-      return [...prev, server];
-    });
-
-    return true;
-  };
-
-  const onServerEdit = async (newServer: Server): Promise<boolean> => {
-    const title = `Editing server ${newServer.applicationName}/${newServer.containerName}`;
-    const server = await fetchWithValidateAndToast({
-      title,
-      setErrors: setEditErrors,
-      validateCallback: () => {
-        return editServerSchema.validateSync(newServer, {
-          abortEarly: false,
-        });
-      },
-      fetchCallback: async (validate) => await editServer(validate),
-    });
-    if (!server) return false;
-
-    // Update servers with edited record if success
-    setServers((prev) => {
-      return prev.map((currentServer) =>
-        currentServer.id === server.id ? server : currentServer
-      );
-    });
-
-    return true;
-  };
-
-  const onServerDelete = async (serverToDelete: Server): Promise<boolean> => {
-    const title = `Deleting server ${serverToDelete.applicationName}/${serverToDelete.containerName}`;
-    const server = await fetchWithValidateAndToast({
-      title,
-      setErrors: setEditErrors,
-      validateCallback: () => {
-        return deleteServerSchema.validateSync(serverToDelete, {
-          abortEarly: false,
-        });
-      },
-      fetchCallback: async (validate) => await deleteServer(validate),
-    });
-    if (!server) return false;
-
-    setServers((prev) => {
-      return prev.filter((currentServer) => currentServer.id !== server.id);
-    });
-    setSelectedServer(null);
-
-    return true;
-  };
+  const {
+    onResourceCreate: onServerCreate,
+    onResourceEdit: onServerEdit,
+    onResourceDelete: onServerDelete
+  } = useOnCRUD<
+    Server,
+    typeof createServerSchema,
+    typeof editServerSchema,
+    typeof deleteServerSchema
+  >({
+    resourceNameKey: "containerName",
+    setCreateErrors,
+    setEditErrors,
+    createResourceSchema: createServerSchema,
+    editResourceSchema: editServerSchema,
+    deleteResourceSchema: deleteServerSchema,
+    createResource: createServer,
+    editResource: editServer,
+    deleteResource: deleteServer,
+    setResources: setServers,
+    setSelectedResource: setSelectedServer,
+  })
 
   const onServerUpdate = async (serverToUpdate: Server): Promise<boolean> => {
     const title = `Updating server ${serverToUpdate.applicationName}/${serverToUpdate.containerName}`;

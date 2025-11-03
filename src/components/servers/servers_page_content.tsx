@@ -17,11 +17,11 @@ import { UserServerLinksTabContent } from "./users_tab_content";
 
 export default function ServersPageContent() {
   const [activeTab, setActiveTab] = useState<string>();
-  const [selectedHost, setSelectedHost] = useState<Host | null>(null);
-  const [selectedServer, setSelectedServer] = useState<Server | null>(null);
+  const [selectedHost, setSelectedHost] = useState<Host>();
+  const [selectedServer, setSelectedServer] = useState<Server>();
 
   useEffect(() => {
-    setSelectedServer(null);
+    setSelectedServer(undefined);
   }, [selectedHost]);
 
   const actions = <></>;

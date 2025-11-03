@@ -6,7 +6,7 @@ import {
 } from "@/app/utils/server-manager-service/server_manager_service_hosts";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { string, object } from "yup";
-import { fetchWithValidateAndToast } from "@/app/utils/fetch/fetch_with_validate_and_toast";
+import { useOnCRUD } from "@/app/utils/rest/use_on_crud";
 
 const createHostSchema = object({
   name: string().required(),
@@ -26,8 +26,8 @@ const deleteHostSchema = object({
 }).stripUnknown();
 
 export function HostsTabContent(props: {
-  selectedHost: Host | null;
-  setSelectedHost: Dispatch<SetStateAction<Host | null>>;
+  selectedHost?: Host;
+  setSelectedHost: Dispatch<SetStateAction<Host | undefined>>;
 }) {
   const { selectedHost, setSelectedHost } = props;
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -64,73 +64,28 @@ export function HostsTabContent(props: {
     setSelectedHost(server);
   };
 
-  const onHostCreate = async (newHost: Host): Promise<boolean> => {
-    const title = `Creating host ${newHost.name}`;
-    const host = await fetchWithValidateAndToast({
-      title,
-      setErrors: setCreateErrors,
-      validateCallback: () => {
-        return createHostSchema.validateSync(newHost, {
-          abortEarly: false,
-        });
-      },
-      fetchCallback: async (validate) => await createHost(validate),
-    });
-    if (!host) return false;
-
-    // Update hosts with new record
-    setHosts((prev) => {
-      return [...prev, host];
-    });
-
-    return true;
-  };
-
-  const onHostEdit = async (newHost: Host): Promise<boolean> => {
-    const title = `Editing host ${newHost.name}`;
-    const host = await fetchWithValidateAndToast({
-      title,
-      setErrors: setEditErrors,
-      validateCallback: () => {
-        return editHostSchema.validateSync(newHost, {
-          abortEarly: false,
-        });
-      },
-      fetchCallback: async (validate) => await editHost(validate),
-    });
-    if (!host) return false;
-
-    // Update hosts with edited record if success
-    setHosts((prev) => {
-      return prev.map((currentHost) =>
-        currentHost.id === host.id ? host : currentHost
-      );
-    });
-
-    return true;
-  };
-
-  const onHostDelete = async (serverToDelete: Host): Promise<boolean> => {
-    const title = `Deleting host ${serverToDelete.name}`;
-    const host = await fetchWithValidateAndToast({
-      title,
-      setErrors: setEditErrors,
-      validateCallback: () => {
-        return deleteHostSchema.validateSync(serverToDelete, {
-          abortEarly: false,
-        });
-      },
-      fetchCallback: async (validate) => await deleteHost(validate),
-    });
-    if (!host) return false;
-
-    setHosts((prev) => {
-      return prev.filter((currentHost) => currentHost.id !== host.id);
-    });
-    setSelectedHost(null);
-
-    return true;
-  };
+  const {
+    onResourceCreate: onHostCreate,
+    onResourceEdit: onHostEdit,
+    onResourceDelete: onHostDelete
+  } = useOnCRUD<
+    Host,
+    typeof createHostSchema,
+    typeof editHostSchema,
+    typeof deleteHostSchema
+  >({
+    resourceNameKey: "name",
+    setCreateErrors,
+    setEditErrors,
+    createResourceSchema: createHostSchema,
+    editResourceSchema: editHostSchema,
+    deleteResourceSchema: deleteHostSchema,
+    createResource: createHost,
+    editResource: editHost,
+    deleteResource: deleteHost,
+    setResources: setHosts,
+    setSelectedResource: setSelectedHost,
+  })
 
   return isLoading ? (
     <Stack direction="column" marginLeft={2} marginRight={2}>

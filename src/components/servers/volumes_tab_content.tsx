@@ -6,9 +6,9 @@ import {
 } from "@/app/utils/server-manager-service/server_manager_service_volumes";
 import { useEffect, useState } from "react";
 import { string, object } from "yup";
-import { fetchWithValidateAndToast } from "@/app/utils/fetch/fetch_with_validate_and_toast";
 import { Server } from "@/app/utils/server-manager-service/server_manager_service_servers";
 import { Host } from "@/app/utils/server-manager-service/server_manager_service_hosts";
+import { useOnCRUD } from "@/app/utils/rest/use_on_crud";
 
 const createVolumeSchema = object({
   hostPath: string().required(),
@@ -34,7 +34,7 @@ export function VolumesTabContent(props: {
   const { selectedHost, selectedServer } = props;
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [volumes, setVolumes] = useState<Volume[]>([]);
-  const [selectedVolume, setSelectedVolume] = useState<Volume | null>(null);
+  const [selectedVolume, setSelectedVolume] = useState<Volume>();
   const [createErrors, setCreateErrors] = useState<{
     [Property in keyof Volume]?: string;
   }>({});
@@ -69,73 +69,28 @@ export function VolumesTabContent(props: {
     setSelectedVolume(volume);
   };
 
-  const onVolumeCreate = async (newVolume: Volume): Promise<boolean> => {
-    const title = `Creating volume ${newVolume.hostPath}:${newVolume.containerPath}`;
-    const volume = await fetchWithValidateAndToast({
-      title,
-      setErrors: setCreateErrors,
-      validateCallback: () => {
-        return createVolumeSchema.validateSync(newVolume, {
-          abortEarly: false,
-        });
-      },
-      fetchCallback: async (validate) => await createVolume(validate),
-    });
-    if (!volume) return false;
-
-    // Update volumes with new record
-    setVolumes((prev) => {
-      return [...prev, volume];
-    });
-
-    return true;
-  };
-
-  const onVolumeEdit = async (newVolume: Volume): Promise<boolean> => {
-    const title = `Editing volume ${newVolume.hostPath}:${newVolume.containerPath}`;
-    const volume = await fetchWithValidateAndToast({
-      title,
-      setErrors: setEditErrors,
-      validateCallback: () => {
-        return editVolumeSchema.validateSync(newVolume, {
-          abortEarly: false,
-        });
-      },
-      fetchCallback: async (validate) => await editVolume(validate),
-    });
-    if (!volume) return false;
-
-    // Update volumes with edited record if success
-    setVolumes((prev) => {
-      return prev.map((currentVolume) =>
-        currentVolume.id === volume.id ? volume : currentVolume
-      );
-    });
-
-    return true;
-  };
-
-  const onVolumeDelete = async (volumeToDelete: Volume): Promise<boolean> => {
-    const title = `Deleting volume ${volumeToDelete.hostPath}:${volumeToDelete.containerPath}`;
-    const volume = await fetchWithValidateAndToast({
-      title,
-      setErrors: setEditErrors,
-      validateCallback: () => {
-        return deleteVolumeSchema.validateSync(volumeToDelete, {
-          abortEarly: false,
-        });
-      },
-      fetchCallback: async (validate) => await deleteVolume(validate),
-    });
-    if (!volume) return false;
-
-    setVolumes((prev) => {
-      return prev.filter((currentVolume) => currentVolume.id !== volume.id);
-    });
-    setSelectedVolume(null);
-
-    return true;
-  };
+  const {
+    onResourceCreate: onVolumeCreate,
+    onResourceEdit: onVolumeEdit,
+    onResourceDelete: onVolumeDelete
+  } = useOnCRUD<
+    Volume,
+    typeof createVolumeSchema,
+    typeof editVolumeSchema,
+    typeof deleteVolumeSchema
+  >({
+    resourceNameKey: "containerPath",
+    setCreateErrors,
+    setEditErrors,
+    createResourceSchema: createVolumeSchema,
+    editResourceSchema: editVolumeSchema,
+    deleteResourceSchema: deleteVolumeSchema,
+    createResource: createVolume,
+    editResource: editVolume,
+    deleteResource: deleteVolume,
+    setResources: setVolumes,
+    setSelectedResource: setSelectedVolume,
+  })
 
   return isLoading ? (
     <Stack direction="column" marginLeft={2} marginRight={2}>

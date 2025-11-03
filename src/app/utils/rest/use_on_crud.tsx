@@ -4,19 +4,19 @@ import { Schema } from "yup";
 
 export function useOnCRUD<
     T extends { id: string },
-    CreateSchemaType extends Schema,
-    EditSchemaType extends Schema,
-    DeleteSchemaType extends Schema,
+    CreateSchemaType extends Schema | undefined,
+    EditSchemaType extends Schema | undefined,
+    DeleteSchemaType extends Schema | undefined,
 >(props: {
     resourceNameKey: keyof T;
-    setCreateErrors: Dispatch<SetStateAction<{ [Property in keyof T]?: string }>>;
-    setEditErrors: Dispatch<SetStateAction<{ [Property in keyof T]?: string }>>;
-    createResourceSchema: CreateSchemaType;
-    editResourceSchema: EditSchemaType;
-    deleteResourceSchema: DeleteSchemaType;
-    createResource: (resource: T) => Promise<T | null>;
-    editResource: (resource: T) => Promise<T | null>;
-    deleteResource: (resource: T) => Promise<T | null>;
+    setCreateErrors?: Dispatch<SetStateAction<{ [Property in keyof T]?: string }>>;
+    setEditErrors?: Dispatch<SetStateAction<{ [Property in keyof T]?: string }>>;
+    createResourceSchema?: CreateSchemaType;
+    editResourceSchema?: EditSchemaType;
+    deleteResourceSchema?: DeleteSchemaType;
+    createResource?: (resource: T) => Promise<T | null>;
+    editResource?: (resource: T) => Promise<T | null>;
+    deleteResource?: (resource: T) => Promise<T | null>;
     setResources: Dispatch<SetStateAction<T[]>>;
     setSelectedResource: Dispatch<SetStateAction<T | undefined>>;
 }) {
@@ -40,11 +40,11 @@ export function useOnCRUD<
             title,
             setErrors: setCreateErrors,
             validateCallback: () => {
-                return createResourceSchema.validateSync(newResource, {
+                return createResourceSchema?.validateSync(newResource, {
                     abortEarly: false,
                 });
             },
-            fetchCallback: async (validate) => await createResource(validate),
+            fetchCallback: async (validate) => await createResource?.(validate) || null,
         });
         if (!resource) return false;
 
@@ -62,11 +62,11 @@ export function useOnCRUD<
             title,
             setErrors: setEditErrors,
             validateCallback: () => {
-                return editResourceSchema.validateSync(newResource, {
+                return editResourceSchema?.validateSync(newResource, {
                     abortEarly: false,
                 });
             },
-            fetchCallback: async (validate) => await editResource(validate),
+            fetchCallback: async (validate) => await editResource?.(validate) || null,
         });
         if (!resource) return false;
 
@@ -87,11 +87,11 @@ export function useOnCRUD<
             title,
             setErrors: setEditErrors,
             validateCallback: () => {
-                return deleteResourceSchema.validateSync(resourceToDelete, {
+                return deleteResourceSchema?.validateSync(resourceToDelete, {
                     abortEarly: false,
                 });
             },
-            fetchCallback: async (validate) => await deleteResource(validate),
+            fetchCallback: async (validate) => await deleteResource?.(validate) || null,
         });
         if (!resource) return false;
 

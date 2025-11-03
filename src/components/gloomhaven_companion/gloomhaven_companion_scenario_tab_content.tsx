@@ -7,6 +7,7 @@ import CRUDButtons from "../ui/crud_buttons";
 import { responseTransformer } from "@/app/utils/gloomhaven_companion_service/response_transformer";
 import { Campaign } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_campaigns";
 import { useOnCRUD } from "@/app/utils/rest/use_on_crud";
+import { SelectableCardRoot } from "../ui/selectable_card_root";
 
 const createScenarioSchema = object({
   name: string().required(),
@@ -132,11 +133,9 @@ export function GloomhavenCompanionScenarioTabContent(props: {
                   justifyItems="center"
                   onClick={() => onScenarioSelect(scenario)}
                 >
-                  <Card.Root
-                    variant="elevated"
-                    width="95%"
-                    height="95%"
-                    key={`navigation-bar-${index}`}
+                  <SelectableCardRoot
+                    resource={scenario}
+                    selectedResource={selectedScenario}
                   >
                     <Card.Body>
                       <Stack gap={6}>
@@ -144,7 +143,7 @@ export function GloomhavenCompanionScenarioTabContent(props: {
                         <AutoDataList record={scenarioToScenarioInfo(scenario)} />
                       </Stack>
                     </Card.Body>
-                  </Card.Root>
+                  </SelectableCardRoot>
                 </GridItem>
               );
             })}

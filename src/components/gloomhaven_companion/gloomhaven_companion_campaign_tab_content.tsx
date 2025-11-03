@@ -6,6 +6,7 @@ import { object, string } from "yup";
 import CRUDButtons from "../ui/crud_buttons";
 import { responseTransformer } from "@/app/utils/gloomhaven_companion_service/response_transformer";
 import { useOnCRUD } from "@/app/utils/rest/use_on_crud";
+import { SelectableCardRoot } from "../ui/selectable_card_root";
 
 const createCampaignSchema = object({
   name: string().required(),
@@ -130,11 +131,9 @@ export function GloomhavenCompanionCampaignTabContent(props: {
                   justifyItems="center"
                   onClick={() => onCampaignSelect(campaign)}
                 >
-                  <Card.Root
-                    variant="elevated"
-                    width="95%"
-                    height="95%"
-                    key={`navigation-bar-${index}`}
+                  <SelectableCardRoot
+                    resource={campaign}
+                    selectedResource={selectedCampaign}
                   >
                     <Card.Body>
                       <Stack gap={6}>
@@ -142,7 +141,7 @@ export function GloomhavenCompanionCampaignTabContent(props: {
                         <AutoDataList record={campaignToCampaignInfo(campaign)} />
                       </Stack>
                     </Card.Body>
-                  </Card.Root>
+                  </SelectableCardRoot>
                 </GridItem>
               );
             })}

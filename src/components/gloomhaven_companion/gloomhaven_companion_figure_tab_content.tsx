@@ -8,6 +8,7 @@ import { responseTransformer } from "@/app/utils/gloomhaven_companion_service/re
 import { Campaign } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_campaigns";
 import { Scenario } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_scenarios";
 import { useOnCRUD } from "@/app/utils/rest/use_on_crud";
+import { SelectableCardRoot } from "../ui/selectable_card_root";
 
 const createFigureSchema = object({
   name: string().required(),
@@ -137,11 +138,9 @@ export function GloomhavenCompanionFigureTabContent(props: {
                   justifyItems="center"
                   onClick={() => onFigureSelect(figure)}
                 >
-                  <Card.Root
-                    variant="elevated"
-                    width="95%"
-                    height="95%"
-                    key={`navigation-bar-${index}`}
+                  <SelectableCardRoot
+                    resource={figure}
+                    selectedResource={selectedFigure}
                   >
                     <Card.Body>
                       <Stack gap={6}>
@@ -149,7 +148,7 @@ export function GloomhavenCompanionFigureTabContent(props: {
                         <AutoDataList record={figureToFigureInfo(figure)} />
                       </Stack>
                     </Card.Body>
-                  </Card.Root>
+                  </SelectableCardRoot>
                 </GridItem>
               );
             })}

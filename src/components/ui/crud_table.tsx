@@ -44,7 +44,7 @@ export default function CRUDTable<T extends object>(
     <>
       <Stack direction="column" {...stackProps}>
         <CRUDButtons
-          idKey={idKey}
+          omitKeys={[idKey]}
           selectedRecord={selectedRecord}
           onCreate={onCreate}
           creationRecord={creationRecord}

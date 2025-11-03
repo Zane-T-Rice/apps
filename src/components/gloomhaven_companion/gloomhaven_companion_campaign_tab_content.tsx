@@ -1,5 +1,5 @@
 import { Card, Grid, GridItem, Skeleton, Stack } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { AutoDataList } from "../ui/auto_data_list";
 import { Campaign, useCampaigns } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_campaigns";
 import { object, string } from "yup";
@@ -23,10 +23,13 @@ const deleteCampaignSchema = object({
   id: string().required(),
 }).stripUnknown();
 
-export function GloomhavenCompanionTabContent() {
+export function GloomhavenCompanionCampaignTabContent(props: {
+  selectedCampaign?: Campaign;
+  setSelectedCampaign: Dispatch<SetStateAction<Campaign | undefined>>;
+}) {
+  const { selectedCampaign, setSelectedCampaign } = props;
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
-  const [selectedCampaign, setSelectedCampaign] = useState<Campaign>();
   const [createErrors, setCreateErrors] = useState<{
     [Property in keyof Campaign]?: string;
   }>({});

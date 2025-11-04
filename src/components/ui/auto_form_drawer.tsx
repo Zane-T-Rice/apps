@@ -149,6 +149,12 @@ export function AutoFormDrawer<T extends object>(props: {
                       {field.name.toString()} <Field.RequiredIndicator />
                     </Field.Label>
                     <Input
+                      _selection={{
+                        bg: {
+                          base: "rgba(0,0,0,0.25)",
+                          _dark: "rgba(255,255,255,0.5)"
+                        }
+                      }}
                       placeholder={field.placeholder}
                       onChange={field.setField}
                       value={field.value}

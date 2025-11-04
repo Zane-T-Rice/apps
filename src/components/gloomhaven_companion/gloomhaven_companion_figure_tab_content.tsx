@@ -1,4 +1,4 @@
-import { Card, Grid, GridItem, Skeleton, Stack, Text } from "@chakra-ui/react";
+import { Card, Grid, GridItem, Skeleton, Stack } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { Figure, useFigures } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_figures";
 import { number, object, string } from "yup";
@@ -7,16 +7,18 @@ import { responseTransformer } from "@/app/utils/gloomhaven_companion_service/re
 import { Campaign } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_campaigns";
 import { Scenario } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_scenarios";
 import { useOnCRUD } from "@/app/utils/rest/use_on_crud";
-import { SelectableCardRoot } from "../ui/selectable_card_root";
-import { FigureDataList } from "../ui/figure_data_list";
-import { Button } from "../recipes/button";
-import { IoCloseSharp } from "react-icons/io5";
-import { FaRegClone } from "react-icons/fa";
+import { FigureCard } from "../ui/figure_card";
 
 const createFigureSchema = object({
   name: string().required(),
   maximumHP: number().integer().required(),
   damage: number().integer().required(),
+  class: string().required(),
+  rank: string().required(),
+  number: number().integer().required(),
+  shield: number().integer().required(),
+  move: number().integer().required(),
+  attack: number().integer().required(),
 }).stripUnknown();
 
 const editFigureSchema = createFigureSchema
@@ -51,7 +53,13 @@ export function GloomhavenCompanionFigureTabContent(props: {
     entity: "",
     name: "",
     maximumHP: 0,
-    damage: 0
+    damage: 0,
+    class: "",
+    number: 0,
+    rank: "",
+    shield: 0,
+    move: 0,
+    attack: 0
   });
 
   const {
@@ -96,6 +104,25 @@ export function GloomhavenCompanionFigureTabContent(props: {
     setSelectedResource: setSelectedFigure,
   })
 
+  const collectGroups = (figures: Figure[]): Array<Figure[]> => {
+    const groups: { [Property in string]: Figure[] } = {};
+
+    figures.forEach((figure) => {
+      if (!groups[figure.class]) groups[figure.class] = [figure];
+      else groups[figure.class].push(figure)
+    })
+
+    return Object.keys(groups).sort().map(key => groups[key].sort((figureA, figureB) => {
+      if (figureA.number < figureB.number) return -1;
+      else if (figureA.number === figureB.number) return 0;
+      else return 1;
+    }).sort((figureA, figureB) => {
+      if (figureA.rank.toLowerCase() === "normal" && figureB.rank.toLowerCase() === "elite") return 1
+      else if (figureA.rank.toLowerCase() === "elite" && figureB.rank.toLowerCase() === "normal") return -1
+      else return 0
+    }));
+  };
+
   return (
     <>
       {isLoading ? (
@@ -105,7 +132,7 @@ export function GloomhavenCompanionFigureTabContent(props: {
           <Skeleton height={50} variant="shine" />
         </Stack>
       ) : (
-        <Stack>
+        <Stack gap="1">
           <CRUDButtons
             omitKeys={["id", "parent", "entity"]}
             selectedRecord={selectedFigure}
@@ -121,57 +148,41 @@ export function GloomhavenCompanionFigureTabContent(props: {
             marginLeft={3}
             marginRight={3}
           />
-          <Grid
-            templateColumns={{
-              base: "repeat(1, 1fr)",
-              md: "repeat(2, 1fr)",
-              lg: "repeat(3, 1fr)",
-            }}
-            gap="0"
-          >
-            {figures.map((figure, index) => {
-              return (
-                <GridItem
-                  colSpan={1}
-                  key={`navigation-bar-grid-item-${index}`}
-                  justifyItems="center"
-                  onClick={() => onFigureSelect(figure)}
-                >
-                  <SelectableCardRoot
-                    resource={figure}
-                    selectedResource={selectedFigure}
+          {
+            collectGroups(figures)
+              .map((groups, groupIndex) => {
+                return (
+                  <Card.Root key={`group-card-${groupIndex}`} bg={"bg.emphasized"}
+                    marginLeft={3}
+                    marginRight={3}
                   >
-                    <Card.Body paddingTop="0px" paddingLeft="12px" paddingBottom="18px" paddingRight="0px">
-                      <Stack gap={6}>
-                        <Card.Title>
-                          <Stack direction="row" alignItems="center" gap="0">
-                            <Text>{`${figure.name}`}</Text>
-                            <Button
-                              paddingLeft="1"
-                              paddingBottom="2"
-                              borderWidth="0"
-                              onClick={() => onFigureCreate(figure)}
-                              _hover={{
-                                color: "green"
-                              }}><FaRegClone />
-                            </Button>
-                            <Button
-                              marginLeft="auto"
-                              onClick={() => onFigureDelete(figure)}
-                              _hover={{
-                                color: "red"
-                              }}><IoCloseSharp />
-                            </Button>
-                          </Stack>
-                        </Card.Title>
-                        <FigureDataList figure={figure} onFigureEdit={onFigureEdit} />
-                      </Stack>
+                    <Card.Body>
+                      <Grid key={`group-grid-${groupIndex}`}
+                        templateColumns={{
+                          base: "repeat(1, 1fr)",
+                          md: "repeat(2, 1fr)",
+                          lg: "repeat(3, 1fr)",
+                        }}
+                        gap="0"
+                      >
+                        {groups.map((figure, figureIndex) => {
+                          return (
+                            <GridItem
+                              colSpan={1}
+                              key={`navigation-bar-grid-item-${figureIndex}`}
+                              justifyItems="center"
+                              onClick={() => onFigureSelect(figure)}
+                            >
+                              <FigureCard figure={figure} selectedFigure={selectedFigure} onFigureCreate={onFigureCreate} onFigureDelete={onFigureDelete} onFigureEdit={onFigureEdit} />
+                            </GridItem>
+                          );
+                        })
+                        }
+                      </Grid>
                     </Card.Body>
-                  </SelectableCardRoot>
-                </GridItem>
-              );
-            })}
-          </Grid>
+                  </Card.Root>
+                )
+              })}
         </Stack>
       )}
     </>

@@ -10,6 +10,12 @@ export type Figure = {
   name: string;
   maximumHP: number;
   damage: number;
+  class: string;
+  number: number;
+  rank: string;
+  shield: number;
+  move: number;
+  attack: number;
 };
 
 export function useFigures(campaignId: string, scenarioId: string, responseTransformer?: (response: Figure | Figure[]) => Figure | Figure[]) {

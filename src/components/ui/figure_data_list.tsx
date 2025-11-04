@@ -1,6 +1,8 @@
 import { Figure } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_figures";
 import { Center, DataList, Stack } from "@chakra-ui/react";
 import { Button } from "../recipes/button";
+import { GiBroadsword, GiLeatherBoot } from "react-icons/gi";
+import { IoShield } from "react-icons/io5";
 
 export function FigureDataList(props: { figure: Figure, onFigureEdit: (figure: Figure) => void }) {
   const { figure, onFigureEdit } = props;
@@ -16,22 +18,25 @@ export function FigureDataList(props: { figure: Figure, onFigureEdit: (figure: F
   return figure ? (
     <>
       <DataList.Root orientation="horizontal" variant="bold">
-        <DataList.Item key={"HP"}>
-          <Stack direction="row" alignItems="center" flex="auto">
-            <DataList.ItemLabel minWidth="1/6">{"HP"}</DataList.ItemLabel>
-            <Button minWidth="1/12" height="1/2" variant={"safe"} onClick={() => {
-              increaseDamage(figure);
-              onFigureEdit(figure);
-            }}>-</Button>
-            <Center minWidth="1/6">
-              {`${figure.maximumHP - figure.damage} / ${figure.maximumHP}`}
-            </Center>
-            <Button minWidth="1/12" height="1/2" variant={"safe"} onClick={() => {
-              decreaseDamage(figure)
-              onFigureEdit(figure)
-            }}>+</Button>
-          </Stack>
-        </DataList.Item>
+        <Stack>
+          <DataList.Item key={"HP"}>
+            <Stack direction="row" alignItems="center" flex="auto">
+              <DataList.ItemLabel minWidth="1/6">{"HP"}</DataList.ItemLabel>
+              <Button minWidth="1/12" height="1/2" variant={"safe"} onClick={() => {
+                increaseDamage(figure);
+                onFigureEdit(figure);
+              }}>-</Button>
+              <Center minWidth="1/6">
+                {`${figure.maximumHP - figure.damage} / ${figure.maximumHP}`}
+              </Center>
+              <Button minWidth="1/12" height="1/2" variant={"safe"} onClick={() => {
+                decreaseDamage(figure)
+                onFigureEdit(figure)
+              }}>+</Button>
+            </Stack>
+          </DataList.Item>
+          <Stack direction="row" alignItems={"center"} gapX="2"><GiLeatherBoot />{figure.move}<GiBroadsword />{figure.attack}<IoShield />{figure.shield}</Stack>
+        </Stack>
       </DataList.Root >
     </>
   ) : null;

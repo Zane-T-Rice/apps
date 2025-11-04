@@ -1,6 +1,5 @@
-import { Card, Grid, GridItem, Skeleton, Stack } from "@chakra-ui/react";
+import { Card, Grid, GridItem, Skeleton, Stack, Text } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { AutoDataList } from "../ui/auto_data_list";
 import { Figure, useFigures } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_figures";
 import { number, object, string } from "yup";
 import CRUDButtons from "../ui/crud_buttons";
@@ -9,6 +8,10 @@ import { Campaign } from "@/app/utils/gloomhaven_companion_service/gloomhaven_co
 import { Scenario } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_scenarios";
 import { useOnCRUD } from "@/app/utils/rest/use_on_crud";
 import { SelectableCardRoot } from "../ui/selectable_card_root";
+import { FigureDataList } from "../ui/figure_data_list";
+import { Button } from "../recipes/button";
+import { IoCloseSharp } from "react-icons/io5";
+import { FaRegClone } from "react-icons/fa";
 
 const createFigureSchema = object({
   name: string().required(),
@@ -93,10 +96,6 @@ export function GloomhavenCompanionFigureTabContent(props: {
     setSelectedResource: setSelectedFigure,
   })
 
-  const figureToFigureInfo = (figure: Figure) => ({
-    HP: `${figure.maximumHP - figure.damage} / ${figure.maximumHP}`
-  });
-
   return (
     <>
       {isLoading ? (
@@ -142,10 +141,30 @@ export function GloomhavenCompanionFigureTabContent(props: {
                     resource={figure}
                     selectedResource={selectedFigure}
                   >
-                    <Card.Body>
+                    <Card.Body paddingTop="0px" paddingLeft="12px" paddingBottom="18px" paddingRight="0px">
                       <Stack gap={6}>
-                        <Card.Title>{`${figure.name}`}</Card.Title>
-                        <AutoDataList record={figureToFigureInfo(figure)} />
+                        <Card.Title>
+                          <Stack direction="row" alignItems="center" gap="0">
+                            <Text>{`${figure.name}`}</Text>
+                            <Button
+                              paddingLeft="1"
+                              paddingBottom="2"
+                              borderWidth="0"
+                              onClick={() => onFigureCreate(figure)}
+                              _hover={{
+                                color: "green"
+                              }}><FaRegClone />
+                            </Button>
+                            <Button
+                              marginLeft="auto"
+                              onClick={() => onFigureDelete(figure)}
+                              _hover={{
+                                color: "red"
+                              }}><IoCloseSharp />
+                            </Button>
+                          </Stack>
+                        </Card.Title>
+                        <FigureDataList figure={figure} onFigureEdit={onFigureEdit} />
                       </Stack>
                     </Card.Body>
                   </SelectableCardRoot>

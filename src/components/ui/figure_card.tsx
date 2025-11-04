@@ -15,6 +15,10 @@ export function FigureCard(props: {
 }) {
     const { figure, selectedFigure, onFigureCreate, onFigureDelete, onFigureEdit } = props;
 
+    const buildTitleText = (figure: Figure) => {
+        return `${figure.rank} ${figure.class} ${figure.name}`
+    }
+
     return (<SelectableCardRoot
         resource={figure}
         selectedResource={selectedFigure}
@@ -23,7 +27,7 @@ export function FigureCard(props: {
             <Stack gap={0}>
                 <Card.Title>
                     <Stack direction="row" alignItems="center" gap="0">
-                        {`${figure.rank} ${figure.class}`}
+                        {buildTitleText(figure)}
                         <Button
                             paddingLeft="1"
                             paddingBottom="2"

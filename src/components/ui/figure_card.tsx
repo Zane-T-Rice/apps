@@ -1,4 +1,4 @@
-import { Card, Stack, Text } from "@chakra-ui/react"
+import { Card, Stack } from "@chakra-ui/react"
 import { SelectableCardRoot } from "./selectable_card_root"
 import { Button } from "../recipes/button"
 import { FaRegClone } from "react-icons/fa"
@@ -14,6 +14,7 @@ export function FigureCard(props: {
     onFigureEdit: (figure: Figure) => Promise<boolean>,
 }) {
     const { figure, selectedFigure, onFigureCreate, onFigureDelete, onFigureEdit } = props;
+
     return (<SelectableCardRoot
         resource={figure}
         selectedResource={selectedFigure}
@@ -22,7 +23,7 @@ export function FigureCard(props: {
             <Stack gap={0}>
                 <Card.Title>
                     <Stack direction="row" alignItems="center" gap="0">
-                        <Text>{`${figure.rank} ${figure.class} #${figure.number}`}</Text>
+                        {`${figure.rank} ${figure.class}`}
                         <Button
                             paddingLeft="1"
                             paddingBottom="2"

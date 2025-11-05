@@ -129,8 +129,6 @@ export function AutoFormDrawer<T extends object>(props: {
     });
   }, [setFields, submittedOnce, errors]);
 
-
-
   const submit = async () => {
     if (isSubmitting) return;
 

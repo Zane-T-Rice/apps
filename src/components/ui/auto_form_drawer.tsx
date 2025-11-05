@@ -42,9 +42,12 @@ export function AutoFormDrawer<T extends object>(props: {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [submittedOnce, setSubmittedOnce] = useState<boolean>(false);
   const [fields, setFields] = useState<FormFields<T>[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isCancelled, setIsCancelled] = useState<boolean>(false);
+  const [isSaved, setIsSaved] = useState<boolean>(false);
 
   const resetFields = useCallback(() => {
-    if (!record) return;
+    if (!record || (!isLoading && !isCancelled && !isSaved)) return;
 
     const newFields = (Object.keys(record) as (keyof T)[])
       // Filter out any non-primitives. Maybe later make an AutoForm that
@@ -76,13 +79,42 @@ export function AutoFormDrawer<T extends object>(props: {
         value: `${record[fieldName]}`,
       }));
 
+    setIsLoading(false);
+    setIsCancelled(false);
+    setIsSaved(false);
     setFields(newFields);
-  }, [record, omitFields]);
+  }, [record, omitFields, isLoading, isCancelled, isSaved]);
 
-  // When a new record comes in, set the default state of the input fields.
+  // Whenever resetFields callback changes, invoke it to reset the fields.
   useEffect(() => {
     resetFields();
   }, [resetFields]);
+
+  // Switching records should reset the fields.
+  useEffect(() => {
+    setIsLoading(true)
+  }, [record])
+
+  // Cancelling the drawer should reset the fields.
+  const cancel = () => {
+    setIsOpen(false);
+    setSubmittedOnce(false);
+    setIsCancelled(true);
+    resetFields();
+  };
+
+  // Successfully saving the drawer should reset the fields.
+  const successfulSave = () => {
+    setIsOpen(false);
+    setSubmittedOnce(false);
+    setIsSaved(true);
+    resetFields();
+  }
+
+  // An unuccessful save reveals errors on the form.
+  const unsuccessfulSave = () => {
+    setSubmittedOnce(true);
+  }
 
   // When a submit happens, check for invalid fields.
   useEffect(() => {
@@ -97,10 +129,7 @@ export function AutoFormDrawer<T extends object>(props: {
     });
   }, [setFields, submittedOnce, errors]);
 
-  const cancel = () => {
-    resetFields();
-    setIsOpen(false);
-  };
+
 
   const submit = async () => {
     if (isSubmitting) return;
@@ -117,11 +146,9 @@ export function AutoFormDrawer<T extends object>(props: {
       if (
         await onSubmit(combinedFields)
       ) {
-        resetFields();
-        setIsOpen(false);
-        setSubmittedOnce(false);
+        successfulSave();
       } else {
-        setSubmittedOnce(true);
+        unsuccessfulSave();
       }
       setIsSubmitting(false);
     })();

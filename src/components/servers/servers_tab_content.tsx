@@ -145,20 +145,25 @@ export function ServersTabContent(props: {
     <Stack direction="column" gapY={1.5}>
       <CRUDTable
         records={servers}
-        onRowSelect={onServerSelect}
+        style={{}}
         idKey="id"
+        onRowSelect={onServerSelect}
         selectedRecordId={selectedServer?.id}
+        createPermission="server-manager:admin"
+        creationRecord={createServerRecord}
         onCreate={onServerCreate}
         onCreateErrors={createErrors}
-        creationRecord={createServerRecord}
+        setCreateErrors={setCreateErrors}
+        createResourceSchema={createServerSchema}
+        editPermission="server-manager:admin"
         onEdit={onServerEdit}
         onEditErrors={editErrors}
+        setEditErrors={setEditErrors}
+        editResourceSchema={editServerSchema}
+        deletePermission="server-manager:admin"
         onDelete={onServerDelete}
         marginLeft={3}
         marginRight={3}
-        createPermission="server-manager:admin"
-        editPermission="server-manager:admin"
-        deletePermission="server-manager:admin"
       />
       <ServerActionsButtons
         selectedServer={selectedServer}

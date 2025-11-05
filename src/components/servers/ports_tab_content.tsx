@@ -101,20 +101,24 @@ export function PortsTabContent(props: {
     <CRUDTable
       records={ports}
       style={{}}
-      onRowSelect={onPortSelect}
       idKey="id"
+      onRowSelect={onPortSelect}
       selectedRecordId={selectedPort?.id}
+      createPermission="server-manager:admin"
+      creationRecord={createPortRecord}
       onCreate={onPortCreate}
       onCreateErrors={createErrors}
-      creationRecord={createPortRecord}
+      setCreateErrors={setCreateErrors}
+      createResourceSchema={createPortSchema}
+      editPermission="server-manager:admin"
       onEdit={onPortEdit}
       onEditErrors={editErrors}
+      setEditErrors={setEditErrors}
+      editResourceSchema={editPortSchema}
+      deletePermission="server-manager:admin"
       onDelete={onPortDelete}
       marginLeft={3}
       marginRight={3}
-      createPermission="server-manager:admin"
-      editPermission="server-manager:admin"
-      deletePermission="server-manager:admin"
     />
   );
 }

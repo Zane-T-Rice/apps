@@ -103,15 +103,19 @@ export function GloomhavenCompanionCampaignTabContent(props: {
           <CRUDButtons
             omitKeys={["id", "parent", "entity"]}
             selectedRecord={selectedCampaign}
-            onCreate={onCampaignCreate}
-            creationRecord={createCampaignRecord}
-            onEdit={onCampaignEdit}
-            onCreateErrors={createErrors}
-            onEditErrors={editErrors}
-            onDelete={onCampaignDelete}
             createPermission="gloomhaven-companion:public"
+            creationRecord={createCampaignRecord}
+            onCreate={onCampaignCreate}
+            createErrors={createErrors}
+            setCreateErrors={setCreateErrors}
+            createResourceSchema={createCampaignSchema}
             editPermission="gloomhaven-companion:public"
+            onEdit={onCampaignEdit}
+            editErrors={editErrors}
+            setEditErrors={setEditErrors}
+            editResourceSchema={editCampaignSchema}
             deletePermission="gloomhaven-companion:public"
+            onDelete={onCampaignDelete}
             marginLeft={3}
             marginRight={3}
           />

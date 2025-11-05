@@ -97,20 +97,25 @@ export function HostsTabContent(props: {
     <Stack direction="column">
       <CRUDTable
         records={hosts}
-        onRowSelect={onHostSelect}
+        style={{}}
         idKey="id"
+        onRowSelect={onHostSelect}
         selectedRecordId={selectedHost?.id}
+        createPermission="server-manager:admin"
+        creationRecord={createHostRecord}
         onCreate={onHostCreate}
         onCreateErrors={createErrors}
-        creationRecord={createHostRecord}
+        setCreateErrors={setCreateErrors}
+        createResourceSchema={createHostSchema}
+        editPermission="server-manager:admin"
         onEdit={onHostEdit}
         onEditErrors={editErrors}
+        setEditErrors={setEditErrors}
+        editResourceSchema={editHostSchema}
+        deletePermission="server-manager:admin"
         onDelete={onHostDelete}
         marginLeft={3}
         marginRight={3}
-        createPermission="server-manager:admin"
-        editPermission="server-manager:admin"
-        deletePermission="server-manager:admin"
       />
     </Stack>
   );

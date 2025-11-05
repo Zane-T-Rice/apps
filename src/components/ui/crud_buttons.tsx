@@ -1,36 +1,45 @@
 import { Box, Stack, StackProps, Text } from "@chakra-ui/react";
 import { AlertDialog } from "./alert_dialog";
 import { AutoDataList } from "./auto_data_list";
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { usePermissions } from "@/app/utils/use_permissions";
 import { AutoFormDrawer } from "./auto_form_drawer";
 import { Button } from "../recipes/button";
+import { Schema } from "yup";
 
-export default function CRUDButtons<T extends object>(props: {
+export default function CRUDButtons<T extends object, C extends Schema | undefined, E extends Schema | undefined>(props: {
     omitKeys?: (keyof T)[];
     selectedRecord?: T;
-    onCreate?: (record: T) => Promise<boolean>;
-    onCreateErrors?: { [Property in keyof T]?: string };
     createPermission?: string;
     creationRecord?: T;
-    onEdit?: (record: T) => Promise<boolean>;
-    onEditErrors?: { [Property in keyof T]?: string };
+    onCreate?: (record: T) => Promise<boolean>;
+    createErrors?: { [Property in keyof T]?: string };
+    setCreateErrors?: Dispatch<SetStateAction<{ [Property in keyof T]?: string }>>;
+    createResourceSchema?: C;
     editPermission?: string;
-    onDelete?: (record: T) => Promise<boolean>;
+    onEdit?: (record: T) => Promise<boolean>;
+    editErrors?: { [Property in keyof T]?: string };
+    setEditErrors?: Dispatch<SetStateAction<{ [Property in keyof T]?: string }>>;
+    editResourceSchema?: E;
     deletePermission?: string;
+    onDelete?: (record: T) => Promise<boolean>;
 } & StackProps) {
     const {
         omitKeys,
         selectedRecord,
-        onCreate,
-        creationRecord,
-        onEdit,
-        onCreateErrors,
-        onEditErrors,
-        onDelete,
         createPermission,
+        creationRecord,
+        onCreate,
+        createErrors,
+        setCreateErrors,
+        createResourceSchema,
         editPermission,
+        onEdit,
+        editErrors,
+        setEditErrors,
+        editResourceSchema,
         deletePermission,
+        onDelete,
         ...stackProps
     } = props;
 
@@ -129,26 +138,31 @@ export default function CRUDButtons<T extends object>(props: {
         </Stack>
         {creationRecord &&
             onCreate &&
-            onCreateErrors &&
+            createErrors &&
+            createResourceSchema &&
             createPermission !== undefined ? (
-            <AutoFormDrawer<T>
+            <AutoFormDrawer<T, typeof createResourceSchema>
                 record={creationRecord}
                 title={"Create"}
                 isOpen={isCreateOpen}
                 setIsOpen={setIsCreateOpen}
                 onSubmit={onCreate}
-                errors={onCreateErrors}
+                resourceSchema={createResourceSchema}
+                errors={createErrors}
+                setErrors={setCreateErrors}
                 omitFields={omitKeys}
             />
         ) : null}
-        {onEdit && onEditErrors && editPermission !== undefined ? (
-            <AutoFormDrawer<T>
+        {onEdit && editErrors && editResourceSchema && editPermission !== undefined ? (
+            <AutoFormDrawer<T, typeof editResourceSchema>
                 record={selectedRecord}
                 title={"Edit"}
                 isOpen={isEditOpen}
                 setIsOpen={setIsEditOpen}
                 onSubmit={onEdit}
-                errors={onEditErrors}
+                resourceSchema={editResourceSchema}
+                errors={editErrors}
+                setErrors={setEditErrors}
                 omitFields={omitKeys}
             />
         ) : null}

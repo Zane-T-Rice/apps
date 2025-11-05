@@ -13,10 +13,14 @@ import { Button } from "../recipes/button";
 import {
   ChangeEvent,
   ChangeEventHandler,
+  Dispatch,
+  SetStateAction,
   useCallback,
   useEffect,
   useState,
 } from "react";
+import { validateWithErrors } from "@/app/utils/fetch/validate_with_errors";
+import { Schema } from "yup";
 
 export type FormFields<T> = {
   id: number;
@@ -28,23 +32,26 @@ export type FormFields<T> = {
   value: string;
 };
 
-export function AutoFormDrawer<T extends object>(props: {
+export function AutoFormDrawer<T extends object, S extends Schema>(props: {
   record?: T;
   title: string;
   isOpen: boolean;
   setIsOpen: (value: boolean) => void;
   onSubmit: (value: T) => Promise<boolean>;
+  resourceSchema: S;
   errors: { [Property in keyof T]?: string };
+  setErrors?: Dispatch<SetStateAction<{ [Property in keyof T]?: string }>>;
   omitFields?: (keyof T)[];
 }) {
-  const { isOpen, setIsOpen, title, record, onSubmit, errors, omitFields } = props;
+  const { isOpen, setIsOpen, title, record, onSubmit, resourceSchema, errors, omitFields, setErrors } = props;
 
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [submittedOnce, setSubmittedOnce] = useState<boolean>(false);
   const [fields, setFields] = useState<FormFields<T>[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isCancelled, setIsCancelled] = useState<boolean>(false);
   const [isSaved, setIsSaved] = useState<boolean>(false);
+  const [isValidating, setIsValidating] = useState<boolean>(false);
 
   const resetFields = useCallback(() => {
     if (!record || (!isLoading && !isCancelled && !isSaved)) return;
@@ -85,15 +92,17 @@ export function AutoFormDrawer<T extends object>(props: {
     setFields(newFields);
   }, [record, omitFields, isLoading, isCancelled, isSaved]);
 
+  // Switching records should reset the fields.
+  useEffect(() => {
+    setIsLoading(true)
+  }, [record])
+
   // Whenever resetFields callback changes, invoke it to reset the fields.
   useEffect(() => {
     resetFields();
   }, [resetFields]);
 
-  // Switching records should reset the fields.
-  useEffect(() => {
-    setIsLoading(true)
-  }, [record])
+
 
   // Cancelling the drawer should reset the fields.
   const cancel = () => {
@@ -127,19 +136,40 @@ export function AutoFormDrawer<T extends object>(props: {
       }));
       return newFields;
     });
+
   }, [setFields, submittedOnce, errors]);
+
+  const getCombinedFields = () => {
+    const combinedFields = fields.reduce((a, b) => ({ ...a, [b.name]: b.value }), {}) as T;
+    if (record) {
+      omitFields?.forEach(field => {
+        combinedFields[field] = record[field]
+      })
+    }
+    return combinedFields;
+  }
+
+  useEffect(() => {
+    if (!isValidating) return;
+
+    const bruh = getCombinedFields();
+    console.log(bruh);
+    validateWithErrors(
+      () => {
+        return resourceSchema?.validateSync(bruh, {
+          abortEarly: false,
+        });
+      }, setErrors);
+
+    setIsValidating(false);
+  }, [isValidating, fields, resourceSchema, setErrors])
 
   const submit = async () => {
     if (isSubmitting) return;
 
     setIsSubmitting(true);
     (async () => {
-      const combinedFields = fields.reduce((a, b) => ({ ...a, [b.name]: b.value }), {}) as T;
-      if (record) {
-        omitFields?.forEach(field => {
-          combinedFields[field] = record[field]
-        })
-      }
+      const combinedFields = getCombinedFields();
 
       if (
         await onSubmit(combinedFields)
@@ -181,7 +211,14 @@ export function AutoFormDrawer<T extends object>(props: {
                         }
                       }}
                       placeholder={field.placeholder}
-                      onChange={field.setField}
+                      onChange={(e) => {
+                        field.setField(e)
+                        console.log("SETTING IS VALIDATING TO TRUE")
+                        setIsValidating(true);
+                        // if (submittedOnce) {
+                        //   validate()
+                        // }
+                      }}
                       value={field.value}
                       onKeyDown={(e) => {
                         if (e.key === "Enter") {

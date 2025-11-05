@@ -84,17 +84,20 @@ export function UserServerLinksTabContent(props: {
     <CRUDTable
       records={userServerLinks}
       style={{}}
-      onRowSelect={onUserServerLinkSelect}
       idKey="id"
+      onRowSelect={onUserServerLinkSelect}
       selectedRecordId={selectedUserServerLink?.id}
+      createPermission="server-manager:admin"
+      creationRecord={createUserServerLinkRecord}
       onCreate={onUserServerLinkCreate}
       onCreateErrors={createErrors}
-      creationRecord={createUserServerLinkRecord}
+      setCreateErrors={setCreateErrors}
+      createResourceSchema={createUserServerLinkSchema}
+      editPermission="server-manager:admin"
+      deletePermission="server-manager:admin"
       onDelete={onUserServerLinkDelete}
       marginLeft={3}
       marginRight={3}
-      createPermission="server-manager:admin"
-      deletePermission="server-manager:admin"
     />
   );
 }

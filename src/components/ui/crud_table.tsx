@@ -1,22 +1,28 @@
 import { Box, Stack, StackProps } from "@chakra-ui/react";
 import DataTable from "./data_table";
 import CRUDButtons from "./crud_buttons";
+import { Schema } from "yup";
+import { Dispatch, SetStateAction } from "react";
 
-export default function CRUDTable<T extends object>(
+export default function CRUDTable<T extends object, C extends Schema | undefined, E extends Schema | undefined>(
   props: {
     records: T[];
     idKey: keyof T;
     selectedRecordId?: string; // Should this just be selectedRecord: T (and update DataTable also)
     onRowSelect: (record: T) => void;
-    onCreate?: (record: T) => Promise<boolean>;
-    onCreateErrors?: { [Property in keyof T]?: string };
     createPermission?: string;
     creationRecord?: T;
+    onCreate?: (record: T) => Promise<boolean>;
+    onCreateErrors?: { [Property in keyof T]?: string };
+    setCreateErrors?: Dispatch<SetStateAction<{ [Property in keyof T]?: string }>>;
+    createResourceSchema?: C;
+    editPermission?: string;
     onEdit?: (record: T) => Promise<boolean>;
     onEditErrors?: { [Property in keyof T]?: string };
-    editPermission?: string;
-    onDelete?: (record: T) => Promise<boolean>;
+    setEditErrors?: Dispatch<SetStateAction<{ [Property in keyof T]?: string }>>;
+    editResourceSchema?: E;
     deletePermission?: string;
+    onDelete?: (record: T) => Promise<boolean>;
   } & StackProps
 ) {
   const {
@@ -24,15 +30,19 @@ export default function CRUDTable<T extends object>(
     onRowSelect,
     idKey,
     selectedRecordId,
+    createPermission,
     onCreate,
     creationRecord,
-    onEdit,
     onCreateErrors,
-    onEditErrors,
-    onDelete,
-    createPermission,
+    setCreateErrors,
+    createResourceSchema,
     editPermission,
+    onEdit,
+    onEditErrors,
+    setEditErrors,
+    editResourceSchema,
     deletePermission,
+    onDelete,
     ...stackProps
   } = props;
 
@@ -46,15 +56,19 @@ export default function CRUDTable<T extends object>(
         <CRUDButtons
           omitKeys={[idKey]}
           selectedRecord={selectedRecord}
-          onCreate={onCreate}
-          creationRecord={creationRecord}
-          onEdit={onEdit}
-          onCreateErrors={onCreateErrors}
-          onEditErrors={onEditErrors}
-          onDelete={onDelete}
           createPermission={createPermission}
+          creationRecord={creationRecord}
+          onCreate={onCreate}
+          createErrors={onCreateErrors}
+          setCreateErrors={setCreateErrors}
+          createResourceSchema={createResourceSchema}
           editPermission={editPermission}
+          onEdit={onEdit}
+          editErrors={onEditErrors}
+          setEditErrors={setEditErrors}
+          editResourceSchema={editResourceSchema}
           deletePermission={deletePermission}
+          onDelete={onDelete}
         />
         <Box overflowX="auto" overflowY="auto" maxHeight="32rem">
           <DataTable

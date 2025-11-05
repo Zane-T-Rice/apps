@@ -101,20 +101,24 @@ export function VolumesTabContent(props: {
     <CRUDTable
       records={volumes}
       style={{}}
-      onRowSelect={onVolumeSelect}
       idKey="id"
+      onRowSelect={onVolumeSelect}
       selectedRecordId={selectedVolume?.id}
+      createPermission="server-manager:admin"
+      creationRecord={createVolumeRecord}
       onCreate={onVolumeCreate}
       onCreateErrors={createErrors}
-      creationRecord={createVolumeRecord}
+      setCreateErrors={setCreateErrors}
+      createResourceSchema={createVolumeSchema}
+      editPermission="server-manager:admin"
       onEdit={onVolumeEdit}
       onEditErrors={editErrors}
+      setEditErrors={setEditErrors}
+      editResourceSchema={editVolumeSchema}
+      deletePermission="server-manager:admin"
       onDelete={onVolumeDelete}
       marginLeft={3}
       marginRight={3}
-      createPermission="server-manager:admin"
-      editPermission="server-manager:admin"
-      deletePermission="server-manager:admin"
     />
   );
 }

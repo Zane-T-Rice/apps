@@ -136,15 +136,19 @@ export function GloomhavenCompanionFigureTabContent(props: {
           <CRUDButtons
             omitKeys={["id", "parent", "entity"]}
             selectedRecord={selectedFigure}
-            onCreate={onFigureCreate}
-            creationRecord={createFigureRecord}
-            onEdit={onFigureEdit}
-            onCreateErrors={createErrors}
-            onEditErrors={editErrors}
-            onDelete={onFigureDelete}
             createPermission="gloomhaven-companion:public"
+            creationRecord={createFigureRecord}
+            onCreate={onFigureCreate}
+            createErrors={createErrors}
+            setCreateErrors={setCreateErrors}
+            createResourceSchema={createFigureSchema}
             editPermission="gloomhaven-companion:public"
+            onEdit={onFigureEdit}
+            editErrors={editErrors}
+            setEditErrors={setEditErrors}
+            editResourceSchema={editFigureSchema}
             deletePermission="gloomhaven-companion:public"
+            onDelete={onFigureDelete}
             marginLeft={3}
             marginRight={3}
           />

@@ -105,20 +105,24 @@ export function EnvironmentVariablesTabContent(props: {
     <CRUDTable
       records={environmentVariables}
       style={{}}
-      onRowSelect={onEnvironmentVariableSelect}
       idKey="id"
+      onRowSelect={onEnvironmentVariableSelect}
       selectedRecordId={selectedEnvironmentVariable?.id}
+      createPermission="server-manager:admin"
+      creationRecord={createEnvironmentVariableRecord}
       onCreate={onEnvironmentVariableCreate}
       onCreateErrors={createErrors}
-      creationRecord={createEnvironmentVariableRecord}
+      setCreateErrors={setCreateErrors}
+      createResourceSchema={createEnvironmentVariableSchema}
+      editPermission="server-manager:admin"
       onEdit={onEnvironmentVariableEdit}
       onEditErrors={editErrors}
+      setEditErrors={setEditErrors}
+      editResourceSchema={editEnvironmentVariableSchema}
+      deletePermission="server-manager:admin"
       onDelete={onEnvironmentVariableDelete}
       marginLeft={3}
       marginRight={3}
-      createPermission="server-manager:admin"
-      editPermission="server-manager:admin"
-      deletePermission="server-manager:admin"
     />
   );
 }

@@ -101,20 +101,24 @@ export function FilesTabContent(props: {
     <CRUDTable
       records={files}
       style={{}}
-      onRowSelect={onFileSelect}
       idKey="id"
+      onRowSelect={onFileSelect}
       selectedRecordId={selectedFile?.id}
+      createPermission="server-manager:admin"
+      creationRecord={createFileRecord}
       onCreate={onFileCreate}
       onCreateErrors={createErrors}
-      creationRecord={createFileRecord}
+      setCreateErrors={setCreateErrors}
+      createResourceSchema={createFileSchema}
+      editPermission="server-manager:admin"
       onEdit={onFileEdit}
       onEditErrors={editErrors}
+      setEditErrors={setEditErrors}
+      editResourceSchema={editFileSchema}
+      deletePermission="server-manager:admin"
       onDelete={onFileDelete}
       marginLeft={3}
       marginRight={3}
-      createPermission="server-manager:admin"
-      editPermission="server-manager:admin"
-      deletePermission="server-manager:admin"
     />
   );
 }

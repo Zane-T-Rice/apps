@@ -105,15 +105,19 @@ export function GloomhavenCompanionScenarioTabContent(props: {
           <CRUDButtons
             omitKeys={["id", "parent", "entity"]}
             selectedRecord={selectedScenario}
-            onCreate={onScenarioCreate}
-            creationRecord={createScenarioRecord}
-            onEdit={onScenarioEdit}
-            onCreateErrors={createErrors}
-            onEditErrors={editErrors}
-            onDelete={onScenarioDelete}
             createPermission="gloomhaven-companion:public"
+            creationRecord={createScenarioRecord}
+            onCreate={onScenarioCreate}
+            createErrors={createErrors}
+            setCreateErrors={setCreateErrors}
+            createResourceSchema={createScenarioSchema}
             editPermission="gloomhaven-companion:public"
+            onEdit={onScenarioEdit}
+            editErrors={editErrors}
+            setEditErrors={setEditErrors}
+            editResourceSchema={editScenarioSchema}
             deletePermission="gloomhaven-companion:public"
+            onDelete={onScenarioDelete}
             marginLeft={3}
             marginRight={3}
           />

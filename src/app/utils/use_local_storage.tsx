@@ -2,7 +2,7 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 export function useLocalStorage<T>(
   storageKey: string,
-  defaultValue: T
+  defaultValue: T,
 ): [T, Dispatch<SetStateAction<T>>, boolean] {
   const [value, setValue] = useState<T>(defaultValue);
   const [isLoading, setIsLoading] = useState<boolean>(true);

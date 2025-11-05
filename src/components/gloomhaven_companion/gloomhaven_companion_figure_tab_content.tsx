@@ -1,6 +1,9 @@
 import { Card, Grid, GridItem, Skeleton, Stack } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { Figure, useFigures } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_figures";
+import {
+  Figure,
+  useFigures,
+} from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_figures";
 import { number, object, string } from "yup";
 import CRUDButtons from "../ui/crud_buttons";
 import { responseTransformer } from "@/app/utils/gloomhaven_companion_service/response_transformer";
@@ -25,7 +28,7 @@ const editFigureSchema = createFigureSchema
   .concat(
     object({
       id: string().required(),
-    })
+    }),
   )
   .stripUnknown();
 
@@ -53,7 +56,7 @@ export function GloomhavenCompanionFigureTabContent(props: {
     rank: "",
     shield: 0,
     move: 0,
-    attack: 0
+    attack: 0,
   });
 
   const {
@@ -78,7 +81,7 @@ export function GloomhavenCompanionFigureTabContent(props: {
   const {
     onResourceCreate: onFigureCreate,
     onResourceEdit: onFigureEdit,
-    onResourceDelete: onFigureDelete
+    onResourceDelete: onFigureDelete,
   } = useOnCRUD<
     Figure,
     typeof createFigureSchema,
@@ -94,25 +97,39 @@ export function GloomhavenCompanionFigureTabContent(props: {
     deleteResource: deleteFigure,
     setResources: setFigures,
     setSelectedResource: setSelectedFigure,
-  })
+  });
 
   const collectGroups = (figures: Figure[]): Array<Figure[]> => {
     const groups: { [Property in string]: Figure[] } = {};
 
     figures.forEach((figure) => {
       if (!groups[figure.class]) groups[figure.class] = [figure];
-      else groups[figure.class].push(figure)
-    })
+      else groups[figure.class].push(figure);
+    });
 
-    return Object.keys(groups).sort().map(key => groups[key].sort((figureA, figureB) => {
-      if (figureA.number < figureB.number) return -1;
-      else if (figureA.number === figureB.number) return 0;
-      else return 1;
-    }).sort((figureA, figureB) => {
-      if (figureA.rank.toLowerCase() === "normal" && figureB.rank.toLowerCase() === "elite") return 1
-      else if (figureA.rank.toLowerCase() === "elite" && figureB.rank.toLowerCase() === "normal") return -1
-      else return 0
-    }));
+    return Object.keys(groups)
+      .sort()
+      .map((key) =>
+        groups[key]
+          .sort((figureA, figureB) => {
+            if (figureA.number < figureB.number) return -1;
+            else if (figureA.number === figureB.number) return 0;
+            else return 1;
+          })
+          .sort((figureA, figureB) => {
+            if (
+              figureA.rank.toLowerCase() === "normal" &&
+              figureB.rank.toLowerCase() === "elite"
+            )
+              return 1;
+            else if (
+              figureA.rank.toLowerCase() === "elite" &&
+              figureB.rank.toLowerCase() === "normal"
+            )
+              return -1;
+            else return 0;
+          }),
+      );
   };
 
   return (
@@ -140,43 +157,49 @@ export function GloomhavenCompanionFigureTabContent(props: {
             marginLeft={3}
             marginRight={3}
           />
-          {
-            collectGroups(figures)
-              .map((groups, groupIndex) => {
-                return (
-                  <Card.Root key={`group-card-${groupIndex}`} bg={"bg.emphasized"}
-                    marginLeft={3}
-                    marginRight={3}
+          {collectGroups(figures).map((groups, groupIndex) => {
+            return (
+              <Card.Root
+                key={`group-card-${groupIndex}`}
+                bg={"bg.emphasized"}
+                marginLeft={3}
+                marginRight={3}
+              >
+                <Card.Body>
+                  <Grid
+                    key={`group-grid-${groupIndex}`}
+                    templateColumns={{
+                      base: "repeat(1, 1fr)",
+                      md: "repeat(2, 1fr)",
+                      lg: "repeat(3, 1fr)",
+                    }}
+                    gap="0"
                   >
-                    <Card.Body>
-                      <Grid key={`group-grid-${groupIndex}`}
-                        templateColumns={{
-                          base: "repeat(1, 1fr)",
-                          md: "repeat(2, 1fr)",
-                          lg: "repeat(3, 1fr)",
-                        }}
-                        gap="0"
-                      >
-                        {groups.map((figure, figureIndex) => {
-                          return (
-                            <GridItem
-                              colSpan={1}
-                              key={`navigation-bar-grid-item-${figureIndex}`}
-                              justifyItems="center"
-                              onClick={() => onFigureSelect(figure)}
-                            >
-                              <FigureCard figure={figure} selectedFigure={selectedFigure} onFigureCreate={onFigureCreate} onFigureDelete={onFigureDelete} onFigureEdit={onFigureEdit} />
-                            </GridItem>
-                          );
-                        })
-                        }
-                      </Grid>
-                    </Card.Body>
-                  </Card.Root>
-                )
-              })}
+                    {groups.map((figure, figureIndex) => {
+                      return (
+                        <GridItem
+                          colSpan={1}
+                          key={`navigation-bar-grid-item-${figureIndex}`}
+                          justifyItems="center"
+                          onClick={() => onFigureSelect(figure)}
+                        >
+                          <FigureCard
+                            figure={figure}
+                            selectedFigure={selectedFigure}
+                            onFigureCreate={onFigureCreate}
+                            onFigureDelete={onFigureDelete}
+                            onFigureEdit={onFigureEdit}
+                          />
+                        </GridItem>
+                      );
+                    })}
+                  </Grid>
+                </Card.Body>
+              </Card.Root>
+            );
+          })}
         </Stack>
       )}
     </>
-  )
+  );
 }

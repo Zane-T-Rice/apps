@@ -25,8 +25,8 @@ export default function CheckPermissionsForContent(props: {
           ? (
               await Promise.all(
                 requiresOneOfPermissions.map(
-                  async (permission) => await hasPermissions([permission])
-                )
+                  async (permission) => await hasPermissions([permission]),
+                ),
               )
             ).some((permission) => !!permission)
           : true;

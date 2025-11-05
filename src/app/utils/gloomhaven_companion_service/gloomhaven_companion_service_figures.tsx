@@ -18,7 +18,14 @@ export type Figure = {
   attack: number;
 };
 
-export function useFigures(campaignId: string, scenarioId: string, responseTransformer?: (response: Figure | Figure[]) => Figure | Figure[]) {
+export function useFigures(
+  campaignId: string,
+  scenarioId: string,
+  responseTransformer?: (response: Figure | Figure[]) => Figure | Figure[],
+) {
   const baseUrl = `${process.env.NEXT_PUBLIC_GLOOMHAVEN_COMPANION_SERVICE_DOMAIN}/campaigns/${campaignId}/scenarios/${scenarioId}/figures`;
-  return useREST<Figure, "id" | "parent" | "entity">(baseUrl, responseTransformer);
+  return useREST<Figure, "id" | "parent" | "entity">(
+    baseUrl,
+    responseTransformer,
+  );
 }

@@ -53,7 +53,10 @@ const apps = [
     icon: <GiCompanionCube size={iconSize} />,
     imageDescription: "Gloomhaven Companion Cube.",
     requiredPermissions: [],
-    requiresOneOfPermissions: ["gloomhaven-companion:admin", "gloomhaven-companion:public"],
+    requiresOneOfPermissions: [
+      "gloomhaven-companion:admin",
+      "gloomhaven-companion:public",
+    ],
   },
 ];
 

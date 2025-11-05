@@ -22,7 +22,7 @@ const editServerSchema = createServerSchema
   .concat(
     object({
       id: string().required(),
-    })
+    }),
   )
   .stripUnknown();
 
@@ -75,7 +75,7 @@ export function ServersTabContent(props: {
   const {
     onResourceCreate: onServerCreate,
     onResourceEdit: onServerEdit,
-    onResourceDelete: onServerDelete
+    onResourceDelete: onServerDelete,
   } = useOnCRUD<
     Server,
     typeof createServerSchema,
@@ -91,18 +91,18 @@ export function ServersTabContent(props: {
     deleteResource: deleteServer,
     setResources: setServers,
     setSelectedResource: setSelectedServer,
-  })
+  });
 
   const onServerUpdate = async (serverToUpdate: Server): Promise<boolean> => {
     const title = `Updating server ${serverToUpdate.applicationName}/${serverToUpdate.containerName}`;
     const server = await fetchWithValidateAndToast({
       title,
-      setErrors: () => { },
+      setErrors: () => {},
       validateCallback: () => {
         updateServerSchema.validateSync(serverToUpdate, {
           abortEarly: false,
         });
-        return Object.keys(serverToUpdate) as (keyof Server)[]
+        return Object.keys(serverToUpdate) as (keyof Server)[];
       },
       fetchCallback: async () => await actionServer(serverToUpdate, "update"),
     });
@@ -115,12 +115,12 @@ export function ServersTabContent(props: {
     const title = `Stopping server ${serverToStop.applicationName}/${serverToStop.containerName}`;
     const server = await fetchWithValidateAndToast({
       title,
-      setErrors: () => { },
+      setErrors: () => {},
       validateCallback: () => {
         stopServerSchema.validateSync(serverToStop, {
           abortEarly: false,
         });
-        return Object.keys(serverToStop) as (keyof Server)[]
+        return Object.keys(serverToStop) as (keyof Server)[];
       },
       fetchCallback: async () => await actionServer(serverToStop, "stop"),
     });

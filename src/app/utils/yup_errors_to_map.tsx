@@ -7,7 +7,7 @@ export const yupErrorsToMap = (errors: ValidationError) => {
       else return a;
     }, {});
   } else if (errors.path) {
-    return { [errors.path]: errors.message }
+    return { [errors.path]: errors.message };
   }
-  return {}
-}
+  return {};
+};

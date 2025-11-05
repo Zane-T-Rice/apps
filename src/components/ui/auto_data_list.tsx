@@ -7,7 +7,9 @@ export function AutoDataList<T>(props: { record: T }) {
       {(Object.keys(record) as (keyof T)[]).map((e) => (
         <DataList.Item key={e.toString()}>
           <DataList.ItemLabel>{e.toString()}</DataList.ItemLabel>
-          <DataList.ItemValue color={"inherit"}>{`${record[e]}`}</DataList.ItemValue>
+          <DataList.ItemValue
+            color={"inherit"}
+          >{`${record[e]}`}</DataList.ItemValue>
         </DataList.Item>
       ))}
     </DataList.Root>

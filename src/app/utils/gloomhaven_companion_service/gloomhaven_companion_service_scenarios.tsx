@@ -9,7 +9,15 @@ export type Scenario = {
   entity: string;
 };
 
-export function useScenarios(campaignId: string, responseTransformer?: (response: Scenario | Scenario[]) => Scenario | Scenario[]) {
+export function useScenarios(
+  campaignId: string,
+  responseTransformer?: (
+    response: Scenario | Scenario[],
+  ) => Scenario | Scenario[],
+) {
   const baseUrl = `${process.env.NEXT_PUBLIC_GLOOMHAVEN_COMPANION_SERVICE_DOMAIN}/campaigns/${campaignId}/scenarios`;
-  return useREST<Scenario, "id" | "parent" | "entity">(baseUrl, responseTransformer);
+  return useREST<Scenario, "id" | "parent" | "entity">(
+    baseUrl,
+    responseTransformer,
+  );
 }

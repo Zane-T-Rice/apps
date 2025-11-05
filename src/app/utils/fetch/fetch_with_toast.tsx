@@ -2,7 +2,7 @@ import { toaster } from "@/components/ui/toaster";
 
 export async function fetchWithToast<T extends object>(
   title: string,
-  fetchCallback: () => Promise<T | null>
+  fetchCallback: () => Promise<T | null>,
 ): Promise<T | null> {
   const toastId = toaster.create({
     title,

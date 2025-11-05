@@ -17,7 +17,7 @@ const editHostSchema = createHostSchema
   .concat(
     object({
       id: string().required(),
-    })
+    }),
   )
   .stripUnknown();
 
@@ -61,7 +61,7 @@ export function HostsTabContent(props: {
   const {
     onResourceCreate: onHostCreate,
     onResourceEdit: onHostEdit,
-    onResourceDelete: onHostDelete
+    onResourceDelete: onHostDelete,
   } = useOnCRUD<
     Host,
     typeof createHostSchema,
@@ -77,7 +77,7 @@ export function HostsTabContent(props: {
     deleteResource: deleteHost,
     setResources: setHosts,
     setSelectedResource: setSelectedHost,
-  })
+  });
 
   return isLoading ? (
     <Stack direction="column" marginLeft={2} marginRight={2}>

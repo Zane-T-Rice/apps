@@ -4,7 +4,9 @@ import { Dispatch, SetStateAction } from "react";
 
 export function validateWithErrors<T extends object>(
   validateCallback: () => (keyof T)[],
-  setErrors?: Dispatch<SetStateAction<{ [Property in keyof T]?: string | undefined; }>>
+  setErrors?: Dispatch<
+    SetStateAction<{ [Property in keyof T]?: string | undefined }>
+  >,
 ): (keyof T)[] | null {
   let validate: (keyof T)[] | null = null;
 
@@ -13,16 +15,16 @@ export function validateWithErrors<T extends object>(
     setErrors?.((prev) => {
       const errors = { ...prev };
       validate?.forEach((key) => {
-        if (errors[key]) delete errors[key]
-      })
+        if (errors[key]) delete errors[key];
+      });
       return errors;
     });
   } catch (err) {
     setErrors?.((prev) => {
       return {
         ...prev,
-        ...yupErrorsToMap(err as ValidationError)
-      }
+        ...yupErrorsToMap(err as ValidationError),
+      };
     });
   }
 

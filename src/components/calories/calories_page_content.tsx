@@ -22,7 +22,7 @@ export default function CaloriesPageContent() {
   const [items, setItems, itemsLoading] = useLocalStorage<Item[]>("items", []);
   const [target, setTarget, targetLoading] = useLocalStorage<number>(
     "target",
-    1500
+    1500,
   );
   const textFillColor = useColorModeValue("black", "white");
 

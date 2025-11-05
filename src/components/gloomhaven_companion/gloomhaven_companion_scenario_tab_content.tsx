@@ -1,7 +1,10 @@
 import { Card, Grid, GridItem, Skeleton, Stack } from "@chakra-ui/react";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { AutoDataList } from "../ui/auto_data_list";
-import { Scenario, useScenarios } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_scenarios";
+import {
+  Scenario,
+  useScenarios,
+} from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_scenarios";
 import { object, string } from "yup";
 import CRUDButtons from "../ui/crud_buttons";
 import { responseTransformer } from "@/app/utils/gloomhaven_companion_service/response_transformer";
@@ -17,7 +20,7 @@ const editScenarioSchema = createScenarioSchema
   .concat(
     object({
       id: string().required(),
-    })
+    }),
   )
   .stripUnknown();
 
@@ -37,7 +40,7 @@ export function GloomhavenCompanionScenarioTabContent(props: {
     id: "",
     name: "",
     parent: "",
-    entity: ""
+    entity: "",
   });
 
   const {
@@ -62,7 +65,7 @@ export function GloomhavenCompanionScenarioTabContent(props: {
   const {
     onResourceCreate: onScenarioCreate,
     onResourceEdit: onScenarioEdit,
-    onResourceDelete: onScenarioDelete
+    onResourceDelete: onScenarioDelete,
   } = useOnCRUD<
     Scenario,
     typeof createScenarioSchema,
@@ -78,7 +81,7 @@ export function GloomhavenCompanionScenarioTabContent(props: {
     deleteResource: deleteScenario,
     setResources: setScenarios,
     setSelectedResource: setSelectedScenario,
-  })
+  });
 
   const scenarioToScenarioInfo = (scenario: Scenario) => ({
     Name: scenario.name,
@@ -132,7 +135,9 @@ export function GloomhavenCompanionScenarioTabContent(props: {
                     <Card.Body>
                       <Stack gap={6}>
                         <Card.Title>{`${scenario.name}`}</Card.Title>
-                        <AutoDataList record={scenarioToScenarioInfo(scenario)} />
+                        <AutoDataList
+                          record={scenarioToScenarioInfo(scenario)}
+                        />
                       </Stack>
                     </Card.Body>
                   </SelectableCardRoot>
@@ -143,5 +148,5 @@ export function GloomhavenCompanionScenarioTabContent(props: {
         </Stack>
       )}
     </>
-  )
+  );
 }

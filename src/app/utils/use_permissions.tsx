@@ -5,17 +5,17 @@ export function usePermissions() {
   const { isLoading, isAuthenticated, getAccessTokenSilently } = useAuth0();
 
   const hasPermissions = async (
-    requiredPermissions: string[]
+    requiredPermissions: string[],
   ): Promise<boolean | null> => {
     if (isLoading) return null;
 
     const accessToken =
       !isLoading && isAuthenticated ? await getAccessTokenSilently() : "";
     const permissions = accessToken
-      ? (jwtDecode(accessToken) as { scope: string }).scope.split(' ')
+      ? (jwtDecode(accessToken) as { scope: string }).scope.split(" ")
       : [];
     return requiredPermissions.every((requiredPermission) =>
-      permissions.includes(requiredPermission)
+      permissions.includes(requiredPermission),
     );
   };
 

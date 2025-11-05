@@ -19,7 +19,7 @@ const editVolumeSchema = createVolumeSchema
   .concat(
     object({
       id: string().required(),
-    })
+    }),
   )
   .stripUnknown();
 
@@ -66,7 +66,7 @@ export function VolumesTabContent(props: {
   const {
     onResourceCreate: onVolumeCreate,
     onResourceEdit: onVolumeEdit,
-    onResourceDelete: onVolumeDelete
+    onResourceDelete: onVolumeDelete,
   } = useOnCRUD<
     Volume,
     typeof createVolumeSchema,
@@ -82,7 +82,7 @@ export function VolumesTabContent(props: {
     deleteResource: deleteVolume,
     setResources: setVolumes,
     setSelectedResource: setSelectedVolume,
-  })
+  });
 
   return isLoading ? (
     <Stack direction="column" marginLeft={2} marginRight={2}>

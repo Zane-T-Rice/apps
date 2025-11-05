@@ -1,7 +1,10 @@
 import { Card, Grid, GridItem, Skeleton, Stack } from "@chakra-ui/react";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { AutoDataList } from "../ui/auto_data_list";
-import { Campaign, useCampaigns } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_campaigns";
+import {
+  Campaign,
+  useCampaigns,
+} from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_campaigns";
 import { object, string } from "yup";
 import CRUDButtons from "../ui/crud_buttons";
 import { responseTransformer } from "@/app/utils/gloomhaven_companion_service/response_transformer";
@@ -16,7 +19,7 @@ const editCampaignSchema = createCampaignSchema
   .concat(
     object({
       id: string().required(),
-    })
+    }),
   )
   .stripUnknown();
 
@@ -35,7 +38,7 @@ export function GloomhavenCompanionCampaignTabContent(props: {
     id: "",
     name: "",
     parent: "",
-    entity: ""
+    entity: "",
   });
 
   const {
@@ -60,7 +63,7 @@ export function GloomhavenCompanionCampaignTabContent(props: {
   const {
     onResourceCreate: onCampaignCreate,
     onResourceEdit: onCampaignEdit,
-    onResourceDelete: onCampaignDelete
+    onResourceDelete: onCampaignDelete,
   } = useOnCRUD<
     Campaign,
     typeof createCampaignSchema,
@@ -76,7 +79,7 @@ export function GloomhavenCompanionCampaignTabContent(props: {
     deleteResource: deleteCampaign,
     setResources: setCampaigns,
     setSelectedResource: setSelectedCampaign,
-  })
+  });
 
   const campaignToCampaignInfo = (campaign: Campaign) => ({
     Name: campaign.name,
@@ -130,7 +133,9 @@ export function GloomhavenCompanionCampaignTabContent(props: {
                     <Card.Body>
                       <Stack gap={6}>
                         <Card.Title>{`${campaign.name}`}</Card.Title>
-                        <AutoDataList record={campaignToCampaignInfo(campaign)} />
+                        <AutoDataList
+                          record={campaignToCampaignInfo(campaign)}
+                        />
                       </Stack>
                     </Card.Body>
                   </SelectableCardRoot>
@@ -141,5 +146,5 @@ export function GloomhavenCompanionCampaignTabContent(props: {
         </Stack>
       )}
     </>
-  )
+  );
 }

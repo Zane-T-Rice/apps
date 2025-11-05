@@ -19,7 +19,7 @@ const editPortSchema = createPortSchema
   .concat(
     object({
       id: string().required(),
-    })
+    }),
   )
   .stripUnknown();
 
@@ -65,7 +65,7 @@ export function PortsTabContent(props: {
   const {
     onResourceCreate: onPortCreate,
     onResourceEdit: onPortEdit,
-    onResourceDelete: onPortDelete
+    onResourceDelete: onPortDelete,
   } = useOnCRUD<
     Port,
     typeof createPortSchema,
@@ -81,7 +81,7 @@ export function PortsTabContent(props: {
     deleteResource: deletePort,
     setResources: setPorts,
     setSelectedResource: setSelectedPort,
-  })
+  });
 
   return isLoading ? (
     <Stack direction="column" marginLeft={2} marginRight={2}>

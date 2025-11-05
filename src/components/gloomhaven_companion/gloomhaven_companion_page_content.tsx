@@ -37,7 +37,10 @@ export default function GloomhavenCompanionPageContent() {
         </Box>
         Scenarios
       </Tabs.Trigger>
-      <Tabs.Trigger value="figures" disabled={!selectedCampaign || !selectedScenario}>
+      <Tabs.Trigger
+        value="figures"
+        disabled={!selectedCampaign || !selectedScenario}
+      >
         <Box hideBelow="sm">
           <GiMeepleGroup />
         </Box>
@@ -49,14 +52,28 @@ export default function GloomhavenCompanionPageContent() {
   const tabContents = (
     <>
       <Tabs.Content value="campaigns">
-        <GloomhavenCompanionCampaignTabContent selectedCampaign={selectedCampaign} setSelectedCampaign={setSelectedCampaign} />
+        <GloomhavenCompanionCampaignTabContent
+          selectedCampaign={selectedCampaign}
+          setSelectedCampaign={setSelectedCampaign}
+        />
       </Tabs.Content>
-      {selectedCampaign && <Tabs.Content value="scenarios">
-        <GloomhavenCompanionScenarioTabContent selectedCampaign={selectedCampaign} selectedScenario={selectedScenario} setSelectedScenario={setSelectedScenario} />
-      </Tabs.Content>}
-      {selectedCampaign && selectedScenario && <Tabs.Content value="figures">
-        <GloomhavenCompanionFigureTabContent selectedCampaign={selectedCampaign} selectedScenario={selectedScenario} />
-      </Tabs.Content>}
+      {selectedCampaign && (
+        <Tabs.Content value="scenarios">
+          <GloomhavenCompanionScenarioTabContent
+            selectedCampaign={selectedCampaign}
+            selectedScenario={selectedScenario}
+            setSelectedScenario={setSelectedScenario}
+          />
+        </Tabs.Content>
+      )}
+      {selectedCampaign && selectedScenario && (
+        <Tabs.Content value="figures">
+          <GloomhavenCompanionFigureTabContent
+            selectedCampaign={selectedCampaign}
+            selectedScenario={selectedScenario}
+          />
+        </Tabs.Content>
+      )}
     </>
   );
 

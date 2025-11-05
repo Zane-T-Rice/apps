@@ -55,7 +55,7 @@ export function UserServerLinksTabContent(props: {
 
   const {
     onResourceCreate: onUserServerLinkCreate,
-    onResourceDelete: onUserServerLinkDelete
+    onResourceDelete: onUserServerLinkDelete,
   } = useOnCRUD<
     UserServerLink,
     typeof createUserServerLinkSchema,
@@ -69,7 +69,7 @@ export function UserServerLinksTabContent(props: {
     deleteResource: deleteUserServerLink,
     setResources: setUserServerLinks,
     setSelectedResource: setSelectedUserServerLink,
-  })
+  });
 
   return isLoading ? (
     <Stack direction="column" marginLeft={2} marginRight={2}>

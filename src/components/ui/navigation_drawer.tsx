@@ -52,7 +52,10 @@ export function NavigationDrawer() {
                 </CheckPermissionsForContent>
                 <CheckPermissionsForContent
                   requiredPermissions={[]}
-                  requiresOneOfPermissions={["server-manager:admin", "server-manager:public"]}
+                  requiresOneOfPermissions={[
+                    "server-manager:admin",
+                    "server-manager:public",
+                  ]}
                 >
                   <Link href="/myservers" variant="button">
                     My Servers
@@ -67,7 +70,10 @@ export function NavigationDrawer() {
                 </CheckPermissionsForContent>
                 <CheckPermissionsForContent
                   requiredPermissions={[]}
-                  requiresOneOfPermissions={["gloomhaven-companion:public", "gloomhaven-companion:admin"]}
+                  requiresOneOfPermissions={[
+                    "gloomhaven-companion:public",
+                    "gloomhaven-companion:admin",
+                  ]}
                 >
                   <Link href="/gloomhaven_companion" variant="button">
                     Gloomhaven Companion

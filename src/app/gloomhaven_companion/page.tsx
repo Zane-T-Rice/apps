@@ -7,7 +7,10 @@ export default function GloomhavenCompanionsPage() {
   return (
     <CheckPermissionsForContent
       requiredPermissions={[]}
-      requiresOneOfPermissions={["gloomhaven-companion:admin", "gloomhaven-companion:public"]}
+      requiresOneOfPermissions={[
+        "gloomhaven-companion:admin",
+        "gloomhaven-companion:public",
+      ]}
       redirect="/"
     >
       <GloomhavenCompanionPageContent />

@@ -17,7 +17,7 @@ const editEnvironmentVariableSchema = createEnvironmentVariableSchema
   .concat(
     object({
       id: string().required(),
-    })
+    }),
   )
   .stripUnknown();
 
@@ -62,7 +62,7 @@ export function EnvironmentVariablesTabContent(props: {
   }, [selectedServer]);
 
   const onEnvironmentVariableSelect = (
-    environmentVariable: EnvironmentVariable
+    environmentVariable: EnvironmentVariable,
   ) => {
     setSelectedEnvironmentVariable(environmentVariable);
   };
@@ -70,7 +70,7 @@ export function EnvironmentVariablesTabContent(props: {
   const {
     onResourceCreate: onEnvironmentVariableCreate,
     onResourceEdit: onEnvironmentVariableEdit,
-    onResourceDelete: onEnvironmentVariableDelete
+    onResourceDelete: onEnvironmentVariableDelete,
   } = useOnCRUD<
     EnvironmentVariable,
     typeof createEnvironmentVariableSchema,
@@ -86,7 +86,7 @@ export function EnvironmentVariablesTabContent(props: {
     deleteResource: deleteEnvironmentVariable,
     setResources: setEnvironmentVariables,
     setSelectedResource: setSelectedEnvironmentVariable,
-  })
+  });
 
   return isLoading ? (
     <Stack direction="column" marginLeft={2} marginRight={2}>

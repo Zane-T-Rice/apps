@@ -6,12 +6,8 @@ export function useREST<
   T extends { id: string }, // The main resource type
   // Any keys to exclude from create and edit.
   // Edit will still receive "id" even if you include it here.
-  K extends keyof T = "id"
->
-  (
-    baseUrl: string,
-    responseTransformer?: (response: T | T[]) => T | T[],
-  ) {
+  K extends keyof T = "id",
+>(baseUrl: string, responseTransformer?: (response: T | T[]) => T | T[]) {
   const { getAccessTokenSilently } = useAuth0();
 
   async function getAllREST(): Promise<T[] | null> {
@@ -53,7 +49,9 @@ export function useREST<
     return responseTransformer?.(parsedResponse) || parsedResponse;
   }
 
-  async function editREST(resource: Omit<T, K> & { id: string }): Promise<T | null> {
+  async function editREST(
+    resource: Omit<T, K> & { id: string },
+  ): Promise<T | null> {
     const accessToken = await getAccessTokenSilently();
 
     const response = await fetch(`${baseUrl}/${resource.id}`, {
@@ -95,7 +93,7 @@ export function useREST<
   // Special function to do actions on a resource (such as reboot or update for Server).
   async function actionREST(
     resource: Pick<T, "id">,
-    action: string
+    action: string,
   ): Promise<T | null> {
     const accessToken = await getAccessTokenSilently();
 

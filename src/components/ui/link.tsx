@@ -4,7 +4,7 @@ import { ReactNode } from "react";
 import { Button } from "../recipes/button";
 
 export function Link(
-  props: LinkProps & { children: ReactNode } & { variant: "button" | "text" }
+  props: LinkProps & { children: ReactNode } & { variant: "button" | "text" },
 ) {
   const { href, children, variant } = props;
   const link = (

@@ -7,7 +7,10 @@ export default function ServersPage() {
   return (
     <CheckPermissionsForContent
       requiredPermissions={[]}
-      requiresOneOfPermissions={["server-manager:admin", "server-manager:public"]}
+      requiresOneOfPermissions={[
+        "server-manager:admin",
+        "server-manager:public",
+      ]}
       redirect="/"
     >
       <MyServersPageContent />

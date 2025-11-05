@@ -85,7 +85,7 @@ export default function AddItemButtonGroup(props: {
                               event.target.value.charAt(0) === "-" ? "-" : "";
                             const newValue = event.target.value.replace(
                               /\D/g,
-                              ""
+                              "",
                             );
                             setCalories(negative + newValue);
                           }}

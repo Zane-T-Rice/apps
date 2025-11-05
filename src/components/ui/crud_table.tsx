@@ -3,7 +3,11 @@ import DataTable from "./data_table";
 import CRUDButtons from "./crud_buttons";
 import { Schema } from "yup";
 
-export default function CRUDTable<T extends object, C extends Schema | undefined, E extends Schema | undefined>(
+export default function CRUDTable<
+  T extends object,
+  C extends Schema | undefined,
+  E extends Schema | undefined,
+>(
   props: {
     records: T[];
     idKey: keyof T;
@@ -18,7 +22,7 @@ export default function CRUDTable<T extends object, C extends Schema | undefined
     editResourceSchema?: E;
     deletePermission?: string;
     onDelete?: (record: T) => Promise<boolean>;
-  } & StackProps
+  } & StackProps,
 ) {
   const {
     records,
@@ -38,7 +42,8 @@ export default function CRUDTable<T extends object, C extends Schema | undefined
   } = props;
 
   const selectedRecord = selectedRecordId
-    ? records.find((record) => record[idKey] === selectedRecordId) ?? undefined
+    ? (records.find((record) => record[idKey] === selectedRecordId) ??
+      undefined)
     : undefined;
 
   return (

@@ -6,7 +6,7 @@ export function ServerActionsButtons<T extends { isUpdatable: boolean }>(
     selectedServer?: T | null;
     onServerUpdate?: (selectedServer: T) => Promise<boolean>;
     onServerStop?: (selectedServer: T) => Promise<boolean>;
-  } & StackProps
+  } & StackProps,
 ) {
   const { selectedServer, onServerUpdate, onServerStop, ...stackProps } = props;
   const updateStopWidth = `${onServerUpdate && onServerStop ? "1/2" : "100%"}`;

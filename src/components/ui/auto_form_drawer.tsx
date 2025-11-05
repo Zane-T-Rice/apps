@@ -38,7 +38,15 @@ export function AutoFormDrawer<T extends object, S extends Schema>(props: {
   resourceSchema: S;
   omitFields?: (keyof T)[];
 }) {
-  const { isOpen, setIsOpen, title, record, onSubmit, resourceSchema, omitFields } = props;
+  const {
+    isOpen,
+    setIsOpen,
+    title,
+    record,
+    onSubmit,
+    resourceSchema,
+    omitFields,
+  } = props;
 
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [fields, setFields] = useState<FormFields<T>[]>([]);
@@ -88,8 +96,8 @@ export function AutoFormDrawer<T extends object, S extends Schema>(props: {
 
   // Switching records should reset the fields.
   useEffect(() => {
-    setIsLoading(true)
-  }, [record])
+    setIsLoading(true);
+  }, [record]);
 
   // Whenever resetFields callback changes, invoke it to reset the fields.
   useEffect(() => {
@@ -110,31 +118,31 @@ export function AutoFormDrawer<T extends object, S extends Schema>(props: {
     setIsSaved(true);
     setErrors?.({});
     resetFields();
-  }
+  };
 
   const submit = async () => {
     if (isSubmitting) return;
     setIsSubmitting(true);
     (async () => {
-      const combinedFields = fields.reduce((a, b) => ({ ...a, [b.name]: b.value }), {}) as T;
+      const combinedFields = fields.reduce(
+        (a, b) => ({ ...a, [b.name]: b.value }),
+        {},
+      ) as T;
       if (record) {
-        omitFields?.forEach(field => {
-          combinedFields[field] = record[field]
-        })
+        omitFields?.forEach((field) => {
+          combinedFields[field] = record[field];
+        });
       }
 
-      if (
-        await onSubmit(combinedFields)
-      ) {
+      if (await onSubmit(combinedFields)) {
         successfulSave();
       } else {
-        validateWithErrors(
-          () => {
-            resourceSchema?.validateSync(combinedFields, {
-              abortEarly: false,
-            });
-            return fields.map(field => field.name);
-          }, setErrors);
+        validateWithErrors(() => {
+          resourceSchema?.validateSync(combinedFields, {
+            abortEarly: false,
+          });
+          return fields.map((field) => field.name);
+        }, setErrors);
       }
       setIsSubmitting(false);
     })();
@@ -163,7 +171,8 @@ export function AutoFormDrawer<T extends object, S extends Schema>(props: {
                     resourceSchema={resourceSchema}
                     submit={submit}
                     errors={errors}
-                    setErrors={setErrors} />
+                    setErrors={setErrors}
+                  />
                 ))}
               </Stack>
             </Drawer.Body>
@@ -184,7 +193,7 @@ export function AutoFormDrawer<T extends object, S extends Schema>(props: {
                     (field) =>
                       field.value === undefined ||
                       field.value === null ||
-                      field.value === ""
+                      field.value === "",
                   ) !== -1 || isSubmitting
                 }
               >

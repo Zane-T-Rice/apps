@@ -4,7 +4,10 @@ import { GiBroadsword, GiLeatherBoot } from "react-icons/gi";
 import { IoShield } from "react-icons/io5";
 import { IncrementalNumberEditor } from "./incremental_number_editor";
 
-export function FigureDataList(props: { figure: Figure, onFigureEdit: (figure: Figure) => void }) {
+export function FigureDataList(props: {
+  figure: Figure;
+  onFigureEdit: (figure: Figure) => void;
+}) {
   const { figure, onFigureEdit } = props;
 
   const decreaseDamage = (figure: Figure) => {
@@ -17,11 +20,11 @@ export function FigureDataList(props: { figure: Figure, onFigureEdit: (figure: F
 
   const increaseNumber = (figure: Figure) => {
     figure.number = figure.number + 1;
-  }
+  };
 
   const decreaseNumber = (figure: Figure) => {
     figure.number = figure.number - 1;
-  }
+  };
 
   return figure ? (
     <>
@@ -36,8 +39,8 @@ export function FigureDataList(props: { figure: Figure, onFigureEdit: (figure: F
                   onFigureEdit(figure);
                 }}
                 decreaseCallback={() => {
-                  decreaseNumber(figure)
-                  onFigureEdit(figure)
+                  decreaseNumber(figure);
+                  onFigureEdit(figure);
                 }}
                 text={`${figure.number}`}
               />
@@ -52,16 +55,23 @@ export function FigureDataList(props: { figure: Figure, onFigureEdit: (figure: F
                   onFigureEdit(figure);
                 }}
                 decreaseCallback={() => {
-                  increaseDamage(figure)
-                  onFigureEdit(figure)
+                  increaseDamage(figure);
+                  onFigureEdit(figure);
                 }}
                 text={`${figure.maximumHP - figure.damage} / ${figure.maximumHP}`}
               />
             </Stack>
           </DataList.Item>
-          <Stack direction="row" alignItems={"center"} gapX="2"><GiLeatherBoot />{figure.move}<GiBroadsword />{figure.attack}<IoShield />{figure.shield}</Stack>
+          <Stack direction="row" alignItems={"center"} gapX="2">
+            <GiLeatherBoot />
+            {figure.move}
+            <GiBroadsword />
+            {figure.attack}
+            <IoShield />
+            {figure.shield}
+          </Stack>
         </Stack>
-      </DataList.Root >
+      </DataList.Root>
     </>
   ) : null;
 }

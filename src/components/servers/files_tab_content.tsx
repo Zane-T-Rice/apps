@@ -19,7 +19,7 @@ const editFileSchema = createFileSchema
   .concat(
     object({
       id: string().required(),
-    })
+    }),
   )
   .stripUnknown();
 
@@ -66,7 +66,7 @@ export function FilesTabContent(props: {
   const {
     onResourceCreate: onFileCreate,
     onResourceEdit: onFileEdit,
-    onResourceDelete: onFileDelete
+    onResourceDelete: onFileDelete,
   } = useOnCRUD<
     File,
     typeof createFileSchema,
@@ -82,7 +82,7 @@ export function FilesTabContent(props: {
     deleteResource: deleteFile,
     setResources: setFiles,
     setSelectedResource: setSelectedFile,
-  })
+  });
 
   return isLoading ? (
     <Stack direction="column" marginLeft={2} marginRight={2}>

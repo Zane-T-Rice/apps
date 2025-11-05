@@ -8,14 +8,8 @@ import {
   Stack,
 } from "@chakra-ui/react";
 import { Button } from "../recipes/button";
-import {
-  ChangeEvent,
-  ChangeEventHandler,
-  useCallback,
-  useEffect,
-  useState,
-} from "react";
-import { Schema } from "yup";
+import { useCallback, useEffect, useState } from "react";
+import { Schema, SchemaDescription, SchemaObjectDescription } from "yup";
 import { AutoFormField } from "./auto_form_field";
 import { validateWithErrors } from "@/app/utils/fetch/validate_with_errors";
 
@@ -25,8 +19,8 @@ export type FormFields<T> = {
   required: boolean;
   name: keyof T;
   placeholder: string;
-  setField: ChangeEventHandler<HTMLInputElement>;
-  value: string;
+  setField: (event: { target: { value: string } }) => void;
+  value: string | number;
 };
 
 export function AutoFormDrawer<T extends object, S extends Schema>(props: {
@@ -56,9 +50,7 @@ export function AutoFormDrawer<T extends object, S extends Schema>(props: {
     return record
       ? (Object.keys(record) as (keyof T)[])
           // Filter out any non-primitives. Maybe later make an AutoForm that
-          // does something sane for arrays and associative arrays?
-          // Also, I should move the field generation logic in to
-          // a component that can be used outside of a drawer.
+          // does something sane for arrays and associative arrays.
           .filter((fieldName) => {
             return !(record[fieldName] instanceof Object);
           })
@@ -69,13 +61,26 @@ export function AutoFormDrawer<T extends object, S extends Schema>(props: {
           .map((fieldName, index) => ({
             id: index,
             invalid: false,
-            required: true,
+            required: !(
+              (resourceSchema.describe() as SchemaObjectDescription).fields[
+                fieldName
+              ] as SchemaDescription
+            )?.optional,
             name: fieldName,
             placeholder: "",
-            setField: (event: ChangeEvent<HTMLInputElement>) => {
+            setField: (event: { target: { value: string } }) => {
               setFields((prev) => {
                 const newField = prev[index];
-                newField.value = event.target.value;
+                if (typeof record[fieldName] === "number") {
+                  const parsedInt = parseInt(event.target.value);
+                  if (!Number.isNaN(parsedInt)) {
+                    newField.value = parsedInt;
+                  } else {
+                    newField.value = event.target.value;
+                  }
+                } else {
+                  newField.value = event.target.value;
+                }
                 return [
                   ...prev.slice(0, index),
                   newField,
@@ -83,10 +88,13 @@ export function AutoFormDrawer<T extends object, S extends Schema>(props: {
                 ];
               });
             },
-            value: `${record[fieldName]}`,
+            value:
+              typeof record[fieldName] === "number"
+                ? record[fieldName]
+                : `${record[fieldName]}`,
           }))
       : [];
-  }, [record, omitFields, setFields]);
+  }, [record, omitFields, resourceSchema, setFields]);
 
   useEffect(() => {
     setFields(resetFields());
@@ -120,7 +128,13 @@ export function AutoFormDrawer<T extends object, S extends Schema>(props: {
         });
       }
 
-      if (await onSubmit(resourceSchema?.cast(combinedFields))) {
+      let castedCombinedFields;
+      try {
+        castedCombinedFields = resourceSchema?.cast(combinedFields);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (e) {}
+
+      if (castedCombinedFields && (await onSubmit(castedCombinedFields))) {
         successfulSave();
       } else {
         validateWithErrors(() => {
@@ -177,9 +191,10 @@ export function AutoFormDrawer<T extends object, S extends Schema>(props: {
                 disabled={
                   fields.findIndex(
                     (field) =>
-                      field.value === undefined ||
-                      field.value === null ||
-                      field.value === "",
+                      field.required &&
+                      (field.value === undefined ||
+                        field.value === null ||
+                        field.value === ""),
                   ) !== -1 || isSubmitting
                 }
               >

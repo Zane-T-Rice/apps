@@ -16,6 +16,10 @@ export type Figure = {
   shield: number;
   move: number;
   attack: number;
+  xp: number;
+  innateDefenses: string;
+  innateOffenses: string;
+  statuses: string;
 };
 
 export function useFigures(

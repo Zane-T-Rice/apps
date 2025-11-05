@@ -12,28 +12,39 @@ import { Scenario } from "@/app/utils/gloomhaven_companion_service/gloomhaven_co
 import { useOnCRUD } from "@/app/utils/rest/use_on_crud";
 import { FigureCard } from "../ui/figure_card";
 
+const transformInt = (value: number) => {
+  return isNaN(value) ? undefined : value;
+};
+
+const stringSchema = string().nullable();
+const numberSchema = number().transform(transformInt).integer().nullable();
+
 const createFigureSchema = object({
-  name: string().required(),
-  maximumHP: number().integer().required(),
-  damage: number().integer().required(),
-  class: string().required(),
-  rank: string().required(),
-  number: number().integer().required(),
-  shield: number().integer().required(),
-  move: number().integer().required(),
-  attack: number().integer().required(),
+  rank: stringSchema.required(),
+  class: stringSchema.required(),
+  maximumHP: numberSchema.required(),
+  damage: numberSchema.required(),
+  name: stringSchema.optional(),
+  number: numberSchema.optional(),
+  shield: numberSchema.optional(),
+  move: numberSchema.optional(),
+  attack: numberSchema.optional(),
+  xp: numberSchema.optional(),
+  innateDefenses: stringSchema.optional(),
+  innateOffenses: stringSchema.optional(),
+  statuses: stringSchema.optional(),
 }).stripUnknown();
 
 const editFigureSchema = createFigureSchema
   .concat(
     object({
-      id: string().required(),
+      id: stringSchema.required(),
     }),
   )
   .stripUnknown();
 
 const deleteFigureSchema = object({
-  id: string().required(),
+  id: stringSchema.required(),
 }).stripUnknown();
 
 export function GloomhavenCompanionFigureTabContent(props: {
@@ -57,6 +68,10 @@ export function GloomhavenCompanionFigureTabContent(props: {
     shield: 0,
     move: 0,
     attack: 0,
+    xp: 0,
+    innateDefenses: "",
+    innateOffenses: "",
+    statuses: "",
   });
 
   const {

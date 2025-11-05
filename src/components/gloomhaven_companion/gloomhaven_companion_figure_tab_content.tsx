@@ -41,12 +41,6 @@ export function GloomhavenCompanionFigureTabContent(props: {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [figures, setFigures] = useState<Figure[]>([]);
   const [selectedFigure, setSelectedFigure] = useState<Figure>();
-  const [createErrors, setCreateErrors] = useState<{
-    [Property in keyof Figure]?: string;
-  }>({});
-  const [editErrors, setEditErrors] = useState<{
-    [Property in keyof Figure]?: string;
-  }>({});
   const [createFigureRecord] = useState<Figure>({
     id: "",
     parent: "",
@@ -92,8 +86,6 @@ export function GloomhavenCompanionFigureTabContent(props: {
     typeof deleteFigureSchema
   >({
     resourceNameKey: "name",
-    setCreateErrors,
-    setEditErrors,
     createResourceSchema: createFigureSchema,
     editResourceSchema: editFigureSchema,
     deleteResourceSchema: deleteFigureSchema,
@@ -139,13 +131,9 @@ export function GloomhavenCompanionFigureTabContent(props: {
             createPermission="gloomhaven-companion:public"
             creationRecord={createFigureRecord}
             onCreate={onFigureCreate}
-            createErrors={createErrors}
-            setCreateErrors={setCreateErrors}
             createResourceSchema={createFigureSchema}
             editPermission="gloomhaven-companion:public"
             onEdit={onFigureEdit}
-            editErrors={editErrors}
-            setEditErrors={setEditErrors}
             editResourceSchema={editFigureSchema}
             deletePermission="gloomhaven-companion:public"
             onDelete={onFigureDelete}

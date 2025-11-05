@@ -4,8 +4,6 @@ import {
   CloseButton,
   Drawer,
   DrawerOpenChangeDetails,
-  Field,
-  Input,
   Portal,
   Stack,
 } from "@chakra-ui/react";
@@ -13,14 +11,13 @@ import { Button } from "../recipes/button";
 import {
   ChangeEvent,
   ChangeEventHandler,
-  Dispatch,
-  SetStateAction,
   useCallback,
   useEffect,
   useState,
 } from "react";
-import { validateWithErrors } from "@/app/utils/fetch/validate_with_errors";
 import { Schema } from "yup";
+import { AutoFormField } from "./auto_form_field";
+import { validateWithErrors } from "@/app/utils/fetch/validate_with_errors";
 
 export type FormFields<T> = {
   id: number;
@@ -39,19 +36,16 @@ export function AutoFormDrawer<T extends object, S extends Schema>(props: {
   setIsOpen: (value: boolean) => void;
   onSubmit: (value: T) => Promise<boolean>;
   resourceSchema: S;
-  errors: { [Property in keyof T]?: string };
-  setErrors?: Dispatch<SetStateAction<{ [Property in keyof T]?: string }>>;
   omitFields?: (keyof T)[];
 }) {
-  const { isOpen, setIsOpen, title, record, onSubmit, resourceSchema, errors, omitFields, setErrors } = props;
+  const { isOpen, setIsOpen, title, record, onSubmit, resourceSchema, omitFields } = props;
 
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [submittedOnce, setSubmittedOnce] = useState<boolean>(false);
   const [fields, setFields] = useState<FormFields<T>[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isCancelled, setIsCancelled] = useState<boolean>(false);
   const [isSaved, setIsSaved] = useState<boolean>(false);
-  const [isValidating, setIsValidating] = useState<boolean>(false);
+  const [errors, setErrors] = useState<{ [Property in keyof T]?: string }>({});
 
   const resetFields = useCallback(() => {
     if (!record || (!isLoading && !isCancelled && !isSaved)) return;
@@ -102,81 +96,45 @@ export function AutoFormDrawer<T extends object, S extends Schema>(props: {
     resetFields();
   }, [resetFields]);
 
-
-
   // Cancelling the drawer should reset the fields.
   const cancel = () => {
     setIsOpen(false);
-    setSubmittedOnce(false);
     setIsCancelled(true);
+    setErrors?.({});
     resetFields();
   };
 
   // Successfully saving the drawer should reset the fields.
   const successfulSave = () => {
     setIsOpen(false);
-    setSubmittedOnce(false);
     setIsSaved(true);
+    setErrors?.({});
     resetFields();
   }
 
-  // An unuccessful save reveals errors on the form.
-  const unsuccessfulSave = () => {
-    setSubmittedOnce(true);
-  }
-
-  // When a submit happens, check for invalid fields.
-  useEffect(() => {
-    if (!submittedOnce) return;
-
-    setFields((prev) => {
-      const newFields = prev.map((field) => ({
-        ...field,
-        invalid: errors[field.name] && submittedOnce,
-      }));
-      return newFields;
-    });
-
-  }, [setFields, submittedOnce, errors]);
-
-  const getCombinedFields = () => {
-    const combinedFields = fields.reduce((a, b) => ({ ...a, [b.name]: b.value }), {}) as T;
-    if (record) {
-      omitFields?.forEach(field => {
-        combinedFields[field] = record[field]
-      })
-    }
-    return combinedFields;
-  }
-
-  useEffect(() => {
-    if (!isValidating) return;
-
-    const bruh = getCombinedFields();
-    console.log(bruh);
-    validateWithErrors(
-      () => {
-        return resourceSchema?.validateSync(bruh, {
-          abortEarly: false,
-        });
-      }, setErrors);
-
-    setIsValidating(false);
-  }, [isValidating, fields, resourceSchema, setErrors])
-
   const submit = async () => {
     if (isSubmitting) return;
-
     setIsSubmitting(true);
     (async () => {
-      const combinedFields = getCombinedFields();
+      const combinedFields = fields.reduce((a, b) => ({ ...a, [b.name]: b.value }), {}) as T;
+      if (record) {
+        omitFields?.forEach(field => {
+          combinedFields[field] = record[field]
+        })
+      }
 
       if (
         await onSubmit(combinedFields)
       ) {
         successfulSave();
       } else {
-        unsuccessfulSave();
+        validateWithErrors(
+          () => {
+            resourceSchema?.validateSync(combinedFields, {
+              abortEarly: false,
+            });
+            return fields.map(field => field.name);
+          }, setErrors);
       }
       setIsSubmitting(false);
     })();
@@ -199,35 +157,13 @@ export function AutoFormDrawer<T extends object, S extends Schema>(props: {
             <Drawer.Body>
               <Stack direction="column" gap={5}>
                 {fields.map((field) => (
-                  <Field.Root invalid={field.invalid} required key={field.id}>
-                    <Field.Label>
-                      {field.name.toString()} <Field.RequiredIndicator />
-                    </Field.Label>
-                    <Input
-                      _selection={{
-                        bg: {
-                          base: "rgba(0,0,0,0.25)",
-                          _dark: "rgba(255,255,255,0.5)"
-                        }
-                      }}
-                      placeholder={field.placeholder}
-                      onChange={(e) => {
-                        field.setField(e)
-                        console.log("SETTING IS VALIDATING TO TRUE")
-                        setIsValidating(true);
-                        // if (submittedOnce) {
-                        //   validate()
-                        // }
-                      }}
-                      value={field.value}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          submit();
-                        }
-                      }}
-                    />
-                    <Field.ErrorText>{errors[field.name]}</Field.ErrorText>
-                  </Field.Root>
+                  <AutoFormField
+                    key={`auto-form-field-${field.id}`}
+                    field={field}
+                    resourceSchema={resourceSchema}
+                    submit={submit}
+                    errors={errors}
+                    setErrors={setErrors} />
                 ))}
               </Stack>
             </Drawer.Body>

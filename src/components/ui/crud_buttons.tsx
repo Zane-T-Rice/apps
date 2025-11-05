@@ -1,7 +1,7 @@
 import { Box, Stack, StackProps, Text } from "@chakra-ui/react";
 import { AlertDialog } from "./alert_dialog";
 import { AutoDataList } from "./auto_data_list";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { usePermissions } from "@/app/utils/use_permissions";
 import { AutoFormDrawer } from "./auto_form_drawer";
 import { Button } from "../recipes/button";
@@ -13,13 +13,9 @@ export default function CRUDButtons<T extends object, C extends Schema | undefin
     createPermission?: string;
     creationRecord?: T;
     onCreate?: (record: T) => Promise<boolean>;
-    createErrors?: { [Property in keyof T]?: string };
-    setCreateErrors?: Dispatch<SetStateAction<{ [Property in keyof T]?: string }>>;
     createResourceSchema?: C;
     editPermission?: string;
     onEdit?: (record: T) => Promise<boolean>;
-    editErrors?: { [Property in keyof T]?: string };
-    setEditErrors?: Dispatch<SetStateAction<{ [Property in keyof T]?: string }>>;
     editResourceSchema?: E;
     deletePermission?: string;
     onDelete?: (record: T) => Promise<boolean>;
@@ -30,13 +26,9 @@ export default function CRUDButtons<T extends object, C extends Schema | undefin
         createPermission,
         creationRecord,
         onCreate,
-        createErrors,
-        setCreateErrors,
         createResourceSchema,
         editPermission,
         onEdit,
-        editErrors,
-        setEditErrors,
         editResourceSchema,
         deletePermission,
         onDelete,
@@ -138,7 +130,6 @@ export default function CRUDButtons<T extends object, C extends Schema | undefin
         </Stack>
         {creationRecord &&
             onCreate &&
-            createErrors &&
             createResourceSchema &&
             createPermission !== undefined ? (
             <AutoFormDrawer<T, typeof createResourceSchema>
@@ -148,12 +139,10 @@ export default function CRUDButtons<T extends object, C extends Schema | undefin
                 setIsOpen={setIsCreateOpen}
                 onSubmit={onCreate}
                 resourceSchema={createResourceSchema}
-                errors={createErrors}
-                setErrors={setCreateErrors}
                 omitFields={omitKeys}
             />
         ) : null}
-        {onEdit && editErrors && editResourceSchema && editPermission !== undefined ? (
+        {onEdit && editResourceSchema && editPermission !== undefined ? (
             <AutoFormDrawer<T, typeof editResourceSchema>
                 record={selectedRecord}
                 title={"Edit"}
@@ -161,8 +150,6 @@ export default function CRUDButtons<T extends object, C extends Schema | undefin
                 setIsOpen={setIsEditOpen}
                 onSubmit={onEdit}
                 resourceSchema={editResourceSchema}
-                errors={editErrors}
-                setErrors={setEditErrors}
                 omitFields={omitKeys}
             />
         ) : null}

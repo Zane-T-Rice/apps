@@ -31,13 +31,14 @@ export function MyServersTabContent() {
     const title = `Updating server ${serverToUpdate.applicationName}/${serverToUpdate.containerName}`;
     const server = await fetchWithValidateAndToast({
       title,
-      setErrors: () => {},
+      setErrors: () => { },
       validateCallback: () => {
-        return updateServerSchema.validateSync(serverToUpdate, {
+        updateServerSchema.validateSync(serverToUpdate, {
           abortEarly: false,
         });
+        return Object.keys(serverToUpdate) as (keyof Server)[];
       },
-      fetchCallback: async (validate) => await actionServer(validate, "update"),
+      fetchCallback: async () => await actionServer(serverToUpdate, "update"),
     });
     if (!server) return false;
 
@@ -48,13 +49,14 @@ export function MyServersTabContent() {
     const title = `Stopping server ${serverToReboot.applicationName}/${serverToReboot.containerName}`;
     const server = await fetchWithValidateAndToast({
       title,
-      setErrors: () => {},
+      setErrors: () => { },
       validateCallback: () => {
-        return stopServerSchema.validateSync(serverToReboot, {
+        stopServerSchema.validateSync(serverToReboot, {
           abortEarly: false,
         });
+        return Object.keys(serverToReboot) as (keyof Server)[];
       },
-      fetchCallback: async (validate) => await actionServer(validate, "stop"),
+      fetchCallback: async () => await actionServer(serverToReboot, "stop"),
     });
     if (!server) return false;
 

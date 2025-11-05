@@ -1,19 +1,29 @@
 import { ValidationError } from "yup";
 import { yupErrorsToMap } from "../yup_errors_to_map";
+import { Dispatch, SetStateAction } from "react";
 
-export function validateWithErrors<T extends object, V extends object>(
-  validateCallback: () => V,
-  setErrors?: (value: {
-    [Property in keyof T]?: string;
-  }) => void
-): V | null {
-  let validate: V | null = null;
+export function validateWithErrors<T extends object>(
+  validateCallback: () => (keyof T)[],
+  setErrors?: Dispatch<SetStateAction<{ [Property in keyof T]?: string | undefined; }>>
+): (keyof T)[] | null {
+  let validate: (keyof T)[] | null = null;
 
   try {
     validate = validateCallback();
-    setErrors?.({});
+    setErrors?.((prev) => {
+      const errors = { ...prev };
+      validate?.forEach((key) => {
+        if (errors[key]) delete errors[key]
+      })
+      return errors;
+    });
   } catch (err) {
-    setErrors?.(yupErrorsToMap(err as ValidationError));
+    setErrors?.((prev) => {
+      return {
+        ...prev,
+        ...yupErrorsToMap(err as ValidationError)
+      }
+    });
   }
 
   return validate;

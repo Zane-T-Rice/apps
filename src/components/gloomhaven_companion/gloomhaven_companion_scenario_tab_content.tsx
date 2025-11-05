@@ -33,12 +33,6 @@ export function GloomhavenCompanionScenarioTabContent(props: {
   const { selectedCampaign, selectedScenario, setSelectedScenario } = props;
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
-  const [createErrors, setCreateErrors] = useState<{
-    [Property in keyof Scenario]?: string;
-  }>({});
-  const [editErrors, setEditErrors] = useState<{
-    [Property in keyof Scenario]?: string;
-  }>({});
   const [createScenarioRecord] = useState<Scenario>({
     id: "",
     name: "",
@@ -76,8 +70,6 @@ export function GloomhavenCompanionScenarioTabContent(props: {
     typeof deleteScenarioSchema
   >({
     resourceNameKey: "name",
-    setCreateErrors,
-    setEditErrors,
     createResourceSchema: createScenarioSchema,
     editResourceSchema: editScenarioSchema,
     deleteResourceSchema: deleteScenarioSchema,
@@ -108,13 +100,9 @@ export function GloomhavenCompanionScenarioTabContent(props: {
             createPermission="gloomhaven-companion:public"
             creationRecord={createScenarioRecord}
             onCreate={onScenarioCreate}
-            createErrors={createErrors}
-            setCreateErrors={setCreateErrors}
             createResourceSchema={createScenarioSchema}
             editPermission="gloomhaven-companion:public"
             onEdit={onScenarioEdit}
-            editErrors={editErrors}
-            setEditErrors={setEditErrors}
             editResourceSchema={editScenarioSchema}
             deletePermission="gloomhaven-companion:public"
             onDelete={onScenarioDelete}

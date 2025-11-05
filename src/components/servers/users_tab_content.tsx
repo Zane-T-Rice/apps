@@ -27,9 +27,6 @@ export function UserServerLinksTabContent(props: {
   const [userServerLinks, setUserServerLinks] = useState<UserServerLink[]>([]);
   const [selectedUserServerLink, setSelectedUserServerLink] =
     useState<UserServerLink>();
-  const [createErrors, setCreateErrors] = useState<{
-    [Property in keyof UserServerLink]?: string;
-  }>({});
 
   const [createUserServerLinkRecord] = useState<UserServerLink>({
     id: "",
@@ -66,7 +63,6 @@ export function UserServerLinksTabContent(props: {
     typeof deleteUserServerLinkSchema
   >({
     resourceNameKey: "username",
-    setCreateErrors,
     createResourceSchema: createUserServerLinkSchema,
     deleteResourceSchema: deleteUserServerLinkSchema,
     createResource: createUserServerLink,
@@ -90,10 +86,7 @@ export function UserServerLinksTabContent(props: {
       createPermission="server-manager:admin"
       creationRecord={createUserServerLinkRecord}
       onCreate={onUserServerLinkCreate}
-      onCreateErrors={createErrors}
-      setCreateErrors={setCreateErrors}
       createResourceSchema={createUserServerLinkSchema}
-      editPermission="server-manager:admin"
       deletePermission="server-manager:admin"
       onDelete={onUserServerLinkDelete}
       marginLeft={3}

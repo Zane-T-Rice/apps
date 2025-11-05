@@ -2,7 +2,6 @@ import { Box, Stack, StackProps } from "@chakra-ui/react";
 import DataTable from "./data_table";
 import CRUDButtons from "./crud_buttons";
 import { Schema } from "yup";
-import { Dispatch, SetStateAction } from "react";
 
 export default function CRUDTable<T extends object, C extends Schema | undefined, E extends Schema | undefined>(
   props: {
@@ -13,13 +12,9 @@ export default function CRUDTable<T extends object, C extends Schema | undefined
     createPermission?: string;
     creationRecord?: T;
     onCreate?: (record: T) => Promise<boolean>;
-    onCreateErrors?: { [Property in keyof T]?: string };
-    setCreateErrors?: Dispatch<SetStateAction<{ [Property in keyof T]?: string }>>;
     createResourceSchema?: C;
     editPermission?: string;
     onEdit?: (record: T) => Promise<boolean>;
-    onEditErrors?: { [Property in keyof T]?: string };
-    setEditErrors?: Dispatch<SetStateAction<{ [Property in keyof T]?: string }>>;
     editResourceSchema?: E;
     deletePermission?: string;
     onDelete?: (record: T) => Promise<boolean>;
@@ -27,19 +22,15 @@ export default function CRUDTable<T extends object, C extends Schema | undefined
 ) {
   const {
     records,
-    onRowSelect,
     idKey,
     selectedRecordId,
+    onRowSelect,
     createPermission,
-    onCreate,
     creationRecord,
-    onCreateErrors,
-    setCreateErrors,
+    onCreate,
     createResourceSchema,
     editPermission,
     onEdit,
-    onEditErrors,
-    setEditErrors,
     editResourceSchema,
     deletePermission,
     onDelete,
@@ -59,13 +50,9 @@ export default function CRUDTable<T extends object, C extends Schema | undefined
           createPermission={createPermission}
           creationRecord={creationRecord}
           onCreate={onCreate}
-          createErrors={onCreateErrors}
-          setCreateErrors={setCreateErrors}
           createResourceSchema={createResourceSchema}
           editPermission={editPermission}
           onEdit={onEdit}
-          editErrors={onEditErrors}
-          setEditErrors={setEditErrors}
           editResourceSchema={editResourceSchema}
           deletePermission={deletePermission}
           onDelete={onDelete}

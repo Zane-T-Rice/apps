@@ -32,12 +32,6 @@ export function HostsTabContent(props: {
   const { selectedHost, setSelectedHost } = props;
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [hosts, setHosts] = useState<Host[]>([]);
-  const [createErrors, setCreateErrors] = useState<{
-    [Property in keyof Host]?: string;
-  }>({});
-  const [editErrors, setEditErrors] = useState<{
-    [Property in keyof Host]?: string;
-  }>({});
 
   const [createHostRecord] = useState<Host>({
     id: "",
@@ -75,8 +69,6 @@ export function HostsTabContent(props: {
     typeof deleteHostSchema
   >({
     resourceNameKey: "name",
-    setCreateErrors,
-    setEditErrors,
     createResourceSchema: createHostSchema,
     editResourceSchema: editHostSchema,
     deleteResourceSchema: deleteHostSchema,
@@ -104,13 +96,9 @@ export function HostsTabContent(props: {
         createPermission="server-manager:admin"
         creationRecord={createHostRecord}
         onCreate={onHostCreate}
-        onCreateErrors={createErrors}
-        setCreateErrors={setCreateErrors}
         createResourceSchema={createHostSchema}
         editPermission="server-manager:admin"
         onEdit={onHostEdit}
-        onEditErrors={editErrors}
-        setEditErrors={setEditErrors}
         editResourceSchema={editHostSchema}
         deletePermission="server-manager:admin"
         onDelete={onHostDelete}

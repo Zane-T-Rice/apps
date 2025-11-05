@@ -35,13 +35,6 @@ export function PortsTabContent(props: {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [ports, setPorts] = useState<Port[]>([]);
   const [selectedPort, setSelectedPort] = useState<Port>();
-  const [createErrors, setCreateErrors] = useState<{
-    [Property in keyof Port]?: string;
-  }>({});
-  const [editErrors, setEditErrors] = useState<{
-    [Property in keyof Port]?: string;
-  }>({});
-
   const [createPortRecord] = useState<Port>({
     id: "",
     number: 0,
@@ -80,8 +73,6 @@ export function PortsTabContent(props: {
     typeof deletePortSchema
   >({
     resourceNameKey: "number",
-    setCreateErrors,
-    setEditErrors,
     createResourceSchema: createPortSchema,
     editResourceSchema: editPortSchema,
     deleteResourceSchema: deletePortSchema,
@@ -107,13 +98,9 @@ export function PortsTabContent(props: {
       createPermission="server-manager:admin"
       creationRecord={createPortRecord}
       onCreate={onPortCreate}
-      onCreateErrors={createErrors}
-      setCreateErrors={setCreateErrors}
       createResourceSchema={createPortSchema}
       editPermission="server-manager:admin"
       onEdit={onPortEdit}
-      onEditErrors={editErrors}
-      setEditErrors={setEditErrors}
       editResourceSchema={editPortSchema}
       deletePermission="server-manager:admin"
       onDelete={onPortDelete}

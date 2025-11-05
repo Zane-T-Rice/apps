@@ -35,12 +35,6 @@ export function VolumesTabContent(props: {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [volumes, setVolumes] = useState<Volume[]>([]);
   const [selectedVolume, setSelectedVolume] = useState<Volume>();
-  const [createErrors, setCreateErrors] = useState<{
-    [Property in keyof Volume]?: string;
-  }>({});
-  const [editErrors, setEditErrors] = useState<{
-    [Property in keyof Volume]?: string;
-  }>({});
 
   const [createVolumeRecord] = useState<Volume>({
     id: "",
@@ -80,8 +74,6 @@ export function VolumesTabContent(props: {
     typeof deleteVolumeSchema
   >({
     resourceNameKey: "containerPath",
-    setCreateErrors,
-    setEditErrors,
     createResourceSchema: createVolumeSchema,
     editResourceSchema: editVolumeSchema,
     deleteResourceSchema: deleteVolumeSchema,
@@ -107,13 +99,9 @@ export function VolumesTabContent(props: {
       createPermission="server-manager:admin"
       creationRecord={createVolumeRecord}
       onCreate={onVolumeCreate}
-      onCreateErrors={createErrors}
-      setCreateErrors={setCreateErrors}
       createResourceSchema={createVolumeSchema}
       editPermission="server-manager:admin"
       onEdit={onVolumeEdit}
-      onEditErrors={editErrors}
-      setEditErrors={setEditErrors}
       editResourceSchema={editVolumeSchema}
       deletePermission="server-manager:admin"
       onDelete={onVolumeDelete}

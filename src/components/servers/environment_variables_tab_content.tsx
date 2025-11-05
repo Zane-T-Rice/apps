@@ -36,12 +36,6 @@ export function EnvironmentVariablesTabContent(props: {
   >([]);
   const [selectedEnvironmentVariable, setSelectedEnvironmentVariable] =
     useState<EnvironmentVariable>();
-  const [createErrors, setCreateErrors] = useState<{
-    [Property in keyof EnvironmentVariable]?: string;
-  }>({});
-  const [editErrors, setEditErrors] = useState<{
-    [Property in keyof EnvironmentVariable]?: string;
-  }>({});
 
   const [createEnvironmentVariableRecord] = useState<EnvironmentVariable>({
     id: "",
@@ -84,8 +78,6 @@ export function EnvironmentVariablesTabContent(props: {
     typeof deleteEnvironmentVariableSchema
   >({
     resourceNameKey: "name",
-    setCreateErrors,
-    setEditErrors,
     createResourceSchema: createEnvironmentVariableSchema,
     editResourceSchema: editEnvironmentVariableSchema,
     deleteResourceSchema: deleteEnvironmentVariableSchema,
@@ -111,13 +103,9 @@ export function EnvironmentVariablesTabContent(props: {
       createPermission="server-manager:admin"
       creationRecord={createEnvironmentVariableRecord}
       onCreate={onEnvironmentVariableCreate}
-      onCreateErrors={createErrors}
-      setCreateErrors={setCreateErrors}
       createResourceSchema={createEnvironmentVariableSchema}
       editPermission="server-manager:admin"
       onEdit={onEnvironmentVariableEdit}
-      onEditErrors={editErrors}
-      setEditErrors={setEditErrors}
       editResourceSchema={editEnvironmentVariableSchema}
       deletePermission="server-manager:admin"
       onDelete={onEnvironmentVariableDelete}

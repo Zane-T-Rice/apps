@@ -31,12 +31,6 @@ export function GloomhavenCompanionCampaignTabContent(props: {
   const { selectedCampaign, setSelectedCampaign } = props;
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
-  const [createErrors, setCreateErrors] = useState<{
-    [Property in keyof Campaign]?: string;
-  }>({});
-  const [editErrors, setEditErrors] = useState<{
-    [Property in keyof Campaign]?: string;
-  }>({});
   const [createCampaignRecord] = useState<Campaign>({
     id: "",
     name: "",
@@ -74,8 +68,6 @@ export function GloomhavenCompanionCampaignTabContent(props: {
     typeof deleteCampaignSchema
   >({
     resourceNameKey: "name",
-    setCreateErrors,
-    setEditErrors,
     createResourceSchema: createCampaignSchema,
     editResourceSchema: editCampaignSchema,
     deleteResourceSchema: deleteCampaignSchema,
@@ -106,13 +98,9 @@ export function GloomhavenCompanionCampaignTabContent(props: {
             createPermission="gloomhaven-companion:public"
             creationRecord={createCampaignRecord}
             onCreate={onCampaignCreate}
-            createErrors={createErrors}
-            setCreateErrors={setCreateErrors}
             createResourceSchema={createCampaignSchema}
             editPermission="gloomhaven-companion:public"
             onEdit={onCampaignEdit}
-            editErrors={editErrors}
-            setEditErrors={setEditErrors}
             editResourceSchema={editCampaignSchema}
             deletePermission="gloomhaven-companion:public"
             onDelete={onCampaignDelete}

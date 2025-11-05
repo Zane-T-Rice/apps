@@ -35,12 +35,6 @@ export function FilesTabContent(props: {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [files, setFiles] = useState<File[]>([]);
   const [selectedFile, setSelectedFile] = useState<File>();
-  const [createErrors, setCreateErrors] = useState<{
-    [Property in keyof File]?: string;
-  }>({});
-  const [editErrors, setEditErrors] = useState<{
-    [Property in keyof File]?: string;
-  }>({});
 
   const [createFileRecord] = useState<File>({
     id: "",
@@ -80,8 +74,6 @@ export function FilesTabContent(props: {
     typeof deleteFileSchema
   >({
     resourceNameKey: "name",
-    setCreateErrors,
-    setEditErrors,
     createResourceSchema: createFileSchema,
     editResourceSchema: editFileSchema,
     deleteResourceSchema: deleteFileSchema,
@@ -107,13 +99,9 @@ export function FilesTabContent(props: {
       createPermission="server-manager:admin"
       creationRecord={createFileRecord}
       onCreate={onFileCreate}
-      onCreateErrors={createErrors}
-      setCreateErrors={setCreateErrors}
       createResourceSchema={createFileSchema}
       editPermission="server-manager:admin"
       onEdit={onFileEdit}
-      onEditErrors={editErrors}
-      setEditErrors={setEditErrors}
       editResourceSchema={editFileSchema}
       deletePermission="server-manager:admin"
       onDelete={onFileDelete}

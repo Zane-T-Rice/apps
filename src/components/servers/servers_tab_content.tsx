@@ -40,12 +40,6 @@ export function ServersTabContent(props: {
   const { selectedHost, selectedServer, setSelectedServer } = props;
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [servers, setServers] = useState<Server[]>([]);
-  const [createErrors, setCreateErrors] = useState<{
-    [Property in keyof Server]?: string;
-  }>({});
-  const [editErrors, setEditErrors] = useState<{
-    [Property in keyof Server]?: string;
-  }>({});
 
   const [createServerRecord] = useState<Server>({
     id: "",
@@ -89,8 +83,6 @@ export function ServersTabContent(props: {
     typeof deleteServerSchema
   >({
     resourceNameKey: "containerName",
-    setCreateErrors,
-    setEditErrors,
     createResourceSchema: createServerSchema,
     editResourceSchema: editServerSchema,
     deleteResourceSchema: deleteServerSchema,
@@ -154,13 +146,9 @@ export function ServersTabContent(props: {
         createPermission="server-manager:admin"
         creationRecord={createServerRecord}
         onCreate={onServerCreate}
-        onCreateErrors={createErrors}
-        setCreateErrors={setCreateErrors}
         createResourceSchema={createServerSchema}
         editPermission="server-manager:admin"
         onEdit={onServerEdit}
-        onEditErrors={editErrors}
-        setEditErrors={setEditErrors}
         editResourceSchema={editServerSchema}
         deletePermission="server-manager:admin"
         onDelete={onServerDelete}

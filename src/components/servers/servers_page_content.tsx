@@ -3,7 +3,7 @@
 import { Box, Tabs } from "@chakra-ui/react";
 import { NavigationBar } from "../ui/navigation_bar";
 import { FaGhost, FaServer } from "react-icons/fa";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Server } from "@/app/utils/server-manager-service/server_manager_service_servers";
 import { CiEdit } from "react-icons/ci";
 import { ServersTabContent } from "./servers_tab_content";
@@ -20,9 +20,10 @@ export default function ServersPageContent() {
   const [selectedHost, setSelectedHost] = useState<Host>();
   const [selectedServer, setSelectedServer] = useState<Server>();
 
-  useEffect(() => {
+  const onSelectHost = (host: Host) => {
+    setSelectedHost(host);
     setSelectedServer(undefined);
-  }, [selectedHost]);
+  };
 
   const actions = <></>;
 
@@ -82,6 +83,7 @@ export default function ServersPageContent() {
         <HostsTabContent
           selectedHost={selectedHost}
           setSelectedHost={setSelectedHost}
+          onSelectHost={onSelectHost}
         />
       </Tabs.Content>
       <Tabs.Content value="servers">

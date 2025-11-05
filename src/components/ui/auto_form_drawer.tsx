@@ -48,76 +48,62 @@ export function AutoFormDrawer<T extends object, S extends Schema>(props: {
     omitFields,
   } = props;
 
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [fields, setFields] = useState<FormFields<T>[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isCancelled, setIsCancelled] = useState<boolean>(false);
-  const [isSaved, setIsSaved] = useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [errors, setErrors] = useState<{ [Property in keyof T]?: string }>({});
 
-  const resetFields = useCallback(() => {
-    if (!record || (!isLoading && !isCancelled && !isSaved)) return;
+  const resetFields = useCallback((): FormFields<T>[] => {
+    return record
+      ? (Object.keys(record) as (keyof T)[])
+          // Filter out any non-primitives. Maybe later make an AutoForm that
+          // does something sane for arrays and associative arrays?
+          // Also, I should move the field generation logic in to
+          // a component that can be used outside of a drawer.
+          .filter((fieldName) => {
+            return !(record[fieldName] instanceof Object);
+          })
+          // Filter out any fields which are in the omit array.
+          .filter(
+            (fieldName) => !omitFields?.find((name) => name === fieldName),
+          )
+          .map((fieldName, index) => ({
+            id: index,
+            invalid: false,
+            required: true,
+            name: fieldName,
+            placeholder: "",
+            setField: (event: ChangeEvent<HTMLInputElement>) => {
+              setFields((prev) => {
+                const newField = prev[index];
+                newField.value = event.target.value;
+                return [
+                  ...prev.slice(0, index),
+                  newField,
+                  ...prev.slice(index + 1),
+                ];
+              });
+            },
+            value: `${record[fieldName]}`,
+          }))
+      : [];
+  }, [record, omitFields, setFields]);
 
-    const newFields = (Object.keys(record) as (keyof T)[])
-      // Filter out any non-primitives. Maybe later make an AutoForm that
-      // does something sane for arrays and associative arrays?
-      // Also, I should move the field generation logic in to
-      // a component that can be used outside of a drawer.
-      .filter((fieldName) => {
-        return !(record[fieldName] instanceof Object);
-      })
-      // Filter out any fields which are in the omit array.
-      .filter((fieldName) => !omitFields?.find((name) => name === fieldName))
-      .map((fieldName, index) => ({
-        id: index,
-        invalid: false,
-        required: true,
-        name: fieldName,
-        placeholder: "",
-        setField: (event: ChangeEvent<HTMLInputElement>) => {
-          setFields((prev) => {
-            const newField = prev[index];
-            newField.value = event.target.value;
-            return [
-              ...prev.slice(0, index),
-              newField,
-              ...prev.slice(index + 1),
-            ];
-          });
-        },
-        value: `${record[fieldName]}`,
-      }));
-
-    setIsLoading(false);
-    setIsCancelled(false);
-    setIsSaved(false);
-    setFields(newFields);
-  }, [record, omitFields, isLoading, isCancelled, isSaved]);
-
-  // Switching records should reset the fields.
   useEffect(() => {
-    setIsLoading(true);
-  }, [record]);
-
-  // Whenever resetFields callback changes, invoke it to reset the fields.
-  useEffect(() => {
-    resetFields();
+    setFields(resetFields());
   }, [resetFields]);
 
   // Cancelling the drawer should reset the fields.
   const cancel = () => {
     setIsOpen(false);
-    setIsCancelled(true);
     setErrors?.({});
-    resetFields();
+    setFields(resetFields());
   };
 
   // Successfully saving the drawer should reset the fields.
   const successfulSave = () => {
     setIsOpen(false);
-    setIsSaved(true);
     setErrors?.({});
-    resetFields();
+    setFields(resetFields());
   };
 
   const submit = async () => {
@@ -134,7 +120,7 @@ export function AutoFormDrawer<T extends object, S extends Schema>(props: {
         });
       }
 
-      if (await onSubmit(combinedFields)) {
+      if (await onSubmit(resourceSchema?.cast(combinedFields))) {
         successfulSave();
       } else {
         validateWithErrors(() => {

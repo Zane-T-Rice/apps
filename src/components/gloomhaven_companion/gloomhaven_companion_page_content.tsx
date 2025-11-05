@@ -3,7 +3,7 @@
 import { Box, Tabs } from "@chakra-ui/react";
 import { NavigationBar } from "../ui/navigation_bar";
 import { FaCity } from "react-icons/fa";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { GloomhavenCompanionCampaignTabContent } from "./gloomhaven_companion_campaign_tab_content";
 import { GloomhavenCompanionScenarioTabContent } from "./gloomhaven_companion_scenario_tab_content";
 import { Campaign } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_campaigns";
@@ -17,9 +17,10 @@ export default function GloomhavenCompanionPageContent() {
   const [selectedCampaign, setSelectedCampaign] = useState<Campaign>();
   const [selectedScenario, setSelectedScenario] = useState<Scenario>();
 
-  useEffect(() => {
+  const onCampaignSelect = ((campaign: Campaign) => {
+    setSelectedCampaign(campaign);
     setSelectedScenario(undefined);
-  }, [selectedCampaign]);
+  })
 
   const actions = <></>;
 
@@ -55,6 +56,7 @@ export default function GloomhavenCompanionPageContent() {
         <GloomhavenCompanionCampaignTabContent
           selectedCampaign={selectedCampaign}
           setSelectedCampaign={setSelectedCampaign}
+          onCampaignSelect={onCampaignSelect}
         />
       </Tabs.Content>
       {selectedCampaign && (

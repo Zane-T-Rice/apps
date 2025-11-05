@@ -28,8 +28,9 @@ const deleteHostSchema = object({
 export function HostsTabContent(props: {
   selectedHost?: Host;
   setSelectedHost: Dispatch<SetStateAction<Host | undefined>>;
+  onSelectHost: (host: Host) => void;
 }) {
-  const { selectedHost, setSelectedHost } = props;
+  const { selectedHost, setSelectedHost, onSelectHost } = props;
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [hosts, setHosts] = useState<Host[]>([]);
 
@@ -53,10 +54,6 @@ export function HostsTabContent(props: {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const onHostSelect = (server: Host) => {
-    setSelectedHost(server);
-  };
 
   const {
     onResourceCreate: onHostCreate,
@@ -91,7 +88,7 @@ export function HostsTabContent(props: {
         records={hosts}
         style={{}}
         idKey="id"
-        onRowSelect={onHostSelect}
+        onRowSelect={onSelectHost}
         selectedRecordId={selectedHost?.id}
         createPermission="server-manager:admin"
         creationRecord={createHostRecord}

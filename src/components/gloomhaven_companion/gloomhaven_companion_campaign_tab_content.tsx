@@ -30,8 +30,9 @@ const deleteCampaignSchema = object({
 export function GloomhavenCompanionCampaignTabContent(props: {
   selectedCampaign?: Campaign;
   setSelectedCampaign: Dispatch<SetStateAction<Campaign | undefined>>;
+  onCampaignSelect: (campaign: Campaign) => void;
 }) {
-  const { selectedCampaign, setSelectedCampaign } = props;
+  const { selectedCampaign, setSelectedCampaign, onCampaignSelect } = props;
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [createCampaignRecord] = useState<Campaign>({
@@ -55,10 +56,6 @@ export function GloomhavenCompanionCampaignTabContent(props: {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const onCampaignSelect = (campaign: Campaign) => {
-    setSelectedCampaign(campaign);
-  };
 
   const {
     onResourceCreate: onCampaignCreate,

@@ -1,7 +1,7 @@
 "use client";
 
 import { LuChartLine, LuTable } from "react-icons/lu";
-import { Field, HStack, Input, Spinner, Stack, Tabs } from "@chakra-ui/react";
+import { Field, HStack, Input, Stack, Tabs } from "@chakra-ui/react";
 import DataTable from "../ui/data_table";
 import AddItemButtonGroup from "./add_item_button_group";
 import { Cell, Pie, PieChart } from "recharts";
@@ -19,14 +19,12 @@ const COLORS = ["#AA8042", "#00C49F", "#EEEE00", "#FF0000"];
 const fontSize = 20;
 
 export default function CaloriesPageContent() {
-  const [items, setItems, itemsLoading] = useLocalStorage<Item[]>("items", []);
-  const [target, setTarget, targetLoading] = useLocalStorage<number>(
+  const [items, setItems] = useLocalStorage<Item[]>("items", []);
+  const [target, setTarget] = useLocalStorage<number>(
     "target",
     1500,
   );
   const textFillColor = useColorModeValue("black", "white");
-
-  const isLoading = itemsLoading || targetLoading;
 
   const value = items.map((item) => item.amount).reduce((a, b) => a + b, 0);
   const outerRadius = 130;
@@ -108,7 +106,7 @@ export default function CaloriesPageContent() {
     <>
       <Tabs.Content value="charts">
         <Stack>
-          {!isLoading ? (
+          {(
             <PieChart
               width={outerRadius * 2 + 10}
               height={outerRadius * 2 + 10}
@@ -145,14 +143,6 @@ export default function CaloriesPageContent() {
                 {target - value}
               </text>
             </PieChart>
-          ) : (
-            <Spinner
-              marginLeft={cx + 70}
-              marginTop={cy}
-              color="blue"
-              size="xl"
-              borderWidth="thick"
-            />
           )}
           <QuickAddRemoveButton
             items={items}

@@ -21,6 +21,7 @@ export function useOnCRUD<
   deleteResource?: (resource: T) => Promise<T | null>;
   setResources: Dispatch<SetStateAction<T[]>>;
   setSelectedResource: Dispatch<SetStateAction<T | undefined>>;
+  sendMessage?: (resource: T) => void;
 }) {
   const {
     resourceNameKey,
@@ -34,6 +35,7 @@ export function useOnCRUD<
     deleteResource,
     setResources,
     setSelectedResource,
+    sendMessage,
   } = props;
 
   const onResourceCreate = async (newResource: T): Promise<boolean> => {
@@ -55,6 +57,8 @@ export function useOnCRUD<
     setResources((prev) => {
       return [...prev, resource];
     });
+
+    sendMessage?.(resource);
 
     return true;
   };
@@ -81,6 +85,7 @@ export function useOnCRUD<
       );
     });
     setSelectedResource(resource);
+    sendMessage?.(resource);
 
     return true;
   };
@@ -107,6 +112,7 @@ export function useOnCRUD<
       );
     });
     setSelectedResource(undefined);
+    sendMessage?.(resource);
 
     return true;
   };

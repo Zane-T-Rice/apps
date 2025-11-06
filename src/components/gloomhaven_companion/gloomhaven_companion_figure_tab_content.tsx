@@ -11,6 +11,7 @@ import { Campaign } from "@/app/utils/gloomhaven_companion_service/gloomhaven_co
 import { Scenario } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_scenarios";
 import { useOnCRUD } from "@/app/utils/rest/use_on_crud";
 import { FigureCard } from "../ui/figure_card";
+import { useWebSocket } from "../ui/websocket";
 
 const transformInt = (value: number) => {
   return isNaN(value) ? undefined : value;
@@ -93,6 +94,14 @@ export function GloomhavenCompanionFigureTabContent(props: {
     setSelectedFigure(figure);
   };
 
+  const { sendMessage, messages } = useWebSocket<Figure>();
+
+  useEffect(() => {
+    getFigures().then((responseFigures) => {
+      if (responseFigures) setFigures(responseFigures);
+    });
+  }, [messages, getFigures]);
+
   const {
     onResourceCreate: onFigureCreate,
     onResourceEdit: onFigureEdit,
@@ -112,6 +121,7 @@ export function GloomhavenCompanionFigureTabContent(props: {
     deleteResource: deleteFigure,
     setResources: setFigures,
     setSelectedResource: setSelectedFigure,
+    sendMessage,
   });
 
   const collectGroups = (figures: Figure[]): Array<Figure[]> => {

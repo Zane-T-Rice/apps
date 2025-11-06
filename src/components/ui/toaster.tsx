@@ -13,7 +13,6 @@ export const toaster = createToaster({
   placement: "bottom-start",
   pauseOnPageIdle: false,
   overlap: true,
-  max: 8,
 });
 
 export const Toaster = () => {

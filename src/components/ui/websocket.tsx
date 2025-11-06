@@ -1,5 +1,5 @@
 import { useAuth0 } from "@auth0/auth0-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export function useWebSocket<T>(props: {
   campaignId: string;
@@ -13,13 +13,18 @@ export function useWebSocket<T>(props: {
   const [ws, setWs] = useState<WebSocket | null>(null);
   const { getAccessTokenSilently } = useAuth0();
 
-  useEffect(() => {
-    getAccessTokenSilently().then((token) => {
-      if (campaignId && scenarioId) {
+  const wsHooks = useCallback(
+    (token: string) => {
+      if (
+        campaignId &&
+        scenarioId &&
+        token &&
+        ws?.readyState !== WebSocket.OPEN
+      ) {
         const websocket = new WebSocket(
           `${process.env.NEXT_PUBLIC_GLOOMHAVEN_COMPANION_WEBSOCKETS_URL as string}?campaignId=${campaignId}&scenarioId=${scenarioId}`,
           [`${token}`],
-        ); // Replace with your WebSocket server URL
+        );
 
         websocket.onopen = () => {
           console.log("WebSocket connection established.");
@@ -45,14 +50,25 @@ export function useWebSocket<T>(props: {
           websocket.close();
         };
       }
-    });
-  }, [campaignId, scenarioId, getAccessTokenSilently]); // Empty dependency array ensures this runs once on mount
+    },
+    [campaignId, scenarioId, ws],
+  );
+
+  const connect = async () => {
+    wsHooks(await getAccessTokenSilently());
+  };
+
+  useEffect(() => {
+    connect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const sendMessage = (resource: T) => {
     if (ws && ws.readyState === WebSocket.OPEN) {
       ws.send(JSON.stringify(resource));
     } else {
-      console.warn("WebSocket is not open.");
+      console.warn("WebSocket is not open, try to re-establish connection.");
+      connect();
     }
   };
 

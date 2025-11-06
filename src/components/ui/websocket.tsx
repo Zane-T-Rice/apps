@@ -32,7 +32,6 @@ export function useWebSocket<T>(props: {
         };
 
         websocket.onmessage = (event) => {
-          console.log("Message received:", event.data);
           setMessages((prevMessages) => [...prevMessages, event.data as T]);
         };
 
@@ -63,7 +62,7 @@ export function useWebSocket<T>(props: {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const sendMessage = (resource: T) => {
+  const sendMessage = async (resource: T) => {
     if (ws && ws.readyState === WebSocket.OPEN) {
       ws.send(JSON.stringify(resource));
     } else {

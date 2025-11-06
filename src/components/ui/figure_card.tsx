@@ -9,9 +9,12 @@ import { Figure } from "@/app/utils/gloomhaven_companion_service/gloomhaven_comp
 export function FigureCard(props: {
   figure: Figure;
   selectedFigure: Figure | undefined;
-  onFigureCreate: (figure: Figure) => Promise<boolean>;
+  onFigureCreate: (
+    figure: Figure,
+    showOnlyErrors?: boolean,
+  ) => Promise<boolean>;
   onFigureDelete: (figure: Figure) => Promise<boolean>;
-  onFigureEdit: (figure: Figure) => Promise<boolean>;
+  onFigureEdit: (figure: Figure, onlyShowErrors?: boolean) => Promise<boolean>;
 }) {
   const {
     figure,

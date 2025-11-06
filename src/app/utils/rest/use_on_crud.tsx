@@ -63,7 +63,10 @@ export function useOnCRUD<
     return true;
   };
 
-  const onResourceEdit = async (newResource: T): Promise<boolean> => {
+  const onResourceEdit = async (
+    newResource: T,
+    onlyShowErrors: boolean = false,
+  ): Promise<boolean> => {
     const title = `Editing resource ${newResource?.[resourceNameKey]}`;
     const resource = await fetchWithValidateAndToast({
       title,
@@ -75,6 +78,7 @@ export function useOnCRUD<
         return Object.keys(newResource) as (keyof T)[];
       },
       fetchCallback: async () => (await editResource?.(newResource)) || null,
+      onlyShowErrors,
     });
     if (!resource) return false;
 

@@ -1,15 +1,18 @@
 import { Figure } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_figures";
-import { DataList, Stack, Text } from "@chakra-ui/react";
+import { Box, Collapsible, DataList, Stack, Text } from "@chakra-ui/react";
 import { GiBroadsword, GiLeatherBoot } from "react-icons/gi";
 import { IoShield } from "react-icons/io5";
 import { IncrementalNumberEditor } from "./incremental_number_editor";
 import { StatusSwitch } from "./status_switch";
+import { LuChevronRight } from "react-icons/lu";
+import { useState } from "react";
 
 export function FigureDataList(props: {
   figure: Figure;
-  onFigureEdit: (figure: Figure) => void;
+  onFigureEdit: (figure: Figure, onlyShowErrors?: boolean) => void;
 }) {
   const { figure, onFigureEdit } = props;
+  const [statusesOpen, setStatusesOpen] = useState<boolean>(false);
 
   const decreaseDamage = (figure: Figure) => {
     figure.damage = figure.damage - 1;
@@ -50,11 +53,11 @@ export function FigureDataList(props: {
                 <IncrementalNumberEditor
                   increaseCallback={() => {
                     increaseNumber(figure);
-                    onFigureEdit(figure);
+                    onFigureEdit(figure, true);
                   }}
                   decreaseCallback={() => {
                     decreaseNumber(figure);
-                    onFigureEdit(figure);
+                    onFigureEdit(figure, true);
                   }}
                   text={`${figure.number}`}
                 />
@@ -67,11 +70,11 @@ export function FigureDataList(props: {
               <IncrementalNumberEditor
                 increaseCallback={() => {
                   decreaseDamage(figure);
-                  onFigureEdit(figure);
+                  onFigureEdit(figure, true);
                 }}
                 decreaseCallback={() => {
                   increaseDamage(figure);
-                  onFigureEdit(figure);
+                  onFigureEdit(figure, true);
                 }}
                 text={`${figure.maximumHP - figure.damage} / ${figure.maximumHP}`}
               />
@@ -84,11 +87,11 @@ export function FigureDataList(props: {
                 <IncrementalNumberEditor
                   increaseCallback={() => {
                     increaseXP(figure);
-                    onFigureEdit(figure);
+                    onFigureEdit(figure, true);
                   }}
                   decreaseCallback={() => {
                     decreaseXP(figure);
-                    onFigureEdit(figure);
+                    onFigureEdit(figure, true);
                   }}
                   text={`${figure.xp}`}
                 />
@@ -110,50 +113,67 @@ export function FigureDataList(props: {
                 <Text fontSize="sm">{figure.innateDefenses}</Text>
               </>
             )}
+            <Collapsible.Root
+              onClick={() => {
+                setStatusesOpen(!statusesOpen);
+              }}
+            >
+              <Collapsible.Trigger display="flex" alignItems="center">
+                <Collapsible.Indicator
+                  transition="transform 0.2s"
+                  _open={{ transform: "rotate(90deg)" }}
+                >
+                  <LuChevronRight />
+                </Collapsible.Indicator>
+                Statuses
+              </Collapsible.Trigger>
+            </Collapsible.Root>
           </Stack>
-          <Stack direction="row" gapX="5">
-            <Stack direction="column">
-              {["Stun", "Immobilize", "Muddle"].map((status) => {
-                return (
-                  <StatusSwitch
-                    key={`status-switch-${figure.id}-${status}`}
-                    figure={figure}
-                    onFigureEdit={onFigureEdit}
-                    status={status}
-                    isPositive={false}
-                  />
-                );
-              })}
-            </Stack>
-            <Stack direction="column" maxWidth="1/2">
-              {["Disarm", "Poison", "Wound"].map((status) => {
-                return (
-                  <StatusSwitch
-                    key={`status-switch-${figure.id}-${status}`}
-                    figure={figure}
-                    onFigureEdit={onFigureEdit}
-                    status={status}
-                    isPositive={false}
-                  />
-                );
-              })}
-            </Stack>
-            <Stack direction="column">
-              {["Strengthen", "Invisible", "Regenerate", "Ward"].map(
-                (status) => {
-                  return (
-                    <StatusSwitch
-                      key={`status-switch-${figure.id}-${status}`}
-                      figure={figure}
-                      onFigureEdit={onFigureEdit}
-                      status={status}
-                      isPositive={true}
-                    />
-                  );
-                },
-              )}
-            </Stack>
-          </Stack>
+          <Collapsible.Root open={statusesOpen}>
+            <Collapsible.Content>
+              <Stack direction="row" gapX="5">
+                <Stack direction="column">
+                  {["Strengthen", "Invisible", "Ward"].map((status) => {
+                    return (
+                      <StatusSwitch
+                        key={`status-switch-${figure.id}-${status}`}
+                        figure={figure}
+                        onFigureEdit={onFigureEdit}
+                        status={status}
+                        isPositive={true}
+                      />
+                    );
+                  })}
+                </Stack>
+                <Stack direction="column">
+                  {["Stun", "Immobilize", "Muddle"].map((status) => {
+                    return (
+                      <StatusSwitch
+                        key={`status-switch-${figure.id}-${status}`}
+                        figure={figure}
+                        onFigureEdit={onFigureEdit}
+                        status={status}
+                        isPositive={false}
+                      />
+                    );
+                  })}
+                </Stack>
+                <Stack direction="column" maxWidth="1/2">
+                  {["Disarm", "Poison", "Wound"].map((status) => {
+                    return (
+                      <StatusSwitch
+                        key={`status-switch-${figure.id}-${status}`}
+                        figure={figure}
+                        onFigureEdit={onFigureEdit}
+                        status={status}
+                        isPositive={false}
+                      />
+                    );
+                  })}
+                </Stack>
+              </Stack>
+            </Collapsible.Content>
+          </Collapsible.Root>
         </Stack>
       </DataList.Root>
     </>

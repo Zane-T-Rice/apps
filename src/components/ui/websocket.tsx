@@ -18,7 +18,7 @@ export function useWebSocket<T>(props: {
       if (campaignId && scenarioId) {
         const websocket = new WebSocket(
           `${process.env.NEXT_PUBLIC_GLOOMHAVEN_COMPANION_WEBSOCKETS_URL as string}?campaignId=${campaignId}&scenarioId=${scenarioId}`,
-          ["sec-websocket-protocol", `Bearer ${token}`],
+          [`${token}`],
         ); // Replace with your WebSocket server URL
 
         websocket.onopen = () => {

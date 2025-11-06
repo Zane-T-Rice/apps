@@ -103,7 +103,8 @@ export function GloomhavenCompanionFigureTabContent(props: {
     getFigures().then((responseFigures) => {
       if (responseFigures) setFigures(responseFigures);
     });
-  }, [messages.length, getFigures]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [messages]);
 
   const {
     onResourceCreate: onFigureCreate,

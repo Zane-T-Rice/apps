@@ -100,12 +100,10 @@ export function GloomhavenCompanionFigureTabContent(props: {
   });
 
   useEffect(() => {
-    console.log(messages);
-    if (messages.length === 0) return;
     getFigures().then((responseFigures) => {
       if (responseFigures) setFigures(responseFigures);
     });
-  }, [messages, getFigures]);
+  }, [messages.length, getFigures]);
 
   const {
     onResourceCreate: onFigureCreate,

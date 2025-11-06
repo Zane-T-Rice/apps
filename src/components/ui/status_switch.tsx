@@ -9,7 +9,8 @@ export function StatusSwitch(props: {
 }) {
   const { figure, onFigureEdit, status, isPositive } = props;
 
-  const checked = figure.statuses
+  const figureStatuses = figure.statuses ?? "";
+  const checked = figureStatuses
     .split(",")
     .some((figureStatus) => figureStatus === status);
 
@@ -24,8 +25,8 @@ export function StatusSwitch(props: {
       checked={checked}
       onCheckedChange={(e) => {
         if (e.checked) {
-          if (!figure.statuses.includes(status)) {
-            const statusesArray = figure.statuses.split(",");
+          if (!figureStatuses.includes(status)) {
+            const statusesArray = figureStatuses.split(",");
             statusesArray.push(status);
             onFigureEdit({
               ...figure,
@@ -33,8 +34,8 @@ export function StatusSwitch(props: {
             });
           }
         } else {
-          if (figure.statuses.includes(status)) {
-            const statuses = figure.statuses
+          if (figureStatuses.includes(status)) {
+            const statuses = figureStatuses
               .split(",")
               .filter((figureStatus) => figureStatus !== status)
               .join(",");

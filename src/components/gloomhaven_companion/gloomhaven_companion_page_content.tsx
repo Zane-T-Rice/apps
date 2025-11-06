@@ -17,10 +17,11 @@ export default function GloomhavenCompanionPageContent() {
   const [selectedCampaign, setSelectedCampaign] = useState<Campaign>();
   const [selectedScenario, setSelectedScenario] = useState<Scenario>();
 
-  const onCampaignSelect = ((campaign: Campaign) => {
+  const onCampaignSelect = (campaign: Campaign) => {
+    if (selectedCampaign?.entity === campaign.entity) return;
     setSelectedCampaign(campaign);
     setSelectedScenario(undefined);
-  })
+  };
 
   const actions = <></>;
 

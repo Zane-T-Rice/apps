@@ -59,6 +59,7 @@ export function GloomhavenCompanionScenarioTabContent(props: {
   }, [selectedCampaign]);
 
   const onScenarioSelect = (scenario: Scenario) => {
+    if (scenario.entity === selectedScenario?.entity) return;
     setSelectedScenario(scenario);
   };
 

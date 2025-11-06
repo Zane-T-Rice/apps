@@ -94,7 +94,10 @@ export function GloomhavenCompanionFigureTabContent(props: {
     setSelectedFigure(figure);
   };
 
-  const { sendMessage, messages } = useWebSocket<Figure>();
+  const { sendMessage, messages } = useWebSocket<Figure>({
+    campaignId: selectedCampaign.id,
+    scenarioId: selectedScenario.id,
+  });
 
   useEffect(() => {
     getFigures().then((responseFigures) => {

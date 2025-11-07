@@ -13,7 +13,10 @@ export function FigureCard(props: {
     figure: Figure,
     showOnlyErrors?: boolean,
   ) => Promise<boolean>;
-  onFigureDelete: (figure: Figure) => Promise<boolean>;
+  onFigureDelete: (
+    figure: Figure,
+    showOnlyErrors?: boolean,
+  ) => Promise<boolean>;
   onFigureEdit: (figure: Figure, onlyShowErrors?: boolean) => Promise<boolean>;
 }) {
   const {
@@ -47,7 +50,7 @@ export function FigureCard(props: {
                 paddingLeft="1"
                 paddingBottom="2"
                 borderWidth="0"
-                onClick={() => onFigureCreate(figure)}
+                onClick={() => onFigureCreate(figure, true)}
                 _hover={{
                   color: "green",
                 }}
@@ -56,7 +59,7 @@ export function FigureCard(props: {
               </Button>
               <Button
                 marginLeft="auto"
-                onClick={() => onFigureDelete(figure)}
+                onClick={() => onFigureDelete(figure, true)}
                 _hover={{
                   color: "red",
                 }}

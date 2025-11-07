@@ -6,6 +6,8 @@ import { IncrementalNumberEditor } from "./incremental_number_editor";
 import { StatusSwitch } from "./status_switch";
 import { LuChevronRight } from "react-icons/lu";
 import { useState } from "react";
+import { Image } from "@chakra-ui/react";
+import { Tooltip } from "@/components/ui/tooltip";
 
 export function FigureDataList(props: {
   figure: Figure;
@@ -110,26 +112,37 @@ export function FigureDataList(props: {
               <>
                 {"  "}
                 <Text fontSize="sm">Immune:</Text>{" "}
-                <Text fontSize="sm">{figure.innateDefenses}</Text>
+                {figure.innateDefenses.split(",").map((status, index) => {
+                  return (
+                    <Tooltip content={status} key={`innate-defences-${index}`}>
+                      <Image
+                        src={`${status.toLowerCase()}.png`}
+                        width="5"
+                        height="5"
+                        alt={status}
+                      />
+                    </Tooltip>
+                  );
+                })}
               </>
             )}
-            <Collapsible.Root
-              onClick={() => {
-                setStatusesOpen(!statusesOpen);
-              }}
-            >
-              <Collapsible.Trigger display="flex" alignItems="center">
-                <Collapsible.Indicator
-                  transition="transform 0.2s"
-                  _open={{ transform: "rotate(90deg)" }}
-                >
-                  <LuChevronRight />
-                </Collapsible.Indicator>
-                Statuses
-              </Collapsible.Trigger>
-            </Collapsible.Root>
           </Stack>
-          <Collapsible.Root open={statusesOpen}>
+          <Collapsible.Root
+            onClick={() => {
+              setStatusesOpen(!statusesOpen);
+            }}
+            open={statusesOpen}
+          >
+            {" "}
+            <Collapsible.Trigger display="flex" alignItems="center">
+              <Collapsible.Indicator
+                transition="transform 0.2s"
+                _open={{ transform: "rotate(90deg)" }}
+              >
+                <LuChevronRight />
+              </Collapsible.Indicator>
+              Statuses
+            </Collapsible.Trigger>
             <Collapsible.Content>
               <Stack direction="row" gapX="5">
                 <Stack direction="column">

@@ -4,11 +4,17 @@ import { useCallback, useEffect, useState } from "react";
 export function useWebSocket<T>(props: {
   campaignId: string;
   scenarioId: string;
+  websocketId: string;
 }): {
   messages: T[];
   sendMessage: (resource: T) => void;
 } {
-  const { campaignId, scenarioId } = props;
+  const {
+    campaignId,
+    scenarioId,
+    // Used to identify messages sent by self (and ignore them).
+    websocketId,
+  } = props;
   const [messages, setMessages] = useState<T[]>([]);
   const [ws, setWs] = useState<WebSocket | null>(null);
   const { getAccessTokenSilently } = useAuth0();
@@ -32,7 +38,14 @@ export function useWebSocket<T>(props: {
         };
 
         websocket.onmessage = (event) => {
-          setMessages((prevMessages) => [...prevMessages, event.data as T]);
+          // Ignore messages from self.
+          // This only really happens in "next dev" mode
+          // because the React hooks are invoked multiple times.
+          if (websocketId !== event?.data?.messageId)
+            setMessages((prevMessages) => [
+              ...prevMessages,
+              event.data?.resource as T,
+            ]);
         };
 
         websocket.onclose = () => {
@@ -50,7 +63,7 @@ export function useWebSocket<T>(props: {
         };
       }
     },
-    [campaignId, scenarioId, ws],
+    [campaignId, scenarioId, ws, websocketId],
   );
 
   const connect = async () => {
@@ -64,7 +77,7 @@ export function useWebSocket<T>(props: {
 
   const sendMessage = async (resource: T) => {
     if (ws && ws.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify(resource));
+      ws.send(JSON.stringify({ messageId: websocketId, resource: resource }));
     } else {
       console.warn("WebSocket is not open, try to re-establish connection.");
       connect();

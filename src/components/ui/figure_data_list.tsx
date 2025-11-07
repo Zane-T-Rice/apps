@@ -133,17 +133,19 @@ export function FigureDataList(props: {
             <Collapsible.Content>
               <Stack direction="row" gapX="5">
                 <Stack direction="column">
-                  {["Strengthen", "Invisible", "Ward"].map((status) => {
-                    return (
-                      <StatusSwitch
-                        key={`status-switch-${figure.id}-${status}`}
-                        figure={figure}
-                        onFigureEdit={onFigureEdit}
-                        status={status}
-                        isPositive={true}
-                      />
-                    );
-                  })}
+                  {["Strengthen", "Invisible", "Ward", "Safeguard"].map(
+                    (status) => {
+                      return (
+                        <StatusSwitch
+                          key={`status-switch-${figure.id}-${status}`}
+                          figure={figure}
+                          onFigureEdit={onFigureEdit}
+                          status={status}
+                          isPositive={true}
+                        />
+                      );
+                    },
+                  )}
                 </Stack>
                 <Stack direction="column">
                   {["Stun", "Immobilize", "Muddle"].map((status) => {

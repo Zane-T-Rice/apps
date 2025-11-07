@@ -20,7 +20,11 @@ export function StatusSwitch(props: {
   return (
     <Switch.Root
       gapX="0"
-      size="sm"
+      size={{
+        base: "sm",
+        md: "md",
+        lg: "lg",
+      }}
       colorPalette={color}
       key={`${status}-status-${figure.id}`}
       ids={{ root: `${status}-status` }}
@@ -65,10 +69,9 @@ export function StatusSwitch(props: {
       <Switch.Label>
         <Tooltip content={status}>
           <Image
-            paddingLeft="0"
             src={`${status.toLowerCase()}.png`}
-            width="5"
-            height="5"
+            width="6"
+            height="6"
             alt={status}
           />
         </Tooltip>

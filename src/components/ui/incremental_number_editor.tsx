@@ -1,5 +1,5 @@
 import { Button } from "../recipes/button";
-import { Center, Stack } from "@chakra-ui/react";
+import { Stack, Text } from "@chakra-ui/react";
 
 export function IncrementalNumberEditor(props: {
   decreaseCallback: () => void;
@@ -8,10 +8,9 @@ export function IncrementalNumberEditor(props: {
 }) {
   const { decreaseCallback, increaseCallback, text } = props;
   return (
-    <Stack direction="row" minWidth="100%">
+    <Stack direction="row" alignItems="center" flex="auto">
       <Button
-        minWidth="1/12"
-        height="1/2"
+        height="75%"
         variant={"safe"}
         onClick={() => {
           decreaseCallback();
@@ -19,10 +18,11 @@ export function IncrementalNumberEditor(props: {
       >
         -
       </Button>
-      <Center minWidth="1/6">{text}</Center>
+      <Text marginRight="auto" marginLeft="auto">
+        {text}
+      </Text>
       <Button
-        minWidth="1/12"
-        height="1/2"
+        height="75%"
         variant={"safe"}
         onClick={() => {
           increaseCallback();

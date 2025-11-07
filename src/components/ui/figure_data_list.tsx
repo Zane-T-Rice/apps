@@ -1,5 +1,5 @@
 import { Figure } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_figures";
-import { DataList, Stack, Text } from "@chakra-ui/react";
+import { Grid, GridItem, Stack, Text } from "@chakra-ui/react";
 import { GiBroadsword, GiLeatherBoot } from "react-icons/gi";
 import { IoShield } from "react-icons/io5";
 import { IncrementalNumberEditor } from "./incremental_number_editor";
@@ -41,129 +41,191 @@ export function FigureDataList(props: {
     return value !== null && value !== undefined && value !== "";
   };
 
-  const statusesToIcons = (statuses: string) => {
+  const redX = () => {
+    const lineOneStyle = {
+      width: 2,
+      height: 24,
+      backgroundColor: "red",
+      transform: "rotate(45deg)",
+      translate: -14,
+    };
+
+    const lineTwoStyle = {
+      width: 2,
+      height: 24,
+      backgroundColor: "red",
+      transform: "rotate(-45deg)",
+      translate: -14,
+    };
+
+    return (
+      <>
+        <div style={lineOneStyle}></div>
+        <div style={lineTwoStyle}></div>
+      </>
+    );
+  };
+
+  const statusesToIcons = (statuses: string, isImmunity: boolean) => {
     return statuses.split(",").map((status, index) => {
       return (
-        <Tooltip content={status} key={`innate-defences-${index}`}>
-          <Image
-            src={`${status.toLowerCase()}.png`}
-            width="5"
-            height="5"
-            alt={status}
-          />
-        </Tooltip>
+        <>
+          <Stack direction="row" gap="0">
+            <Tooltip content={status} key={`innate-defences-${index}`}>
+              <Image
+                src={`${status.toLowerCase()}.png`}
+                width="6"
+                height="6"
+                alt={status}
+              />
+            </Tooltip>
+            {isImmunity ? redX() : null}
+          </Stack>
+        </>
       );
     });
   };
 
+  const columnOneSpan = {
+    smDown: 2,
+    md: 1,
+  };
+  const columnTwoSpan = {
+    smDown: 9,
+    md: 6,
+  };
+  const columnThreeSpan = {
+    smDown: 3,
+    md: 7,
+  };
+  const totalColumnSpan = {
+    base: 14,
+  };
+
   return figure ? (
-    <>
-      <DataList.Root orientation="horizontal" variant="bold">
-        <Stack>
-          {notNil(figure.number) && (
-            <DataList.Item key={"#"}>
-              <Stack direction="row" alignItems="center" flex="auto">
-                <DataList.ItemLabel minWidth="1/6">{"#"}</DataList.ItemLabel>
-                <IncrementalNumberEditor
-                  increaseCallback={() => {
-                    increaseNumber(figure);
-                    onFigureEdit(figure, true);
-                  }}
-                  decreaseCallback={() => {
-                    decreaseNumber(figure);
-                    onFigureEdit(figure, true);
-                  }}
-                  text={`${figure.number}`}
-                />
-              </Stack>
-            </DataList.Item>
-          )}
-          <DataList.Item key={"HP"}>
-            <Stack direction="row" alignItems="center" flex="auto">
-              <DataList.ItemLabel minWidth="1/6">{"HP"}</DataList.ItemLabel>
+    <Grid templateColumns="repeat(14, 1fr)" gapX={2} gapY={1}>
+      {notNil(figure.number) && (
+        <>
+          <GridItem colSpan={columnOneSpan}>
+            <Text>{"#"}</Text>
+          </GridItem>
+          <GridItem colSpan={columnTwoSpan}>
+            <Stack direction="row" alignItems="center">
               <IncrementalNumberEditor
                 increaseCallback={() => {
-                  decreaseDamage(figure);
+                  increaseNumber(figure);
                   onFigureEdit(figure, true);
                 }}
                 decreaseCallback={() => {
-                  increaseDamage(figure);
+                  decreaseNumber(figure);
                   onFigureEdit(figure, true);
                 }}
-                text={`${figure.maximumHP - figure.damage} / ${figure.maximumHP}`}
+                text={`${figure.number}`}
               />
             </Stack>
-          </DataList.Item>
-          {notNil(figure.xp) && (
-            <DataList.Item key={"XP"}>
-              <Stack direction="row" alignItems="center" flex="auto">
-                <DataList.ItemLabel minWidth="1/6">{"XP"}</DataList.ItemLabel>
-                <IncrementalNumberEditor
-                  increaseCallback={() => {
-                    increaseXP(figure);
-                    onFigureEdit(figure, true);
-                  }}
-                  decreaseCallback={() => {
-                    decreaseXP(figure);
-                    onFigureEdit(figure, true);
-                  }}
-                  text={`${figure.xp}`}
-                />
-              </Stack>
-            </DataList.Item>
-          )}
-          <Stack direction="row" alignItems={"center"} gapX="2">
-            {notNil(figure.move) && <GiLeatherBoot />}
-            {notNil(figure.move) && figure.move}
-            {notNil(figure.attack) && <GiBroadsword />}
-            {notNil(figure.attack) && figure.attack}
-            {notNil(figure.innateOffenses) &&
-              statusesToIcons(figure.innateOffenses)}
-            {notNil(figure.shield) && <IoShield />}
-            {notNil(figure.shield) && figure.shield}
-            <Text>Immune:</Text>
-            {notNil(figure.innateDefenses) &&
-              statusesToIcons(figure.innateDefenses)}
-          </Stack>
-          <Stack direction="column" gapY="2">
-            <Stack direction="row" gapX="2">
-              {["Strengthen", "Invisible", "Ward", "Safeguard"].map(
-                (status) => {
-                  return (
-                    <StatusSwitch
-                      key={`status-switch-${figure.id}-${status}`}
-                      figure={figure}
-                      onFigureEdit={onFigureEdit}
-                      status={status}
-                      isPositive={true}
-                    />
-                  );
-                },
-              )}
-            </Stack>
-            <Stack direction="row" gapX="2">
-              {[
-                "Stun",
-                "Immobilize",
-                "Muddle",
-                "Disarm",
-                "Poison",
-                "Wound",
-              ].map((status) => {
-                return (
-                  <StatusSwitch
-                    key={`status-switch-${figure.id}-${status}`}
-                    figure={figure}
-                    onFigureEdit={onFigureEdit}
-                    status={status}
-                    isPositive={false}
-                  />
-                );
-              })}
-            </Stack>
-          </Stack>
+          </GridItem>
+          <GridItem colSpan={columnThreeSpan}></GridItem>
+        </>
+      )}
+      <GridItem colSpan={columnOneSpan}>
+        <Text minWidth="1/12">{"HP"}</Text>
+      </GridItem>
+      <GridItem colSpan={columnTwoSpan}>
+        <Stack direction="row" alignItems={"center"}>
+          <IncrementalNumberEditor
+            increaseCallback={() => {
+              decreaseDamage(figure);
+              onFigureEdit(figure, true);
+            }}
+            decreaseCallback={() => {
+              increaseDamage(figure);
+              onFigureEdit(figure, true);
+            }}
+            text={`${figure.maximumHP - figure.damage} / ${figure.maximumHP}`}
+          />
         </Stack>
-      </DataList.Root>
-    </>
+      </GridItem>
+      <GridItem colSpan={columnThreeSpan}></GridItem>
+      {notNil(figure.xp) && (
+        <>
+          <GridItem colSpan={columnOneSpan}>
+            <Text minWidth="1/12">{"XP"}</Text>
+          </GridItem>
+          <GridItem colSpan={columnTwoSpan}>
+            <Stack direction="row" alignItems="center">
+              <IncrementalNumberEditor
+                increaseCallback={() => {
+                  increaseXP(figure);
+                  onFigureEdit(figure, true);
+                }}
+                decreaseCallback={() => {
+                  decreaseXP(figure);
+                  onFigureEdit(figure, true);
+                }}
+                text={`${figure.xp}`}
+              />
+            </Stack>
+          </GridItem>
+          <GridItem colSpan={columnThreeSpan}></GridItem>
+        </>
+      )}
+      <GridItem colSpan={totalColumnSpan}>
+        <Stack direction="row" alignItems={"center"} gapX="2">
+          {notNil(figure.move) && <GiLeatherBoot />}
+          {notNil(figure.move) && figure.move}
+          {notNil(figure.attack) && <GiBroadsword />}
+          {notNil(figure.attack) && figure.attack}
+          {notNil(figure.innateOffenses) &&
+            statusesToIcons(figure.innateOffenses, false)}
+          {notNil(figure.shield) && <IoShield />}
+          {notNil(figure.shield) && figure.shield}
+          {notNil(figure.innateDefenses) &&
+            statusesToIcons(figure.innateDefenses, true)}
+        </Stack>
+      </GridItem>
+      <GridItem rowSpan={1} colSpan={totalColumnSpan}>
+        <Stack direction="row" gapX="2">
+          {["Strengthen", "Invisible", "Ward", "Safeguard"].map((status) => {
+            return (
+              <StatusSwitch
+                key={`status-switch-${figure.id}-${status}`}
+                figure={figure}
+                onFigureEdit={onFigureEdit}
+                status={status}
+                isPositive={true}
+              />
+            );
+          })}
+          {["Stun"].map((status) => {
+            return (
+              <StatusSwitch
+                key={`status-switch-${figure.id}-${status}`}
+                figure={figure}
+                onFigureEdit={onFigureEdit}
+                status={status}
+                isPositive={false}
+              />
+            );
+          })}
+        </Stack>
+      </GridItem>
+      <GridItem rowSpan={1} colSpan={totalColumnSpan}>
+        <Stack direction="row" gapX="2">
+          {["Immobilize", "Muddle", "Disarm", "Poison", "Wound"].map(
+            (status) => {
+              return (
+                <StatusSwitch
+                  key={`status-switch-${figure.id}-${status}`}
+                  figure={figure}
+                  onFigureEdit={onFigureEdit}
+                  status={status}
+                  isPositive={false}
+                />
+              );
+            },
+          )}
+        </Stack>
+      </GridItem>
+    </Grid>
   ) : null;
 }

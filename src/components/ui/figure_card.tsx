@@ -32,9 +32,12 @@ export function FigureCard(props: {
     <SelectableCardRoot resource={figure} selectedResource={selectedFigure}>
       <Card.Body
         paddingTop="0px"
-        paddingLeft="12px"
-        paddingBottom="18px"
-        paddingRight="0px"
+        paddingLeft="6px"
+        paddingBottom="12px"
+        paddingRight="6px"
+        _hover={{
+          bg: figure.id !== selectedFigure?.id ? "bg.subtle" : "unset",
+        }}
       >
         <Stack gap={0}>
           <Card.Title>

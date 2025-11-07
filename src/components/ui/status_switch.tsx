@@ -67,7 +67,7 @@ export function StatusSwitch(props: {
             src={`${status.toLowerCase()}.png`}
             width="5"
             height="5"
-            alt="Stun"
+            alt={status}
           />
         </Tooltip>
       </Switch.Label>

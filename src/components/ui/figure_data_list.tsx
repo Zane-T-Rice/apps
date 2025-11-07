@@ -1,5 +1,5 @@
 import { Figure } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_figures";
-import { Box, Collapsible, DataList, Stack, Text } from "@chakra-ui/react";
+import { Collapsible, DataList, Stack, Text } from "@chakra-ui/react";
 import { GiBroadsword, GiLeatherBoot } from "react-icons/gi";
 import { IoShield } from "react-icons/io5";
 import { IncrementalNumberEditor } from "./incremental_number_editor";
@@ -158,7 +158,7 @@ export function FigureDataList(props: {
                     );
                   })}
                 </Stack>
-                <Stack direction="column" maxWidth="1/2">
+                <Stack direction="column">
                   {["Disarm", "Poison", "Wound"].map((status) => {
                     return (
                       <StatusSwitch

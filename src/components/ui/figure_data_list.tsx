@@ -110,8 +110,9 @@ export function FigureDataList(props: {
             {notNil(figure.shield) && figure.shield}
             {notNil(figure.innateDefenses) && (
               <>
-                {"  "}
-                <Text fontSize="sm">Immune:</Text>{" "}
+                <Text fontSize="sm" alignItems={"center"}>
+                  Immune:
+                </Text>
                 {figure.innateDefenses.split(",").map((status, index) => {
                   return (
                     <Tooltip content={status} key={`innate-defences-${index}`}>

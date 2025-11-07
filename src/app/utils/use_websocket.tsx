@@ -69,12 +69,6 @@ export function useWebSocket<
                   else return prevResource;
                 });
               }
-              // Add the resource that is missing.
-              else if (data.action === "PATCH" && !resourceExists) {
-                return prev
-                  .map((prevResource) => prevResource)
-                  .concat(resource);
-              }
               // Remove the existing resource as it was deleted.
               else if (data.action === "DELETE" && resourceExists) {
                 return prev.filter((prevResource, prevIndex) => {
@@ -85,7 +79,8 @@ export function useWebSocket<
               // Do nothing the deleted resource already does not exist.
               else if (data.action === "DELETE" && !resourceExists) {
                 return prev.map((r) => r);
-              } // Add the new resource.
+              }
+              // Add the new resource.
               else if (data.action === "POST" && !resourceExists) {
                 return prev
                   .map((prevResource) => prevResource)
@@ -96,6 +91,9 @@ export function useWebSocket<
                 return prev.map((r) => r);
               } else {
                 // Fallback to just refreshing all resources.
+                // This happens when an edit is made to a resource that
+                // the client does not know about yet due to a missed
+                // or out of order CREATE or DELETE action.
                 setMessages((prevMessages) => [...prevMessages, resource]);
                 return prev;
               }

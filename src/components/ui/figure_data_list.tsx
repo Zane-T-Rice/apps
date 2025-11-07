@@ -187,45 +187,27 @@ export function FigureDataList(props: {
       </GridItem>
       <GridItem rowSpan={1} colSpan={totalColumnSpan}>
         <Stack direction="row" gapX="2">
-          {["Strengthen", "Invisible", "Ward", "Safeguard"].map((status) => {
+          {[
+            "Strengthen",
+            "Invisible",
+            "Ward",
+            "Safeguard",
+            "Immobilize",
+            "Muddle",
+            "Disarm",
+            "Poison",
+            "Wound",
+            "Stun",
+          ].map((status) => {
             return (
               <StatusSwitch
                 key={`status-switch-${figure.id}-${status}`}
                 figure={figure}
                 onFigureEdit={onFigureEdit}
                 status={status}
-                isPositive={true}
               />
             );
           })}
-          {["Stun"].map((status) => {
-            return (
-              <StatusSwitch
-                key={`status-switch-${figure.id}-${status}`}
-                figure={figure}
-                onFigureEdit={onFigureEdit}
-                status={status}
-                isPositive={false}
-              />
-            );
-          })}
-        </Stack>
-      </GridItem>
-      <GridItem rowSpan={1} colSpan={totalColumnSpan}>
-        <Stack direction="row" gapX="2">
-          {["Immobilize", "Muddle", "Disarm", "Poison", "Wound"].map(
-            (status) => {
-              return (
-                <StatusSwitch
-                  key={`status-switch-${figure.id}-${status}`}
-                  figure={figure}
-                  onFigureEdit={onFigureEdit}
-                  status={status}
-                  isPositive={false}
-                />
-              );
-            },
-          )}
         </Stack>
       </GridItem>
     </Grid>

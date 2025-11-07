@@ -6,16 +6,13 @@ export function StatusSwitch(props: {
   figure: Figure;
   onFigureEdit: (figure: Figure, onlyShowErrors?: boolean) => void;
   status: string;
-  isPositive: boolean;
 }) {
-  const { figure, onFigureEdit, status, isPositive } = props;
+  const { figure, onFigureEdit, status } = props;
 
   const figureStatuses = figure.statuses ?? "";
   const checked = figureStatuses
     .split(",")
     .some((figureStatus) => figureStatus === status);
-
-  const color = isPositive ? "green" : "red";
 
   return (
     <Switch.Root
@@ -25,7 +22,6 @@ export function StatusSwitch(props: {
       size={{
         base: "lg",
       }}
-      colorPalette={color}
       key={`${status}-status-${figure.id}`}
       ids={{ root: `${status}-status` }}
       checked={checked}
@@ -60,10 +56,10 @@ export function StatusSwitch(props: {
         <Tooltip content={status}>
           <Image
             src={`${status.toLowerCase()}.png`}
-            width="8"
-            height="8"
+            width="9"
+            height="9"
             alt={status}
-            bgColor="whiteAlpha.600"
+            bgColor={checked ? "whiteAlpha.600" : "none"}
           />
         </Tooltip>
       </Switch.Label>

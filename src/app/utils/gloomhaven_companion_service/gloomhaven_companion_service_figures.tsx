@@ -7,18 +7,18 @@ export type Figure = {
   parent: string;
   entity: string;
 
+  rank: string;
+  class: string;
   name: string;
+  number: number;
   maximumHP: number;
   damage: number;
-  class: string;
-  number: number;
-  rank: string;
-  shield: number;
+  xp: number;
   move: number;
   attack: number;
-  xp: number;
-  innateDefenses: string;
   innateOffenses: string;
+  shield: number;
+  innateDefenses: string;
   statuses: string;
 };
 

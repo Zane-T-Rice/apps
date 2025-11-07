@@ -24,6 +24,7 @@ export default function CRUDButtons<
     editResourceSchema?: E;
     deletePermission?: string;
     onDelete?: (record: T) => Promise<boolean>;
+    desiredFieldOrder?: { [Property in keyof T]?: number };
   } & StackProps,
 ) {
   const {
@@ -38,6 +39,7 @@ export default function CRUDButtons<
     editResourceSchema,
     deletePermission,
     onDelete,
+    desiredFieldOrder,
     ...stackProps
   } = props;
 
@@ -148,6 +150,7 @@ export default function CRUDButtons<
           onSubmit={onCreate}
           resourceSchema={createResourceSchema}
           omitFields={omitKeys}
+          desiredFieldOrder={desiredFieldOrder}
         />
       ) : null}
       {onEdit && editResourceSchema && editPermission !== undefined ? (
@@ -159,6 +162,7 @@ export default function CRUDButtons<
           onSubmit={onEdit}
           resourceSchema={editResourceSchema}
           omitFields={omitKeys}
+          desiredFieldOrder={desiredFieldOrder}
         />
       ) : null}
     </>

@@ -61,18 +61,18 @@ export function GloomhavenCompanionFigureTabContent(props: {
     id: "",
     parent: "",
     entity: "",
+    rank: "",
+    class: "",
     name: "",
+    number: 0,
     maximumHP: 0,
     damage: 0,
-    class: "",
-    number: 0,
-    rank: "",
-    shield: 0,
+    xp: 0,
     move: 0,
     attack: 0,
-    xp: 0,
-    innateDefenses: "",
     innateOffenses: "",
+    shield: 0,
+    innateDefenses: "",
     statuses: "",
   });
 
@@ -163,6 +163,22 @@ export function GloomhavenCompanionFigureTabContent(props: {
       );
   };
 
+  const desiredFieldOrder: { [Property in keyof Figure]?: number } = {
+    rank: 0,
+    class: 1,
+    name: 2,
+    number: 3,
+    maximumHP: 4,
+    damage: 5,
+    xp: 6,
+    move: 7,
+    attack: 8,
+    innateOffenses: 9,
+    shield: 10,
+    innateDefenses: 11,
+    statuses: 12,
+  };
+
   return (
     <>
       {isLoading ? (
@@ -185,6 +201,7 @@ export function GloomhavenCompanionFigureTabContent(props: {
             editResourceSchema={editFigureSchema}
             deletePermission="gloomhaven-companion:public"
             onDelete={onFigureDelete}
+            desiredFieldOrder={desiredFieldOrder}
             marginLeft={3}
             marginRight={3}
           />

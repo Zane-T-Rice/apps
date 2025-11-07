@@ -31,6 +31,7 @@ export function AutoFormDrawer<T extends object, S extends Schema>(props: {
   onSubmit: (value: T) => Promise<boolean>;
   resourceSchema: S;
   omitFields?: (keyof T)[];
+  desiredFieldOrder?: { [Property in keyof T]?: number };
 }) {
   const {
     isOpen,
@@ -40,6 +41,7 @@ export function AutoFormDrawer<T extends object, S extends Schema>(props: {
     onSubmit,
     resourceSchema,
     omitFields,
+    desiredFieldOrder,
   } = props;
 
   const [fields, setFields] = useState<FormFields<T>[]>([]);
@@ -47,6 +49,14 @@ export function AutoFormDrawer<T extends object, S extends Schema>(props: {
   const [errors, setErrors] = useState<{ [Property in keyof T]?: string }>({});
 
   const resetFields = useCallback((): FormFields<T>[] => {
+    const isFieldRequired = (fieldName: keyof T): boolean => {
+      return !(
+        (resourceSchema.describe() as SchemaObjectDescription).fields[
+          fieldName
+        ] as SchemaDescription
+      )?.optional;
+    };
+
     return record
       ? (Object.keys(record) as (keyof T)[])
           // Filter out any non-primitives. Maybe later make an AutoForm that
@@ -58,14 +68,31 @@ export function AutoFormDrawer<T extends object, S extends Schema>(props: {
           .filter(
             (fieldName) => !omitFields?.find((name) => name === fieldName),
           )
+          .sort((aField, bField) => {
+            if (!desiredFieldOrder) return 0;
+
+            const a = desiredFieldOrder[aField];
+            const b = desiredFieldOrder[bField];
+
+            if (a === 0 && b !== 0) return -1;
+            else if (a !== 0 && b === 0) return 1;
+
+            if (a && b) {
+              if (a < b) return -1;
+              else if (a > b) return 1;
+            }
+
+            if (a && !b) return -1;
+            else if (!a && b) return 1;
+
+            if (!a && !b) return 0;
+
+            return 0;
+          })
           .map((fieldName, index) => ({
             id: index,
             invalid: false,
-            required: !(
-              (resourceSchema.describe() as SchemaObjectDescription).fields[
-                fieldName
-              ] as SchemaDescription
-            )?.optional,
+            required: isFieldRequired(fieldName),
             name: fieldName,
             placeholder: "",
             setField: (event: { target: { value: string } }) => {
@@ -94,7 +121,7 @@ export function AutoFormDrawer<T extends object, S extends Schema>(props: {
                 : `${record[fieldName]}`,
           }))
       : [];
-  }, [record, omitFields, resourceSchema, setFields]);
+  }, [record, omitFields, resourceSchema, setFields, desiredFieldOrder]);
 
   useEffect(() => {
     setFields(resetFields());

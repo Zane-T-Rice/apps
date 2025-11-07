@@ -89,16 +89,16 @@ export function FigureDataList(props: {
   };
 
   const columnOneSpan = {
+    base: 1,
     smDown: 2,
-    md: 1,
   };
   const columnTwoSpan = {
+    base: 6,
     smDown: 9,
-    md: 6,
   };
   const columnThreeSpan = {
+    base: 7,
     smDown: 3,
-    md: 7,
   };
   const totalColumnSpan = {
     base: 14,

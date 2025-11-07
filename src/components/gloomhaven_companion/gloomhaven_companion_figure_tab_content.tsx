@@ -212,6 +212,7 @@ export function GloomhavenCompanionFigureTabContent(props: {
                 bg={"bg.emphasized"}
                 marginLeft={3}
                 marginRight={3}
+                overflow="auto"
               >
                 <Card.Body>
                   <Grid
@@ -227,9 +228,10 @@ export function GloomhavenCompanionFigureTabContent(props: {
                       return (
                         <GridItem
                           colSpan={1}
-                          key={`navigation-bar-grid-item-${figureIndex}`}
+                          key={`figure-card-${figureIndex}`}
                           justifyItems="center"
                           onClick={() => onFigureSelect(figure)}
+                          minWidth={425}
                         >
                           <FigureCard
                             figure={figure}

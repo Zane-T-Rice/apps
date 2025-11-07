@@ -19,11 +19,11 @@ export function StatusSwitch(props: {
 
   return (
     <Switch.Root
+      overflow={"hidden"}
+      minWidth="300"
       gapX="0"
       size={{
-        base: "sm",
-        md: "md",
-        lg: "lg",
+        base: "lg",
       }}
       colorPalette={color}
       key={`${status}-status-${figure.id}`}
@@ -32,30 +32,26 @@ export function StatusSwitch(props: {
       onCheckedChange={(e) => {
         if (e.checked) {
           if (!figureStatuses.includes(status)) {
-            const statusesArray = figureStatuses.split(",");
-            statusesArray.push(status);
             onFigureEdit(
               {
                 ...figure,
-                statuses: statusesArray.join(","),
+                statuses: `${figureStatuses},${status}`,
               },
               true,
             );
           }
         } else {
-          if (figureStatuses.includes(status)) {
-            const statuses = figureStatuses
-              .split(",")
-              .filter((figureStatus) => figureStatus !== status)
-              .join(",");
-            onFigureEdit(
-              {
-                ...figure,
-                statuses: statuses,
-              },
-              true,
-            );
-          }
+          const statuses = figureStatuses
+            .split(",")
+            .filter((figureStatus) => figureStatus !== status)
+            .join(",");
+          onFigureEdit(
+            {
+              ...figure,
+              statuses: statuses,
+            },
+            true,
+          );
         }
       }}
     >

@@ -21,7 +21,7 @@ export function useOnCRUD<
   deleteResource?: (resource: T) => Promise<T | null>;
   setResources: Dispatch<SetStateAction<T[]>>;
   setSelectedResource: Dispatch<SetStateAction<T | undefined>>;
-  sendMessage?: (resource: T) => void;
+  sendMessage?: (resource: T, action: string) => void;
 }) {
   const {
     resourceNameKey,
@@ -62,7 +62,7 @@ export function useOnCRUD<
       return [...prev, resource];
     });
 
-    sendMessage?.(resource);
+    sendMessage?.(resource, "POST");
 
     return true;
   };
@@ -93,7 +93,7 @@ export function useOnCRUD<
       );
     });
     setSelectedResource(resource);
-    sendMessage?.(resource);
+    sendMessage?.(resource, "PATCH");
 
     return true;
   };
@@ -124,7 +124,7 @@ export function useOnCRUD<
       );
     });
     setSelectedResource(undefined);
-    sendMessage?.(resource);
+    sendMessage?.(resource, "DELETE");
 
     return true;
   };

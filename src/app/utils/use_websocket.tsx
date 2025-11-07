@@ -1,19 +1,29 @@
 import { useAuth0 } from "@auth0/auth0-react";
-import { useCallback, useEffect, useState } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 
-export function useWebSocket<T>(props: {
+export function useWebSocket<
+  T extends { parent: string; entity: string },
+>(props: {
   campaignId: string;
   scenarioId: string;
   websocketId: string;
+  setResources: Dispatch<SetStateAction<T[]>>;
 }): {
   messages: T[];
-  sendMessage: (resource: T) => void;
+  sendMessage: (resource: T, action: string) => void;
 } {
   const {
     campaignId,
     scenarioId,
     // Used to identify messages sent by self (and ignore them).
     websocketId,
+    setResources,
   } = props;
   const [messages, setMessages] = useState<T[]>([]);
   const [ws, setWs] = useState<WebSocket | null>(null);
@@ -41,11 +51,56 @@ export function useWebSocket<T>(props: {
           // Ignore messages from self.
           // This only really happens in "next dev" mode
           // because the React hooks are invoked multiple times.
-          if (websocketId !== event?.data?.messageId)
-            setMessages((prevMessages) => [
-              ...prevMessages,
-              event.data?.resource as T,
-            ]);
+          const data = JSON.parse(event.data);
+          const resource = data.resource as T;
+          if (websocketId !== data.messageId) {
+            setResources((prev) => {
+              const existingResourceIndex = prev.findIndex((prevResource) => {
+                return (
+                  prevResource.parent === resource.parent &&
+                  prevResource.entity === resource.entity
+                );
+              });
+              const resourceExists = existingResourceIndex !== -1;
+              // Replace existing resource with updated one.
+              if (data.action === "PATCH" && resourceExists) {
+                return prev.map((prevResource, prevIndex) => {
+                  if (prevIndex === existingResourceIndex) return resource;
+                  else return prevResource;
+                });
+              }
+              // Add the resource that is missing.
+              else if (data.action === "PATCH" && !resourceExists) {
+                return prev
+                  .map((prevResource) => prevResource)
+                  .concat(resource);
+              }
+              // Remove the existing resource as it was deleted.
+              else if (data.action === "DELETE" && resourceExists) {
+                return prev.filter((prevResource, prevIndex) => {
+                  if (prevIndex === existingResourceIndex) return false;
+                  else return true;
+                });
+              }
+              // Do nothing the deleted resource already does not exist.
+              else if (data.action === "DELETE" && !resourceExists) {
+                return prev.map((r) => r);
+              } // Add the new resource.
+              else if (data.action === "POST" && !resourceExists) {
+                return prev
+                  .map((prevResource) => prevResource)
+                  .concat(resource);
+              }
+              // Change nothing, the resource already made it in another message.
+              else if (data.action === "POST" && resourceExists) {
+                return prev.map((r) => r);
+              } else {
+                // Fallback to just refreshing all resources.
+                setMessages((prevMessages) => [...prevMessages, resource]);
+                return prev;
+              }
+            });
+          }
         };
 
         websocket.onclose = () => {
@@ -63,7 +118,7 @@ export function useWebSocket<T>(props: {
         };
       }
     },
-    [campaignId, scenarioId, ws, websocketId],
+    [campaignId, scenarioId, ws, websocketId, setResources],
   );
 
   const connect = async () => {
@@ -75,9 +130,11 @@ export function useWebSocket<T>(props: {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const sendMessage = async (resource: T) => {
+  const sendMessage = async (resource: T, action: string) => {
     if (ws && ws.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify({ messageId: websocketId, resource: resource }));
+      ws.send(
+        JSON.stringify({ action, messageId: websocketId, resource: resource }),
+      );
     } else {
       console.warn("WebSocket is not open, try to re-establish connection.");
       connect();

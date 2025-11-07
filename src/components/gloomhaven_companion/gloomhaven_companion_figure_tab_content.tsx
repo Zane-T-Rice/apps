@@ -75,6 +75,7 @@ export function GloomhavenCompanionFigureTabContent(props: {
     innateDefenses: "",
     statuses: "",
   });
+  const [websocketID] = useState<string>(uuid());
 
   const {
     getAllREST: getFigures,
@@ -98,7 +99,8 @@ export function GloomhavenCompanionFigureTabContent(props: {
   const { sendMessage, messages } = useWebSocket<Figure>({
     campaignId: selectedCampaign.id,
     scenarioId: selectedScenario.id,
-    websocketId: uuid(),
+    websocketId: websocketID,
+    setResources: setFigures,
   });
 
   useEffect(() => {

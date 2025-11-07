@@ -38,9 +38,6 @@ export function useWebSocket<T>(props: {
         };
 
         websocket.onmessage = (event) => {
-          console.log("Got a message: event: ", event);
-          console.log("Got a message: data: ", event?.data);
-          console.log("Got a message: messageId", event?.data?.messageId);
           // Ignore messages from self.
           // This only really happens in "next dev" mode
           // because the React hooks are invoked multiple times.

@@ -186,7 +186,7 @@ export function FigureDataList(props: {
         </Stack>
       </GridItem>
       <GridItem rowSpan={1} colSpan={totalColumnSpan}>
-        <Stack direction="row" gapX="2">
+        <Stack direction="row" gapX="0">
           {[
             "Strengthen",
             "Invisible",

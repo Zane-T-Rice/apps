@@ -1,6 +1,8 @@
 ## What is this?
 
-A front-end for the [server-manager-service](https://github.com/Zane-T-Rice/server-manager-service). Has seperate apps for admins and users to be able to control servers managed by an instance of the server-manager-service.
+A front-end for the [server-manager-service](https://github.com/Zane-T-Rice/server-manager-service) and [gloomhaven-companion-service](https://github.com/Zane-T-Rice/gloomhaven-companion-service).
+
+One of my personal projects that I do for fun and learning.
 
 ## Requirements
 
@@ -27,7 +29,12 @@ docker network create \
 
 ## Deployment
 
+The application runs fine with only some URLs, but the apps within the webpage for the services
+that are left out will not work of course.
+
 - NEXT_PUBLIC_SERVER_MANAGER_SERVICE_DOMAIN is the URL to the server-manager-service.
+- NEXT_PUBLIC_GLOOMHAVEN_COMPANION_SERVICE_DOMAIN is the URL to the gloomhaven-companion-service
+- NEXT_PUBLIC_GLOOMHAVEN_COMPANION_WEBSOCKETS_URL is the websocket URI 
 - NEXT_PUBLIC_WEBSITE_DOMAIN is the URL to the host of this application.
 - NEXT_PUBLIC_AUTH0_DOMAIN is the URL to the Auth0 Issuer.
 - NEXT_PUBLIC_AUTH0_CLIENT_ID is the id of this application in Auth0.
@@ -46,6 +53,8 @@ docker run --name=apps -d \
  --restart unless-stopped \
  --network server-manager-service-network \
  --env NEXT_PUBLIC_SERVER_MANAGER_SERVICE_DOMAIN="" \
+ --env NEXT_PUBLIC_GLOOMHAVEN_COMPANION_SERVICE_DOMAIN="" \
+ --env NEXT_PUBLIC_GLOOMHAVEN_COMPANION_WEBSOCKETS_URL="" \
  --env NEXT_PUBLIC_WEBSITE_DOMAIN="" \
  --env NEXT_PUBLIC_AUTH0_DOMAIN="" \
  --env NEXT_PUBLIC_AUTH0_CLIENT_ID="" \

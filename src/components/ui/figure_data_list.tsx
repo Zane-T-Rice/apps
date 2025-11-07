@@ -1,11 +1,9 @@
 import { Figure } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_figures";
-import { Collapsible, DataList, Stack, Text } from "@chakra-ui/react";
+import { DataList, Stack, Text } from "@chakra-ui/react";
 import { GiBroadsword, GiLeatherBoot } from "react-icons/gi";
 import { IoShield } from "react-icons/io5";
 import { IncrementalNumberEditor } from "./incremental_number_editor";
 import { StatusSwitch } from "./status_switch";
-import { LuChevronRight } from "react-icons/lu";
-import { useState } from "react";
 import { Image } from "@chakra-ui/react";
 import { Tooltip } from "@/components/ui/tooltip";
 
@@ -14,7 +12,6 @@ export function FigureDataList(props: {
   onFigureEdit: (figure: Figure, onlyShowErrors?: boolean) => void;
 }) {
   const { figure, onFigureEdit } = props;
-  const [statusesOpen, setStatusesOpen] = useState<boolean>(false);
 
   const decreaseDamage = (figure: Figure) => {
     figure.damage = figure.damage - 1;
@@ -42,6 +39,21 @@ export function FigureDataList(props: {
 
   const notNil = (value: string | number) => {
     return value !== null && value !== undefined && value !== "";
+  };
+
+  const statusesToIcons = (statuses: string) => {
+    return statuses.split(",").map((status, index) => {
+      return (
+        <Tooltip content={status} key={`innate-defences-${index}`}>
+          <Image
+            src={`${status.toLowerCase()}.png`}
+            width="5"
+            height="5"
+            alt={status}
+          />
+        </Tooltip>
+      );
+    });
   };
 
   return figure ? (
@@ -104,92 +116,52 @@ export function FigureDataList(props: {
             {notNil(figure.move) && <GiLeatherBoot />}
             {notNil(figure.move) && figure.move}
             {notNil(figure.attack) && <GiBroadsword />}
-            {notNil(figure.attack) && figure.attack}{" "}
-            {notNil(figure.innateOffenses) && figure.innateOffenses}
+            {notNil(figure.attack) && figure.attack}
+            {notNil(figure.innateOffenses) &&
+              statusesToIcons(figure.innateOffenses)}
             {notNil(figure.shield) && <IoShield />}
             {notNil(figure.shield) && figure.shield}
-            {notNil(figure.innateDefenses) && (
-              <>
-                <Text fontSize="sm" alignItems={"center"}>
-                  Immune:
-                </Text>
-                {figure.innateDefenses.split(",").map((status, index) => {
-                  return (
-                    <Tooltip content={status} key={`innate-defences-${index}`}>
-                      <Image
-                        src={`${status.toLowerCase()}.png`}
-                        width="5"
-                        height="5"
-                        alt={status}
-                      />
-                    </Tooltip>
-                  );
-                })}
-              </>
-            )}
+            <Text>Immune:</Text>
+            {notNil(figure.innateDefenses) &&
+              statusesToIcons(figure.innateDefenses)}
           </Stack>
-          <Collapsible.Root
-            onClick={() => {
-              setStatusesOpen(!statusesOpen);
-            }}
-            open={statusesOpen}
-          >
-            {" "}
-            <Collapsible.Trigger display="flex" alignItems="center">
-              <Collapsible.Indicator
-                transition="transform 0.2s"
-                _open={{ transform: "rotate(90deg)" }}
-              >
-                <LuChevronRight />
-              </Collapsible.Indicator>
-              Statuses
-            </Collapsible.Trigger>
-            <Collapsible.Content>
-              <Stack direction="row" gapX="5">
-                <Stack direction="column">
-                  {["Strengthen", "Invisible", "Ward", "Safeguard"].map(
-                    (status) => {
-                      return (
-                        <StatusSwitch
-                          key={`status-switch-${figure.id}-${status}`}
-                          figure={figure}
-                          onFigureEdit={onFigureEdit}
-                          status={status}
-                          isPositive={true}
-                        />
-                      );
-                    },
-                  )}
-                </Stack>
-                <Stack direction="column">
-                  {["Stun", "Immobilize", "Muddle"].map((status) => {
-                    return (
-                      <StatusSwitch
-                        key={`status-switch-${figure.id}-${status}`}
-                        figure={figure}
-                        onFigureEdit={onFigureEdit}
-                        status={status}
-                        isPositive={false}
-                      />
-                    );
-                  })}
-                </Stack>
-                <Stack direction="column">
-                  {["Disarm", "Poison", "Wound"].map((status) => {
-                    return (
-                      <StatusSwitch
-                        key={`status-switch-${figure.id}-${status}`}
-                        figure={figure}
-                        onFigureEdit={onFigureEdit}
-                        status={status}
-                        isPositive={false}
-                      />
-                    );
-                  })}
-                </Stack>
-              </Stack>
-            </Collapsible.Content>
-          </Collapsible.Root>
+          <Stack direction="column" gapY="2">
+            <Stack direction="row" gapX="2">
+              {["Strengthen", "Invisible", "Ward", "Safeguard"].map(
+                (status) => {
+                  return (
+                    <StatusSwitch
+                      key={`status-switch-${figure.id}-${status}`}
+                      figure={figure}
+                      onFigureEdit={onFigureEdit}
+                      status={status}
+                      isPositive={true}
+                    />
+                  );
+                },
+              )}
+            </Stack>
+            <Stack direction="row" gapX="2">
+              {[
+                "Stun",
+                "Immobilize",
+                "Muddle",
+                "Disarm",
+                "Poison",
+                "Wound",
+              ].map((status) => {
+                return (
+                  <StatusSwitch
+                    key={`status-switch-${figure.id}-${status}`}
+                    figure={figure}
+                    onFigureEdit={onFigureEdit}
+                    status={status}
+                    isPositive={false}
+                  />
+                );
+              })}
+            </Stack>
+          </Stack>
         </Stack>
       </DataList.Root>
     </>

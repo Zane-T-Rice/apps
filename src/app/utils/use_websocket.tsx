@@ -42,10 +42,13 @@ export function useWebSocket<T>(props: {
           // This only really happens in "next dev" mode
           // because the React hooks are invoked multiple times.
           if (websocketId !== event?.data?.messageId)
-            setMessages((prevMessages) => [
-              ...prevMessages,
-              event.data?.resource as T,
-            ]);
+            console.log("Got a message: event: ", event);
+          console.log("Got a message: data: ", event?.data);
+          console.log("Got a message: messageId", event?.data?.messageId);
+          setMessages((prevMessages) => [
+            ...prevMessages,
+            event.data?.resource as T,
+          ]);
         };
 
         websocket.onclose = () => {

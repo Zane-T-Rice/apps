@@ -59,7 +59,10 @@ export function StatusSwitch(props: {
             width="9"
             height="9"
             alt={status}
-            bgColor={checked ? "whiteAlpha.600" : "none"}
+            bgColor={{
+              _dark: checked ? "rgba(100,200,100,.7)" : "none",
+              base: checked ? "rgba(100,200,100,.7)" : "none",
+            }}
           />
         </Tooltip>
       </Switch.Label>

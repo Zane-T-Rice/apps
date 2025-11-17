@@ -7,6 +7,8 @@ export type Scenario = {
   name: string;
   parent: string;
   entity: string;
+  scenarioLevel: number;
+  groups: string;
 };
 
 export function useScenarios(

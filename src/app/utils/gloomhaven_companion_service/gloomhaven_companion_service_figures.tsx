@@ -7,19 +7,21 @@ export type Figure = {
   parent: string;
   entity: string;
 
-  rank: string;
+  rank: string | null;
   class: string;
-  name: string;
-  number: number;
+  name: string | null;
+  number: number | null;
   maximumHP: number;
   damage: number;
-  xp: number;
-  move: number;
-  attack: number;
-  innateOffenses: string;
-  shield: number;
-  innateDefenses: string;
-  statuses: string;
+  xp: number | null;
+  move: number | null;
+  attack: number | null;
+  innateOffenses: string | null;
+  shield: number | null;
+  innateDefenses: string | null;
+  statuses: string | null;
+  target: number | null;
+  retaliate: number | null;
 };
 
 export function useFigures(

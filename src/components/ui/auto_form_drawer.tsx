@@ -118,7 +118,9 @@ export function AutoFormDrawer<T extends object, S extends Schema>(props: {
             value:
               typeof record[fieldName] === "number"
                 ? record[fieldName]
-                : `${record[fieldName]}`,
+                : record[fieldName]
+                  ? `${record[fieldName]}`
+                  : "",
           }))
       : [];
   }, [record, omitFields, resourceSchema, setFields, desiredFieldOrder]);

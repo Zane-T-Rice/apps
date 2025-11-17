@@ -28,7 +28,10 @@ export function FigureCard(props: {
   } = props;
 
   const buildTitleText = (figure: Figure) => {
-    return `${figure.rank} ${figure.class} ${figure.name}`;
+    const title = [figure.rank, figure.class, figure.name]
+      .filter((e) => !!e)
+      .join(" ");
+    return title;
   };
 
   return (

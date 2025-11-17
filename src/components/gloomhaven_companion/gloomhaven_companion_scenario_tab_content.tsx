@@ -5,7 +5,7 @@ import {
   Scenario,
   useScenarios,
 } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_scenarios";
-import { object, string } from "yup";
+import { number, object, string } from "yup";
 import CRUDButtons from "../ui/crud_buttons";
 import { responseTransformer } from "@/app/utils/gloomhaven_companion_service/response_transformer";
 import { Campaign } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_campaigns";
@@ -14,6 +14,8 @@ import { SelectableCardRoot } from "../ui/selectable_card_root";
 
 const createScenarioSchema = object({
   name: string().required(),
+  scenarioLevel: number().integer().required(),
+  groups: string().required(),
 }).stripUnknown();
 
 const editScenarioSchema = createScenarioSchema
@@ -41,6 +43,8 @@ export function GloomhavenCompanionScenarioTabContent(props: {
     name: "",
     parent: "",
     entity: "",
+    scenarioLevel: 0,
+    groups: "",
   });
 
   const {
@@ -86,6 +90,8 @@ export function GloomhavenCompanionScenarioTabContent(props: {
 
   const scenarioToScenarioInfo = (scenario: Scenario) => ({
     Name: scenario.name,
+    "Scenario Level": scenario.scenarioLevel,
+    Enemies: scenario.groups,
   });
 
   return (

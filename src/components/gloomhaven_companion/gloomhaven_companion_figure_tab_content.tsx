@@ -1,4 +1,4 @@
-import { Card, Grid, GridItem, Skeleton, Stack } from "@chakra-ui/react";
+import { Card, Grid, GridItem, Skeleton, Stack, Text } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import {
   Figure,
@@ -13,6 +13,11 @@ import { useOnCRUD } from "@/app/utils/rest/use_on_crud";
 import { FigureCard } from "../ui/figure_card";
 import { useWebSocket } from "../../app/utils/use_websocket";
 import { v4 as uuid } from "uuid";
+import {
+  Template,
+  useTemplates,
+} from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_templates";
+import { Button } from "../recipes/button";
 
 const transformInt = (value: number) => {
   return isNaN(value) ? undefined : value;
@@ -22,15 +27,17 @@ const stringSchema = string().nullable();
 const numberSchema = number().transform(transformInt).integer().nullable();
 
 const createFigureSchema = object({
-  rank: stringSchema.required(),
+  rank: stringSchema.optional(),
   class: stringSchema.required(),
   maximumHP: numberSchema.required(),
   damage: numberSchema.required(),
   name: stringSchema.optional(),
   number: numberSchema.optional(),
   shield: numberSchema.optional(),
+  retaliate: numberSchema.optional(),
   move: numberSchema.optional(),
   attack: numberSchema.optional(),
+  target: numberSchema.optional(),
   xp: numberSchema.optional(),
   innateDefenses: stringSchema.optional(),
   innateOffenses: stringSchema.optional(),
@@ -56,24 +63,27 @@ export function GloomhavenCompanionFigureTabContent(props: {
   const { selectedCampaign, selectedScenario } = props;
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [figures, setFigures] = useState<Figure[]>([]);
+  const [templates, setTemplates] = useState<Template[]>([]);
   const [selectedFigure, setSelectedFigure] = useState<Figure>();
   const [createFigureRecord] = useState<Figure>({
     id: "",
     parent: "",
     entity: "",
-    rank: "",
+    rank: null,
     class: "",
-    name: "",
-    number: 0,
+    name: null,
+    number: null,
     maximumHP: 0,
     damage: 0,
-    xp: 0,
-    move: 0,
-    attack: 0,
-    innateOffenses: "",
-    shield: 0,
-    innateDefenses: "",
-    statuses: "",
+    xp: null,
+    move: null,
+    attack: null,
+    innateOffenses: null,
+    shield: null,
+    innateDefenses: null,
+    statuses: null,
+    target: null,
+    retaliate: null,
   });
   const [websocketID] = useState<string>(uuid());
 
@@ -84,10 +94,16 @@ export function GloomhavenCompanionFigureTabContent(props: {
     deleteREST: deleteFigure,
   } = useFigures(selectedCampaign.id, selectedScenario.id, responseTransformer);
 
+  const { getAllREST: getTemplates } = useTemplates(responseTransformer);
+
   useEffect(() => {
     getFigures().then((responseFigures) => {
       if (responseFigures) setFigures(responseFigures);
       setIsLoading(false);
+    });
+
+    getTemplates().then((responseTemplates) => {
+      if (responseTemplates) setTemplates(responseTemplates);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCampaign, selectedScenario]);
@@ -132,37 +148,81 @@ export function GloomhavenCompanionFigureTabContent(props: {
     sendMessage,
   });
 
-  const collectGroups = (figures: Figure[]): Array<Figure[]> => {
-    const groups: { [Property in string]: Figure[] } = {};
+  const playerClasses = [
+    "bruiser",
+    "mindthief",
+    "silent knife",
+    "spellweaver",
+    "wildfury",
+    "berserker",
+    "quartermaster",
+    "elementalist",
+    "doomstalker",
+    "bladeswarm",
+    "soothsinger",
+    "sawbones",
+    "plagueherald",
+    "cragheart",
+    "tinkerer",
+    "sunkeeper",
+    "nightshroud",
+    "soultether",
+  ];
 
-    figures.forEach((figure) => {
-      if (!groups[figure.class]) groups[figure.class] = [figure];
-      else groups[figure.class].push(figure);
+  type Group = {
+    class: string;
+    figures: Figure[];
+  };
+  const collectGroups = (figures: Figure[]): Group[] => {
+    const groups: { [Property in string]: Group } = {};
+
+    // Any groups listed for the scenario always have a placeholder
+    // group card.
+    selectedScenario.groups.split(",").forEach((group) => {
+      if (!groups[group]) groups[group] = { class: group, figures: [] };
     });
 
-    return Object.keys(groups)
+    figures.forEach((figure) => {
+      const groupClass = playerClasses.some(
+        (playerClass) => playerClass === figure.class.toLocaleLowerCase(),
+      )
+        ? "Player"
+        : figure.class;
+      if (!groups[groupClass])
+        groups[groupClass] = { class: groupClass, figures: [figure] };
+      else groups[groupClass].figures.push(figure);
+    });
+
+    Object.keys(groups)
       .sort()
-      .map((key) =>
-        groups[key]
-          .sort((figureA, figureB) => {
-            if (figureA.number < figureB.number) return -1;
-            else if (figureA.number === figureB.number) return 0;
-            else return 1;
-          })
-          .sort((figureA, figureB) => {
-            if (
-              figureA.rank.toLowerCase() === "normal" &&
-              figureB.rank.toLowerCase() === "elite"
-            )
-              return 1;
-            else if (
-              figureA.rank.toLowerCase() === "elite" &&
-              figureB.rank.toLowerCase() === "normal"
-            )
-              return -1;
-            else return 0;
-          }),
+      .forEach(
+        (key) =>
+          (groups[key].figures = groups[key].figures
+            .sort((figureA, figureB) => {
+              if (figureA.number === null) return -1;
+              if (figureB.number === null) return 1;
+              if (figureA.number < figureB.number) return -1;
+              else if (figureA.number === figureB.number) return 0;
+              else return 1;
+            })
+            .sort((figureA, figureB) => {
+              if (figureA.rank === null) return -1;
+              if (figureB.rank === null) return 1;
+              if (
+                figureA.rank.toLowerCase() === "normal" &&
+                figureB.rank.toLowerCase() === "elite"
+              )
+                return 1;
+              else if (
+                figureA.rank.toLowerCase() === "elite" &&
+                figureB.rank.toLowerCase() === "normal"
+              )
+                return -1;
+              else return 0;
+            })),
       );
+
+    return Object.keys(groups).map((key) => groups[key]);
   };
 
   const desiredFieldOrder: { [Property in keyof Figure]?: number } = {
@@ -175,10 +235,46 @@ export function GloomhavenCompanionFigureTabContent(props: {
     xp: 6,
     move: 7,
     attack: 8,
-    innateOffenses: 9,
-    shield: 10,
-    innateDefenses: 11,
-    statuses: 12,
+    target: 9,
+    innateOffenses: 10,
+    shield: 11,
+    retaliate: 12,
+    innateDefenses: 13,
+    statuses: 14,
+  };
+
+  const groups = collectGroups(figures);
+
+  const addEnemy = (enemyClass: string, rank: "normal" | "elite") => {
+    const template: Template | undefined = templates.find(
+      (template) => template.class === enemyClass,
+    );
+    if (template) {
+      const group = groups.find((group) => group.class === enemyClass);
+      const currentStandeeNumbers = group?.figures.map(
+        (figure) => figure.number,
+      );
+      const standeeNumbers = new Array(template.standeeLimit)
+        .fill(0)
+        .map((_, index) => index + 1)
+        .filter((standeeNumber) => {
+          if (currentStandeeNumbers) {
+            return !currentStandeeNumbers.some(
+              (sNumber) => sNumber === standeeNumber,
+            );
+          } else {
+            return true;
+          }
+        });
+      if (standeeNumbers.length > 0) {
+        const standeeNumber =
+          standeeNumbers[Math.floor(Math.random() * standeeNumbers.length)];
+        const figure: Figure =
+          template.stats[selectedScenario.scenarioLevel][rank];
+        figure.number = standeeNumber;
+        onFigureCreate(figure, true);
+      }
+    }
   };
 
   return (
@@ -207,7 +303,7 @@ export function GloomhavenCompanionFigureTabContent(props: {
             marginLeft={3}
             marginRight={3}
           />
-          {collectGroups(figures).map((groups, groupIndex) => {
+          {groups.map((group, groupIndex) => {
             return (
               <Card.Root
                 key={`group-card-${groupIndex}`}
@@ -222,6 +318,37 @@ export function GloomhavenCompanionFigureTabContent(props: {
                   paddingTop="4"
                   paddingBottom="2"
                 >
+                  <Card.Title marginBottom={2} marginLeft={3}>
+                    <Stack direction="row" alignItems="center">
+                      <Text>{group.class}</Text>
+                      {templates.find(
+                        (template) => template.class === group.class,
+                      ) && (
+                        <>
+                          <Button
+                            marginLeft="auto"
+                            variant="safe"
+                            minWidth="90px"
+                            onClick={() => {
+                              addEnemy(group.class, "normal");
+                            }}
+                          >
+                            {"Normal"}
+                          </Button>
+                          <Button
+                            marginRight={3}
+                            variant="safe"
+                            minWidth="90px"
+                            onClick={() => {
+                              addEnemy(group.class, "elite");
+                            }}
+                          >
+                            {"Elite"}
+                          </Button>
+                        </>
+                      )}
+                    </Stack>
+                  </Card.Title>
                   <Grid
                     key={`group-grid-${groupIndex}`}
                     templateColumns={{
@@ -231,7 +358,7 @@ export function GloomhavenCompanionFigureTabContent(props: {
                     }}
                     gap="0"
                   >
-                    {groups.map((figure, figureIndex) => {
+                    {group.figures.map((figure, figureIndex) => {
                       return (
                         <GridItem
                           colSpan={1}

@@ -6,6 +6,8 @@ import { IncrementalNumberEditor } from "./incremental_number_editor";
 import { StatusSwitch } from "./status_switch";
 import { Image } from "@chakra-ui/react";
 import { Tooltip } from "@/components/ui/tooltip";
+import { FiTarget } from "react-icons/fi";
+import { FaHandFist } from "react-icons/fa6";
 
 export function FigureDataList(props: {
   figure: Figure;
@@ -22,48 +24,23 @@ export function FigureDataList(props: {
   };
 
   const increaseNumber = (figure: Figure) => {
-    figure.number = figure.number + 1;
+    if (figure.number) figure.number = figure.number + 1;
   };
 
   const decreaseNumber = (figure: Figure) => {
-    figure.number = figure.number - 1;
+    if (figure.number) figure.number = figure.number - 1;
   };
 
   const increaseXP = (figure: Figure) => {
-    figure.xp = figure.xp + 1;
+    if (figure.xp) figure.xp = figure.xp + 1;
   };
 
   const decreaseXP = (figure: Figure) => {
-    figure.xp = figure.xp - 1;
+    if (figure.xp) figure.xp = figure.xp - 1;
   };
 
-  const notNil = (value: string | number) => {
+  const notNil = (value: string | number | null | undefined) => {
     return value !== null && value !== undefined && value !== "";
-  };
-
-  const redX = () => {
-    const lineOneStyle = {
-      width: 2,
-      height: 24,
-      backgroundColor: "red",
-      transform: "rotate(45deg)",
-      translate: -14,
-    };
-
-    const lineTwoStyle = {
-      width: 2,
-      height: 24,
-      backgroundColor: "red",
-      transform: "rotate(-45deg)",
-      translate: -14,
-    };
-
-    return (
-      <>
-        <div style={lineOneStyle}></div>
-        <div style={lineTwoStyle}></div>
-      </>
-    );
   };
 
   const statusesToIcons = (statuses: string, isImmunity: boolean) => {
@@ -75,14 +52,17 @@ export function FigureDataList(props: {
           key={`statuses-${status}-${isImmunity}-${index}`}
         >
           <Tooltip content={status}>
-            <Image
-              src={`${status.toLowerCase()}.png`}
-              width="6"
-              height="6"
-              alt={status}
-            />
+            {status.toLowerCase() !== "attackersgaindisadvantage" ? (
+              <Image
+                src={`${status.toLowerCase()}.png`}
+                width="6"
+                height="6"
+                alt={status}
+              />
+            ) : (
+              <Text>{"AtkGDis"}</Text>
+            )}
           </Tooltip>
-          {isImmunity ? redX() : null}
         </Stack>
       );
     });
@@ -177,11 +157,20 @@ export function FigureDataList(props: {
           {notNil(figure.move) && figure.move}
           {notNil(figure.attack) && <GiBroadsword />}
           {notNil(figure.attack) && figure.attack}
-          {notNil(figure.innateOffenses) &&
+          {figure.innateOffenses &&
+            notNil(figure.innateOffenses) &&
             statusesToIcons(figure.innateOffenses, false)}
-          {notNil(figure.shield) && <IoShield />}
-          {notNil(figure.shield) && figure.shield}
-          {notNil(figure.innateDefenses) &&
+          {notNil(figure.target) && <FiTarget />}
+          {notNil(figure.target) && figure.target}
+          {(notNil(figure.shield) || notNil(figure.innateDefenses)) && (
+            <IoShield />
+          )}
+          {(notNil(figure.shield) || notNil(figure.innateDefenses)) &&
+            (figure.shield || 0)}
+          {notNil(figure.retaliate) && <FaHandFist />}
+          {notNil(figure.retaliate) && figure.retaliate}
+          {figure.innateDefenses &&
+            notNil(figure.innateDefenses) &&
             statusesToIcons(figure.innateDefenses, true)}
         </Stack>
       </GridItem>

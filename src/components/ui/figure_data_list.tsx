@@ -162,7 +162,12 @@ export function FigureDataList(props: {
             statusesToIcons(figure.innateOffenses, false)}
           {notNil(figure.target) && <FiTarget />}
           {notNil(figure.target) && figure.target}
-          <Text>{"--"}</Text>
+          {(notNil(figure.move) ||
+            notNil(figure.attack) ||
+            notNil(figure.innateOffenses)) &&
+            (notNil(figure.shield) ||
+              notNil(figure.retaliate) ||
+              notNil(figure.innateDefenses)) && <Text>{"--"}</Text>}
           {(notNil(figure.shield) || notNil(figure.innateDefenses)) && (
             <IoShield />
           )}

@@ -66,6 +66,7 @@ export function FigureCard(props: {
                 _hover={{
                   color: "red",
                 }}
+                disabled={figure.maximumHP > figure.damage}
               >
                 <IoCloseSharp />
               </Button>

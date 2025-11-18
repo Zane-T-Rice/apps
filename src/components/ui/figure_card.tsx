@@ -17,7 +17,7 @@ export function FigureCard(props: {
     figure: Figure,
     showOnlyErrors?: boolean,
   ) => Promise<boolean>;
-  onFigureEdit: (figure: Figure, onlyShowErrors?: boolean) => Promise<boolean>;
+  onFigureEdit: (figure: Figure, silent?: boolean) => Promise<boolean>;
 }) {
   const {
     figure,

@@ -159,9 +159,9 @@ export function GloomhavenCompanionFigureTabContent(props: {
 
   const onFigureEdit = async (
     newResource: Figure,
-    onlyShowErrors?: boolean,
+    silent?: boolean,
   ): Promise<boolean> => {
-    const result = await _onFigureEdit(newResource, onlyShowErrors);
+    const result = await _onFigureEdit(newResource, silent);
     // Try to freshen the data. Edit failures are usually from stale data
     // with old updatedAt values.
     if (!result) {

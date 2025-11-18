@@ -9,10 +9,9 @@ export async function fetchWithValidateAndToast<F extends object>(params: {
   >;
   title: string;
   fetchCallback: () => Promise<F | null>;
-  onlyShowErrors?: boolean;
+  silent?: boolean;
 }): Promise<F | null> {
-  const { validateCallback, setErrors, title, fetchCallback, onlyShowErrors } =
-    params;
+  const { validateCallback, setErrors, title, fetchCallback, silent } = params;
 
   const validate = validateWithErrors(validateCallback, setErrors);
   if (!validate) return null;
@@ -20,7 +19,7 @@ export async function fetchWithValidateAndToast<F extends object>(params: {
   const response = await fetchWithToast(
     title,
     async () => await fetchCallback(),
-    onlyShowErrors,
+    silent,
   );
   if (!response) return null;
 

@@ -4,7 +4,7 @@ import { Tooltip } from "@/components/ui/tooltip";
 
 export function StatusSwitch(props: {
   figure: Figure;
-  onFigureEdit: (figure: Figure, onlyShowErrors?: boolean) => void;
+  onFigureEdit: (figure: Figure, silent?: boolean) => void;
   status: string;
 }) {
   const { figure, onFigureEdit, status } = props;

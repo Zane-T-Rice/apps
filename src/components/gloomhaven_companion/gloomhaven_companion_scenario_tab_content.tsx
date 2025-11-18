@@ -92,9 +92,9 @@ export function GloomhavenCompanionScenarioTabContent(props: {
 
   const onScenarioEdit = async (
     newResource: Scenario,
-    onlyShowErrors?: boolean,
+    silent?: boolean,
   ): Promise<boolean> => {
-    const result = await _onScenarioEdit(newResource, onlyShowErrors);
+    const result = await _onScenarioEdit(newResource, silent);
     // Try to freshen the data. Edit failures are usually from stale data
     // with old updatedAt values.
     if (!result) {

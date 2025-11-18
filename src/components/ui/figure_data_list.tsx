@@ -11,7 +11,7 @@ import { FaHandFist } from "react-icons/fa6";
 
 export function FigureDataList(props: {
   figure: Figure;
-  onFigureEdit: (figure: Figure, onlyShowErrors?: boolean) => void;
+  onFigureEdit: (figure: Figure, silent?: boolean) => void;
 }) {
   const { figure, onFigureEdit } = props;
 

@@ -3,21 +3,10 @@ import { toaster } from "@/components/ui/toaster";
 export async function fetchWithToast<T extends object>(
   title: string,
   fetchCallback: () => Promise<T | null>,
-  onlyShowErrors?: boolean,
+  silent?: boolean,
 ): Promise<T | null> {
-  if (onlyShowErrors) {
+  if (silent) {
     const response = await fetchCallback();
-    if (!response) {
-      toaster.create({
-        title,
-        description: "Failed",
-        type: "error",
-        meta: {
-          closable: true,
-        },
-      });
-      return null;
-    }
     return response;
   }
 

@@ -40,7 +40,7 @@ export function useOnCRUD<
 
   const onResourceCreate = async (
     newResource: T,
-    onlyShowErrors: boolean = false,
+    silent: boolean = false,
   ): Promise<boolean> => {
     const title = `Creating resource ${newResource?.[resourceNameKey]}`;
     const resource = await fetchWithValidateAndToast({
@@ -53,7 +53,7 @@ export function useOnCRUD<
         return Object.keys(newResource) as (keyof T)[];
       },
       fetchCallback: async () => (await createResource?.(newResource)) || null,
-      onlyShowErrors,
+      silent,
     });
     if (!resource) return false;
 
@@ -69,7 +69,7 @@ export function useOnCRUD<
 
   const onResourceEdit = async (
     newResource: T,
-    onlyShowErrors: boolean = false,
+    silent: boolean = false,
   ): Promise<boolean> => {
     const title = `Editing resource ${newResource?.[resourceNameKey]}`;
     const resource = await fetchWithValidateAndToast({
@@ -82,7 +82,7 @@ export function useOnCRUD<
         return Object.keys(newResource) as (keyof T)[];
       },
       fetchCallback: async () => (await editResource?.(newResource)) || null,
-      onlyShowErrors,
+      silent,
     });
     if (!resource) return false;
 
@@ -100,7 +100,7 @@ export function useOnCRUD<
 
   const onResourceDelete = async (
     resourceToDelete: T,
-    onlyShowErrors: boolean = false,
+    silent: boolean = false,
   ): Promise<boolean> => {
     const title = `Deleting resource ${resourceToDelete?.[resourceNameKey]}`;
     const resource = await fetchWithValidateAndToast({
@@ -114,7 +114,7 @@ export function useOnCRUD<
       },
       fetchCallback: async () =>
         (await deleteResource?.(resourceToDelete)) || null,
-      onlyShowErrors,
+      silent,
     });
     if (!resource) return false;
 

@@ -104,9 +104,9 @@ export function GloomhavenCompanionCampaignTabContent(props: {
 
   const onCampaignEdit = async (
     newResource: Campaign,
-    onlyShowErrors?: boolean,
+    silent?: boolean,
   ): Promise<boolean> => {
-    const result = await _onCampaignEdit(newResource, onlyShowErrors);
+    const result = await _onCampaignEdit(newResource, silent);
     // Try to freshen the data. Edit failures are usually from stale data
     // with old updatedAt values.
     if (!result) {

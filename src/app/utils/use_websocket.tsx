@@ -165,9 +165,6 @@ export function useWebSocket<
       ws.send(
         JSON.stringify({ action, messageId: websocketId, resource: resource }),
       );
-    } else {
-      console.warn("WebSocket is not open, try to re-establish connection.");
-      connect();
     }
   };
 

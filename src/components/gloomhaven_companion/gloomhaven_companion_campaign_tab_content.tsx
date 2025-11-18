@@ -210,7 +210,9 @@ export function GloomhavenCompanionCampaignTabContent(props: {
                 md: "repeat(2, 1fr)",
                 lg: "repeat(3, 1fr)",
               }}
-              gap="2"
+              gap="3"
+              marginLeft={3}
+              marginRight={3}
             >
               {campaigns.map((campaign, index) => {
                 return (

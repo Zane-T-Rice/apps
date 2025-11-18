@@ -153,7 +153,9 @@ export function GloomhavenCompanionScenarioTabContent(props: {
               md: "repeat(2, 1fr)",
               lg: "repeat(3, 1fr)",
             }}
-            gap="0"
+            gap="3"
+            marginLeft={3}
+            marginRight={3}
           >
             {scenarios.map((scenario, index) => {
               return (

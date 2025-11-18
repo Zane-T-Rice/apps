@@ -114,23 +114,24 @@ export function GloomhavenCompanionFigureTabContent(props: {
     setSelectedFigure(figure);
   };
 
-  const { sendMessage, messages } = useWebSocket<Figure>({
+  const { sendMessage, reconnected } = useWebSocket<Figure>({
     campaignId: selectedCampaign.id,
     scenarioId: selectedScenario.id,
     websocketId: websocketID,
     setResources: setFigures,
   });
 
+  // Anytime the websocket reconnects freshen the data.
   useEffect(() => {
     getFigures().then((responseFigures) => {
       if (responseFigures) setFigures(responseFigures);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messages]);
+  }, [reconnected]);
 
   const {
     onResourceCreate: onFigureCreate,
-    onResourceEdit: onFigureEdit,
+    onResourceEdit: _onFigureEdit,
     onResourceDelete: onFigureDelete,
   } = useOnCRUD<
     Figure,
@@ -138,7 +139,7 @@ export function GloomhavenCompanionFigureTabContent(props: {
     typeof editFigureSchema,
     typeof deleteFigureSchema
   >({
-    resourceNameKey: "name",
+    resourceNameKey: "class",
     createResourceSchema: createFigureSchema,
     editResourceSchema: editFigureSchema,
     deleteResourceSchema: deleteFigureSchema,
@@ -149,6 +150,22 @@ export function GloomhavenCompanionFigureTabContent(props: {
     setSelectedResource: setSelectedFigure,
     sendMessage,
   });
+
+  const onFigureEdit = async (
+    newResource: Figure,
+    onlyShowErrors?: boolean,
+  ): Promise<boolean> => {
+    const result = await _onFigureEdit(newResource, onlyShowErrors);
+    // Try to freshen the data. Edit failures are usually from stale data
+    // with old updatedAt values.
+    if (!result) {
+      const responseFigures = await getFigures();
+      if (responseFigures) {
+        setFigures(responseFigures);
+      }
+    }
+    return result;
+  };
 
   const playerClasses = [
     "bruiser",

@@ -71,7 +71,7 @@ export function GloomhavenCompanionScenarioTabContent(props: {
 
   const {
     onResourceCreate: onScenarioCreate,
-    onResourceEdit: onScenarioEdit,
+    onResourceEdit: _onScenarioEdit,
     onResourceDelete: onScenarioDelete,
   } = useOnCRUD<
     Scenario,
@@ -89,6 +89,22 @@ export function GloomhavenCompanionScenarioTabContent(props: {
     setResources: setScenarios,
     setSelectedResource: setSelectedScenario,
   });
+
+  const onScenarioEdit = async (
+    newResource: Scenario,
+    onlyShowErrors?: boolean,
+  ): Promise<boolean> => {
+    const result = await _onScenarioEdit(newResource, onlyShowErrors);
+    // Try to freshen the data. Edit failures are usually from stale data
+    // with old updatedAt values.
+    if (!result) {
+      const responseScenarios = await getScenarios();
+      if (responseScenarios) {
+        setScenarios(responseScenarios);
+      }
+    }
+    return result;
+  };
 
   const scenarioToScenarioInfo = (scenario: Scenario) => ({
     Name: scenario.name,

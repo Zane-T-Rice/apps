@@ -17,6 +17,7 @@ export function useWebSocket<
 }): {
   messages: T[];
   sendMessage: (resource: T, action: string) => void;
+  reconnected: boolean;
 } {
   const {
     campaignId,
@@ -25,6 +26,7 @@ export function useWebSocket<
     websocketId,
     setResources,
   } = props;
+  const [reconnected, setReconnected] = useState<boolean>(false);
   const [messages, setMessages] = useState<T[]>([]);
   const [ws, setWs] = useState<WebSocket | null>(null);
   const { getAccessTokenSilently } = useAuth0();
@@ -121,6 +123,7 @@ export function useWebSocket<
 
   const connect = async () => {
     wsHooks(await getAccessTokenSilently());
+    setReconnected(!reconnected);
   };
 
   useEffect(() => {
@@ -142,5 +145,6 @@ export function useWebSocket<
   return {
     messages,
     sendMessage,
+    reconnected,
   };
 }

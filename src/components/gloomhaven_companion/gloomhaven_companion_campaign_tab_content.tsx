@@ -83,7 +83,7 @@ export function GloomhavenCompanionCampaignTabContent(props: {
 
   const {
     onResourceCreate: onCampaignCreate,
-    onResourceEdit: onCampaignEdit,
+    onResourceEdit: _onCampaignEdit,
     onResourceDelete: onCampaignDelete,
   } = useOnCRUD<
     Campaign,
@@ -101,6 +101,22 @@ export function GloomhavenCompanionCampaignTabContent(props: {
     setResources: setCampaigns,
     setSelectedResource: setSelectedCampaign,
   });
+
+  const onCampaignEdit = async (
+    newResource: Campaign,
+    onlyShowErrors?: boolean,
+  ): Promise<boolean> => {
+    const result = await _onCampaignEdit(newResource, onlyShowErrors);
+    // Try to freshen the data. Edit failures are usually from stale data
+    // with old updatedAt values.
+    if (!result) {
+      const responseCampaigns = await getCampaigns();
+      if (responseCampaigns) {
+        setCampaigns(responseCampaigns);
+      }
+    }
+    return result;
+  };
 
   const campaignToCampaignInfo = (campaign: Campaign) => ({
     Name: campaign.name,

@@ -121,9 +121,13 @@ export function useWebSocket<
     [campaignId, scenarioId, ws, websocketId, setResources],
   );
 
-  const connect = async () => {
+  // After reconnecting, any message will be sent.
+  const connect = async (message?: string) => {
     wsHooks(await getAccessTokenSilently());
     setReconnected(!reconnected);
+    if (ws && ws.readyState === WebSocket.OPEN && message) {
+      ws?.send(message);
+    }
   };
 
   useEffect(() => {
@@ -132,13 +136,18 @@ export function useWebSocket<
   }, []);
 
   const sendMessage = async (resource: T, action: string) => {
+    const message = JSON.stringify({
+      action,
+      messageId: websocketId,
+      resource: resource,
+    });
     if (ws && ws.readyState === WebSocket.OPEN) {
-      ws.send(
-        JSON.stringify({ action, messageId: websocketId, resource: resource }),
-      );
+      ws.send(message);
     } else {
       console.warn("WebSocket is not open, try to re-establish connection.");
-      connect();
+      // Make sure to update other clients about any creation or deletion
+      // that was done while the socket was disconnected.
+      connect(action === "POST" || action === "DELETE" ? message : undefined);
     }
   };
 

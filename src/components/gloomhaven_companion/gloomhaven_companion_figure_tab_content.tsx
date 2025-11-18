@@ -114,20 +114,22 @@ export function GloomhavenCompanionFigureTabContent(props: {
     setSelectedFigure(figure);
   };
 
-  const { sendMessage, reconnected } = useWebSocket<Figure>({
+  const { sendMessage, refresh, setRefresh } = useWebSocket<Figure>({
     campaignId: selectedCampaign.id,
     scenarioId: selectedScenario.id,
     websocketId: websocketID,
     setResources: setFigures,
   });
 
-  // Anytime the websocket reconnects freshen the data.
+  // Sometimes the websocket will tell the listener to refresh all data.
   useEffect(() => {
+    if (!refresh) return;
     getFigures().then((responseFigures) => {
       if (responseFigures) setFigures(responseFigures);
     });
+    setRefresh(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reconnected]);
+  }, [refresh]);
 
   const {
     onResourceCreate: onFigureCreate,

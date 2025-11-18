@@ -15,9 +15,9 @@ export function useWebSocket<
   websocketId: string;
   setResources: Dispatch<SetStateAction<T[]>>;
 }): {
-  messages: T[];
   sendMessage: (resource: T, action: string) => void;
-  reconnected: boolean;
+  refresh: boolean;
+  setRefresh: Dispatch<SetStateAction<boolean>>;
 } {
   const {
     campaignId,
@@ -26,8 +26,7 @@ export function useWebSocket<
     websocketId,
     setResources,
   } = props;
-  const [reconnected, setReconnected] = useState<boolean>(false);
-  const [messages, setMessages] = useState<T[]>([]);
+  const [refresh, setRefresh] = useState<boolean>(false);
   const [ws, setWs] = useState<WebSocket | null>(null);
   const { getAccessTokenSilently } = useAuth0();
 
@@ -50,11 +49,11 @@ export function useWebSocket<
         };
 
         websocket.onmessage = (event) => {
+          const data = JSON.parse(event.data);
+          const resource = data.resource as T;
           // Ignore messages from self.
           // This only really happens in "next dev" mode
           // because the React hooks are invoked multiple times.
-          const data = JSON.parse(event.data);
-          const resource = data.resource as T;
           if (websocketId !== data.messageId) {
             setResources((prev) => {
               const existingResourceIndex = prev.findIndex((prevResource) => {
@@ -96,7 +95,10 @@ export function useWebSocket<
                 // This happens when an edit is made to a resource that
                 // the client does not know about yet due to a missed
                 // or out of order CREATE or DELETE action.
-                setMessages((prevMessages) => [...prevMessages, resource]);
+                //
+                // This also happens whenever a client instructs other
+                // clients to do a REFRESH action.
+                setRefresh(true);
                 return prev;
               }
             });
@@ -123,8 +125,23 @@ export function useWebSocket<
 
   const connect = async () => {
     wsHooks(await getAccessTokenSilently());
-    setReconnected(!reconnected);
+    setRefresh(true);
   };
+
+  // Anytime a client connects (or reconnects), tell other clients to refresh their data.
+  useEffect(() => {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(
+        JSON.stringify({
+          action: "REFRESH",
+          messageId: websocketId,
+          resource: {
+            parent: "#CAMPAIGN#" + campaignId + "#SCENARIO#" + scenarioId,
+          },
+        }),
+      );
+    }
+  }, [ws, websocketId, campaignId, scenarioId]);
 
   useEffect(() => {
     connect();
@@ -143,8 +160,8 @@ export function useWebSocket<
   };
 
   return {
-    messages,
     sendMessage,
-    reconnected,
+    refresh,
+    setRefresh,
   };
 }

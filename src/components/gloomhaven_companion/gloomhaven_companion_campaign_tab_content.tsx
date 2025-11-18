@@ -19,6 +19,7 @@ import { fetchWithToast } from "@/app/utils/fetch/fetch_with_toast";
 import { AlertDialog } from "../ui/alert_dialog";
 import { AutoFormDrawer } from "../ui/auto_form_drawer";
 import { useJoinCampaign } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_join_campaign";
+import { useSearchParams } from "next/navigation";
 
 const createCampaignSchema = object({
   name: string().required(),
@@ -47,6 +48,7 @@ export function GloomhavenCompanionCampaignTabContent(props: {
   onCampaignSelect: (campaign: Campaign) => void;
 }) {
   const { selectedCampaign, setSelectedCampaign, onCampaignSelect } = props;
+  const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [createCampaignRecord] = useState<Campaign>({
@@ -76,6 +78,14 @@ export function GloomhavenCompanionCampaignTabContent(props: {
   useEffect(() => {
     getCampaigns().then((responseCampaigns) => {
       if (responseCampaigns) setCampaigns(responseCampaigns);
+      if (searchParams.get("campaignId")) {
+        const campaign = responseCampaigns?.find(
+          (campaign) => campaign.id === searchParams.get("campaignId"),
+        );
+        if (campaign) {
+          setSelectedCampaign(campaign);
+        }
+      }
       setIsLoading(false);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps

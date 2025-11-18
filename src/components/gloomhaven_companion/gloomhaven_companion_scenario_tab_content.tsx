@@ -11,6 +11,7 @@ import { responseTransformer } from "@/app/utils/gloomhaven_companion_service/re
 import { Campaign } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_campaigns";
 import { useOnCRUD } from "@/app/utils/rest/use_on_crud";
 import { SelectableCardRoot } from "../ui/selectable_card_root";
+import { useSearchParams } from "next/navigation";
 
 const createScenarioSchema = object({
   name: string().required(),
@@ -37,6 +38,7 @@ export function GloomhavenCompanionScenarioTabContent(props: {
   setSelectedScenario: Dispatch<SetStateAction<Scenario | undefined>>;
 }) {
   const { selectedCampaign, selectedScenario, setSelectedScenario } = props;
+  const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
   const [createScenarioRecord] = useState<Scenario>({
@@ -59,6 +61,14 @@ export function GloomhavenCompanionScenarioTabContent(props: {
   useEffect(() => {
     getScenarios().then((responseScenarios) => {
       if (responseScenarios) setScenarios(responseScenarios);
+      if (searchParams.get("scenarioId")) {
+        const scenario = responseScenarios?.find(
+          (scenario) => scenario.id === searchParams.get("scenarioId"),
+        );
+        if (scenario) {
+          setSelectedScenario(scenario);
+        }
+      }
       setIsLoading(false);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps

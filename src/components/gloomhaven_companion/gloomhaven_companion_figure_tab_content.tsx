@@ -244,6 +244,12 @@ export function GloomhavenCompanionFigureTabContent(props: {
               )
                 return -1;
               else return 0;
+            })
+            // Class sorting really only effects the Player group.
+            .sort((figureA, figureB) => {
+              if (figureA.class < figureB.class) return -1;
+              if (figureA.class > figureB.class) return 1;
+              else return 0;
             })),
       );
 

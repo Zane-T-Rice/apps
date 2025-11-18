@@ -123,10 +123,10 @@ export function useWebSocket<
     [campaignId, scenarioId, ws, websocketId, setResources],
   );
 
-  const connect = async () => {
+  const connect = useCallback(async () => {
     wsHooks(await getAccessTokenSilently());
     setRefresh(true);
-  };
+  }, [wsHooks, getAccessTokenSilently]);
 
   // Anytime a client connects (or reconnects), tell other clients to refresh their data.
   useEffect(() => {
@@ -141,7 +141,12 @@ export function useWebSocket<
         }),
       );
     }
-  }, [ws, websocketId, campaignId, scenarioId]);
+
+    // This tries to keep the websocket alive.
+    if (ws === null) {
+      connect();
+    }
+  }, [ws, websocketId, campaignId, scenarioId, connect]);
 
   useEffect(() => {
     connect();

@@ -180,7 +180,7 @@ export function GloomhavenCompanionCampaignTabContent(props: {
         </Stack>
       ) : (
         <>
-          <Stack>
+          <Stack gap={3}>
             <CRUDButtons
               omitKeys={["id", "parent", "entity", "updatedAt"]}
               selectedRecord={selectedCampaign}
@@ -225,7 +225,7 @@ export function GloomhavenCompanionCampaignTabContent(props: {
                       selectedResource={selectedCampaign}
                     >
                       <Card.Body>
-                        <Stack gap={6}>
+                        <Stack gap={3}>
                           <Card.Title>{`${campaign.name}`}</Card.Title>
                           <AutoDataList
                             record={campaignToCampaignInfo(campaign)}

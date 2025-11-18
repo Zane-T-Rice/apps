@@ -131,7 +131,7 @@ export function GloomhavenCompanionScenarioTabContent(props: {
           <Skeleton height={50} variant="shine" />
         </Stack>
       ) : (
-        <Stack>
+        <Stack gap={3}>
           <CRUDButtons
             omitKeys={["id", "parent", "entity", "updatedAt"]}
             selectedRecord={selectedScenario}
@@ -168,7 +168,7 @@ export function GloomhavenCompanionScenarioTabContent(props: {
                     selectedResource={selectedScenario}
                   >
                     <Card.Body>
-                      <Stack gap={6}>
+                      <Stack gap={3}>
                         <Card.Title>{`${scenario.name}`}</Card.Title>
                         <AutoDataList
                           record={scenarioToScenarioInfo(scenario)}

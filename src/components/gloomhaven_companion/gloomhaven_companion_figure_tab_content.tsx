@@ -321,7 +321,7 @@ export function GloomhavenCompanionFigureTabContent(props: {
           <Skeleton height={50} variant="shine" />
         </Stack>
       ) : (
-        <Stack>
+        <Stack gap={3}>
           <CRUDButtons
             omitKeys={["id", "parent", "entity", "updatedAt"]}
             selectedRecord={selectedFigure}
@@ -346,12 +346,12 @@ export function GloomhavenCompanionFigureTabContent(props: {
                 overflow="hidden"
               >
                 <Card.Body
-                  paddingLeft="0"
-                  paddingRight="0"
-                  paddingTop="4"
-                  paddingBottom="2"
+                  paddingLeft={0}
+                  paddingRight={0}
+                  paddingTop={3}
+                  paddingBottom={3}
                 >
-                  <Card.Title marginBottom={2} marginLeft={3}>
+                  <Card.Title marginBottom={3} marginLeft={3}>
                     <Stack direction="row" alignItems="center">
                       <Text>{group.class}</Text>
                       {templates.find(

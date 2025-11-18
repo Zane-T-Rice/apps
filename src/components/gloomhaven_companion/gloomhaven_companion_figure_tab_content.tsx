@@ -321,7 +321,7 @@ export function GloomhavenCompanionFigureTabContent(props: {
           <Skeleton height={50} variant="shine" />
         </Stack>
       ) : (
-        <Stack gap="1">
+        <Stack>
           <CRUDButtons
             omitKeys={["id", "parent", "entity", "updatedAt"]}
             selectedRecord={selectedFigure}
@@ -335,8 +335,6 @@ export function GloomhavenCompanionFigureTabContent(props: {
             deletePermission="gloomhaven-companion:public"
             onDelete={onFigureDelete}
             desiredFieldOrder={desiredFieldOrder}
-            marginLeft={3}
-            marginRight={3}
           />
           {groups.map((group, groupIndex) => {
             return (

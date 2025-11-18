@@ -193,8 +193,6 @@ export function GloomhavenCompanionCampaignTabContent(props: {
               editResourceSchema={editCampaignSchema}
               deletePermission="gloomhaven-companion:public"
               onDelete={onCampaignDelete}
-              marginLeft={3}
-              marginRight={3}
             />
             <Button
               onClick={openJoinCampaignDrawer}

@@ -124,9 +124,12 @@ export function useWebSocket<
   );
 
   const connect = useCallback(async () => {
-    wsHooks(await getAccessTokenSilently());
-    setRefresh(true);
-  }, [wsHooks, getAccessTokenSilently]);
+    if (!ws || ws.readyState !== WebSocket.OPEN) {
+      console.log("Attempting to connect to the WebSocket.");
+      wsHooks(await getAccessTokenSilently());
+      setRefresh(true);
+    }
+  }, [ws, wsHooks, getAccessTokenSilently]);
 
   // Anytime a client connects (or reconnects), tell other clients to refresh their data.
   useEffect(() => {
@@ -143,9 +146,13 @@ export function useWebSocket<
     }
 
     // This tries to keep the websocket alive.
-    if (ws === null) {
+    const interval = setInterval(() => {
       connect();
-    }
+    }, 5000);
+
+    return () => {
+      clearInterval(interval);
+    };
   }, [ws, websocketId, campaignId, scenarioId, connect]);
 
   useEffect(() => {

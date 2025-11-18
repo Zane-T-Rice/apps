@@ -9,7 +9,12 @@ export function StatusSwitch(props: {
 }) {
   const { figure, onFigureEdit, status } = props;
 
-  const figureStatuses = figure.statuses ?? "";
+  const figureStatuses = figure.statuses
+    ? figure.statuses
+        .split(",")
+        .map((status) => status.trim())
+        .join(",")
+    : "";
   const checked = figureStatuses
     .split(",")
     .some((figureStatus) => figureStatus === status);

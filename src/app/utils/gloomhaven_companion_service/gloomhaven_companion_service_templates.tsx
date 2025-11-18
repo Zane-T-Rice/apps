@@ -7,6 +7,7 @@ export type Template = {
   id: string;
   parent: string;
   entity: string;
+  updatedAt: string;
 
   standeeLimit: number;
   class: string;

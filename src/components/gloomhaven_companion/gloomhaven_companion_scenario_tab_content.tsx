@@ -22,6 +22,7 @@ const editScenarioSchema = createScenarioSchema
   .concat(
     object({
       id: string().required(),
+      updatedAt: string().required(),
     }),
   )
   .stripUnknown();
@@ -45,6 +46,7 @@ export function GloomhavenCompanionScenarioTabContent(props: {
     entity: "",
     scenarioLevel: 0,
     groups: "",
+    updatedAt: null,
   });
 
   const {
@@ -105,7 +107,7 @@ export function GloomhavenCompanionScenarioTabContent(props: {
       ) : (
         <Stack>
           <CRUDButtons
-            omitKeys={["id", "parent", "entity"]}
+            omitKeys={["id", "parent", "entity", "updatedAt"]}
             selectedRecord={selectedScenario}
             createPermission="gloomhaven-companion:public"
             creationRecord={createScenarioRecord}

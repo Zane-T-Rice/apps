@@ -4,9 +4,11 @@ import { useREST } from "../rest/use_rest";
 
 export type Scenario = {
   id: string;
-  name: string;
   parent: string;
   entity: string;
+  updatedAt: string | null;
+
+  name: string;
   scenarioLevel: number;
   groups: string;
 };

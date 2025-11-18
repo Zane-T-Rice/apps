@@ -6,6 +6,7 @@ export type Figure = {
   id: string;
   parent: string;
   entity: string;
+  updatedAt: string | null;
 
   rank: string | null;
   class: string;

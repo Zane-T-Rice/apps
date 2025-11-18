@@ -44,28 +44,31 @@ export function FigureDataList(props: {
   };
 
   const statusesToIcons = (statuses: string, isImmunity: boolean) => {
-    return statuses.split(",").map((status, index) => {
-      return (
-        <Stack
-          direction="row"
-          gap="0"
-          key={`statuses-${status}-${isImmunity}-${index}`}
-        >
-          <Tooltip content={status}>
-            {status.toLowerCase() !== "attackersgaindisadvantage" ? (
-              <Image
-                src={`${status.toLowerCase()}.png`}
-                width="6"
-                height="6"
-                alt={status}
-              />
-            ) : (
-              <Text>{"AtkGDis"}</Text>
-            )}
-          </Tooltip>
-        </Stack>
-      );
-    });
+    return statuses
+      .split(",")
+      .map((status) => status.trim())
+      .map((status, index) => {
+        return (
+          <Stack
+            direction="row"
+            gap="0"
+            key={`statuses-${status}-${isImmunity}-${index}`}
+          >
+            <Tooltip content={status}>
+              {status.toLowerCase() !== "attackersgaindisadvantage" ? (
+                <Image
+                  src={`${status.toLowerCase()}.png`}
+                  width="6"
+                  height="6"
+                  alt={status}
+                />
+              ) : (
+                <Text>{"AtkGDis"}</Text>
+              )}
+            </Tooltip>
+          </Stack>
+        );
+      });
   };
 
   const columnOneSpan = {

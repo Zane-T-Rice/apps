@@ -47,7 +47,8 @@ const createFigureSchema = object({
 const editFigureSchema = createFigureSchema
   .concat(
     object({
-      id: stringSchema.required(),
+      id: string().required(),
+      updatedAt: string().required(),
     }),
   )
   .stripUnknown();
@@ -84,6 +85,7 @@ export function GloomhavenCompanionFigureTabContent(props: {
     statuses: null,
     target: null,
     retaliate: null,
+    updatedAt: null,
   });
   const [websocketID] = useState<string>(uuid());
 
@@ -178,9 +180,13 @@ export function GloomhavenCompanionFigureTabContent(props: {
 
     // Any groups listed for the scenario always have a placeholder
     // group card.
-    selectedScenario.groups.split(",").forEach((group) => {
-      if (!groups[group]) groups[group] = { class: group, figures: [] };
-    });
+    selectedScenario.groups
+      .split(",")
+      .map((group) => group.trim())
+      .sort()
+      .forEach((group) => {
+        if (!groups[group]) groups[group] = { class: group, figures: [] };
+      });
 
     figures.forEach((figure) => {
       const groupClass = playerClasses.some(
@@ -288,7 +294,7 @@ export function GloomhavenCompanionFigureTabContent(props: {
       ) : (
         <Stack gap="1">
           <CRUDButtons
-            omitKeys={["id", "parent", "entity"]}
+            omitKeys={["id", "parent", "entity", "updatedAt"]}
             selectedRecord={selectedFigure}
             createPermission="gloomhaven-companion:public"
             creationRecord={createFigureRecord}

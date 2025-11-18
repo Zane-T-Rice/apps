@@ -28,6 +28,7 @@ const editCampaignSchema = createCampaignSchema
   .concat(
     object({
       id: string().required(),
+      updatedAt: string().required(),
     }),
   )
   .stripUnknown();
@@ -53,6 +54,7 @@ export function GloomhavenCompanionCampaignTabContent(props: {
     name: "",
     parent: "",
     entity: "",
+    updatedAt: null,
   });
   const [joinCampaign, setJoinCampaign] = useState<JoinCampaign>();
   const [isJoinCampaignDrawerOpen, setIsJoinCampaignDrawerOpen] =
@@ -154,7 +156,7 @@ export function GloomhavenCompanionCampaignTabContent(props: {
         <>
           <Stack>
             <CRUDButtons
-              omitKeys={["id", "parent", "entity"]}
+              omitKeys={["id", "parent", "entity", "updatedAt"]}
               selectedRecord={selectedCampaign}
               createPermission="gloomhaven-companion:public"
               creationRecord={createCampaignRecord}

@@ -24,19 +24,19 @@ export function FigureDataList(props: {
   };
 
   const increaseNumber = (figure: Figure) => {
-    if (figure.number) figure.number = figure.number + 1;
+    if (figure.number !== null) figure.number = figure.number + 1;
   };
 
   const decreaseNumber = (figure: Figure) => {
-    if (figure.number) figure.number = figure.number - 1;
+    if (figure.number !== null) figure.number = figure.number - 1;
   };
 
   const increaseXP = (figure: Figure) => {
-    if (figure.xp) figure.xp = figure.xp + 1;
+    if (figure.xp !== null) figure.xp = figure.xp + 1;
   };
 
   const decreaseXP = (figure: Figure) => {
-    if (figure.xp) figure.xp = figure.xp - 1;
+    if (figure.xp !== null) figure.xp = figure.xp - 1;
   };
 
   const notNil = (value: string | number | null | undefined) => {

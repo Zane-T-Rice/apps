@@ -44,10 +44,15 @@ export function FigureDataList(props: {
   };
 
   const statusesToIcons = (statuses: string, isImmunity: boolean) => {
+    const textStatuses: { [key: string]: string } = {
+      attackersgaindisadvantage: "AtkGDis",
+      advantage: "Adv",
+    };
     return statuses
       .split(",")
       .map((status) => status.trim())
       .map((status, index) => {
+        const lowerCaseStatus = status.toLowerCase();
         return (
           <Stack
             direction="row"
@@ -55,7 +60,7 @@ export function FigureDataList(props: {
             key={`statuses-${status}-${isImmunity}-${index}`}
           >
             <Tooltip content={status}>
-              {status.toLowerCase() !== "attackersgaindisadvantage" ? (
+              {!textStatuses[lowerCaseStatus] ? (
                 <Image
                   src={`${status.toLowerCase()}.png`}
                   width="6"
@@ -63,7 +68,7 @@ export function FigureDataList(props: {
                   alt={status}
                 />
               ) : (
-                <Text>{"AtkGDis"}</Text>
+                <Text>{textStatuses[lowerCaseStatus]}</Text>
               )}
             </Tooltip>
           </Stack>
@@ -155,32 +160,44 @@ export function FigureDataList(props: {
         </>
       )}
       <GridItem colSpan={totalColumnSpan}>
-        <Stack direction="row" alignItems={"center"} gapX="2">
-          {notNil(figure.move) && <GiLeatherBoot />}
-          {notNil(figure.move) && figure.move}
-          {notNil(figure.attack) && <GiBroadsword />}
-          {notNil(figure.attack) && figure.attack}
-          {figure.innateOffenses &&
-            notNil(figure.innateOffenses) &&
-            statusesToIcons(figure.innateOffenses, false)}
-          {notNil(figure.target) && <FiTarget />}
-          {notNil(figure.target) && figure.target}
-          {(notNil(figure.move) ||
-            notNil(figure.attack) ||
-            notNil(figure.innateOffenses)) &&
-            (notNil(figure.shield) ||
-              notNil(figure.retaliate) ||
-              notNil(figure.innateDefenses)) && <Text>{"--"}</Text>}
-          {(notNil(figure.shield) || notNil(figure.innateDefenses)) && (
-            <IoShield />
-          )}
-          {(notNil(figure.shield) || notNil(figure.innateDefenses)) &&
-            (figure.shield || 0)}
-          {notNil(figure.retaliate) && <FaHandFist />}
-          {notNil(figure.retaliate) && figure.retaliate}
-          {figure.innateDefenses &&
-            notNil(figure.innateDefenses) &&
-            statusesToIcons(figure.innateDefenses, true)}
+        <Stack gapY="1">
+          <Stack direction="row" alignItems={"center"} gapX="2">
+            {notNil(figure.move) && <GiLeatherBoot />}
+            {notNil(figure.move) && figure.move}
+            {notNil(figure.attack) && <GiBroadsword />}
+            {notNil(figure.attack) && figure.attack}
+            {figure.innateOffenses &&
+              notNil(figure.innateOffenses) &&
+              statusesToIcons(figure.innateOffenses, false)}
+            {notNil(figure.target) && <FiTarget />}
+            {notNil(figure.target) && figure.target}
+            {notNil(figure.pierce) && (
+              <Tooltip content={"Pierce"}>
+                <Image src={"pierce.png"} width="6" height="6" alt={"pierce"} />
+              </Tooltip>
+            )}
+            {notNil(figure.pierce) && figure.pierce}
+            {(notNil(figure.move) ||
+              notNil(figure.attack) ||
+              notNil(figure.innateOffenses)) &&
+              (notNil(figure.shield) ||
+                notNil(figure.retaliate) ||
+                notNil(figure.innateDefenses)) && <Text>{"--"}</Text>}
+            {(notNil(figure.shield) || notNil(figure.innateDefenses)) && (
+              <IoShield />
+            )}
+            {(notNil(figure.shield) || notNil(figure.innateDefenses)) &&
+              (figure.shield || 0)}
+            {notNil(figure.retaliate) && <FaHandFist />}
+            {notNil(figure.retaliate) && figure.retaliate}
+            {figure.innateDefenses &&
+              notNil(figure.innateDefenses) &&
+              statusesToIcons(figure.innateDefenses, true)}
+          </Stack>
+          {figure.special &&
+            figure.special.split("|").map((special, index) => {
+              return <Text key={special + "-" + index}>{special}</Text>;
+            })}
         </Stack>
       </GridItem>
       <GridItem rowSpan={1} colSpan={totalColumnSpan}>

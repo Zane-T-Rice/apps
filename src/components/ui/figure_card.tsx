@@ -41,9 +41,6 @@ export function FigureCard(props: {
         paddingLeft="6px"
         paddingBottom="12px"
         paddingRight="6px"
-        _hover={{
-          bg: figure.id !== selectedFigure?.id ? "bg.subtle" : "unset",
-        }}
       >
         <Stack gap={0}>
           <Card.Title>

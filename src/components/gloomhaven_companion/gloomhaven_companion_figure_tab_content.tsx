@@ -42,6 +42,8 @@ const createFigureSchema = object({
   innateDefenses: stringSchema.optional(),
   innateOffenses: stringSchema.optional(),
   statuses: stringSchema.optional(),
+  pierce: numberSchema.optional(),
+  special: stringSchema.optional(),
 }).stripUnknown();
 
 const editFigureSchema = createFigureSchema
@@ -86,6 +88,8 @@ export function GloomhavenCompanionFigureTabContent(props: {
     target: null,
     retaliate: null,
     updatedAt: null,
+    pierce: null,
+    special: null,
   });
   const [websocketID] = useState<string>(uuid());
 
@@ -387,7 +391,9 @@ export function GloomhavenCompanionFigureTabContent(props: {
                       md: "repeat(2, 1fr)",
                       lg: "repeat(3, 1fr)",
                     }}
-                    gap="0"
+                    gap="3"
+                    marginLeft={3}
+                    marginRight={3}
                   >
                     {group.figures.map((figure, figureIndex) => {
                       return (

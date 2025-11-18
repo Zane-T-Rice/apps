@@ -23,6 +23,8 @@ export type Figure = {
   statuses: string | null;
   target: number | null;
   retaliate: number | null;
+  pierce: number | null;
+  special: string | null;
 };
 
 export function useFigures(

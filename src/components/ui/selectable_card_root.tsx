@@ -10,9 +10,10 @@ export function SelectableCardRoot<T extends { id: string }>(props: {
 
   return (
     <Card.Root
+      overflow="hidden"
       variant="elevated"
-      width="95%"
-      height="95%"
+      width="100%"
+      height="100%"
       key={`navigation-bar-${resource.id}`}
       shadow={{
         base:
@@ -39,12 +40,12 @@ export function SelectableCardRoot<T extends { id: string }>(props: {
           base:
             !selectedResource ||
             (selectedResource && selectedResource.id !== resource.id)
-              ? "blackAlpha.500"
+              ? "blackAlpha.300"
               : undefined,
           _dark:
             !selectedResource ||
             (selectedResource && selectedResource.id !== resource.id)
-              ? "whiteAlpha.500"
+              ? "whiteAlpha.200"
               : undefined,
         },
       }}

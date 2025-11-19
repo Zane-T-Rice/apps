@@ -47,7 +47,7 @@ export function GloomhavenCompanionAllyEnemyTabSharedContent(props: {
             block: "center",
             behavior: "smooth",
           }),
-        1,
+        1000,
       );
     } else if (activeTab === "allies") {
       setTimeout(
@@ -56,7 +56,7 @@ export function GloomhavenCompanionAllyEnemyTabSharedContent(props: {
             block: "center",
             behavior: "smooth",
           }),
-        1,
+        1000,
       );
     }
   }, [

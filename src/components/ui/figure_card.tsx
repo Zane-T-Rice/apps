@@ -5,6 +5,7 @@ import { FaRegClone } from "react-icons/fa";
 import { IoCloseSharp } from "react-icons/io5";
 import { FigureDataList } from "./figure_data_list";
 import { Figure } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_figures";
+import { RefObject } from "react";
 
 export function FigureCard(props: {
   figure: Figure;
@@ -18,6 +19,7 @@ export function FigureCard(props: {
     showOnlyErrors?: boolean,
   ) => Promise<boolean>;
   onFigureEdit: (figure: Figure, silent?: boolean) => Promise<boolean>;
+  ref: RefObject<HTMLDivElement | null>;
 }) {
   const {
     figure,
@@ -25,6 +27,7 @@ export function FigureCard(props: {
     onFigureCreate,
     onFigureDelete,
     onFigureEdit,
+    ref,
   } = props;
 
   const buildTitleText = (figure: Figure) => {
@@ -35,7 +38,11 @@ export function FigureCard(props: {
   };
 
   return (
-    <SelectableCardRoot resource={figure} selectedResource={selectedFigure}>
+    <SelectableCardRoot
+      resource={figure}
+      selectedResource={selectedFigure}
+      ref={ref}
+    >
       <Card.Body
         paddingTop="0px"
         paddingLeft="6px"

@@ -3,16 +3,16 @@
 import { Box, Tabs } from "@chakra-ui/react";
 import { NavigationBar } from "../ui/navigation_bar";
 import { FaCity } from "react-icons/fa";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { GloomhavenCompanionCampaignTabContent } from "./gloomhaven_companion_campaign_tab_content";
 import { GloomhavenCompanionScenarioTabContent } from "./gloomhaven_companion_scenario_tab_content";
 import { Campaign } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_campaigns";
 import { Scenario } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_scenarios";
-import { GloomhavenCompanionFigureTabContent } from "./gloomhaven_companion_figure_tab_content";
 import { GiMeepleGroup } from "react-icons/gi";
 import { FiHexagon } from "react-icons/fi";
 import { useSearchParams } from "next/navigation";
-import { useQueryString } from "@/app/utils/use_clear_query_string";
+import { useQueryString } from "@/app/utils/use_query_string";
+import { GloomhavenCompanionAllyEnemyTabContent } from "./gloomhaven_companion_allies_enemies_tab_content";
 
 export default function GloomhavenCompanionPageContent() {
   const searchParams = useSearchParams();
@@ -20,6 +20,8 @@ export default function GloomhavenCompanionPageContent() {
   const [activeTab, setActiveTab] = useState<string>();
   const [selectedCampaign, setSelectedCampaign] = useState<Campaign>();
   const [selectedScenario, setSelectedScenario] = useState<Scenario>();
+  const selectedEnemyRef = useRef<HTMLDivElement | null>(null);
+  const selectedAllyRef = useRef<HTMLDivElement | null>(null);
 
   const onCampaignSelect = (campaign: Campaign) => {
     if (selectedCampaign?.entity === campaign.entity) return;
@@ -28,7 +30,7 @@ export default function GloomhavenCompanionPageContent() {
   };
 
   useEffect(() => {
-    const moveToFigures = async () => {
+    const moveToEnemies = async () => {
       if (
         searchParams.get("campaignId") &&
         selectedCampaign &&
@@ -43,12 +45,40 @@ export default function GloomhavenCompanionPageContent() {
         selectedCampaign &&
         selectedScenario
       ) {
-        setActiveTab("figures");
+        setActiveTab("enemies");
       }
     };
 
-    moveToFigures();
+    moveToEnemies();
   }, [selectedCampaign, selectedScenario, searchParams]);
+
+  useEffect(() => {
+    // I cannot figure out how to automatically scroll without
+    // waiting for the next cycle by using setTimeout.
+    if (activeTab === "enemies") {
+      setTimeout(
+        () =>
+          selectedEnemyRef?.current?.scrollIntoView({
+            block: "center",
+            behavior: "instant",
+          }),
+        1,
+      );
+    }
+
+    // I cannot figure out how to automatically scroll without
+    // waiting for the next cycle by using setTimeout.
+    if (activeTab === "allies") {
+      setTimeout(
+        () =>
+          selectedAllyRef?.current?.scrollIntoView({
+            block: "center",
+            behavior: "instant",
+          }),
+        1,
+      );
+    }
+  }, [activeTab, selectedEnemyRef, selectedAllyRef]);
 
   const actions = <></>;
 
@@ -74,16 +104,30 @@ export default function GloomhavenCompanionPageContent() {
         Scenarios
       </Tabs.Trigger>
       <Tabs.Trigger
-        value="figures"
-        onClick={() =>
-          setQueryString(selectedCampaign?.id, selectedScenario?.id)
-        }
+        value="enemies"
+        onClick={() => {
+          if (activeTab !== "enemies" && activeTab !== "allies")
+            setQueryString(selectedCampaign?.id, selectedScenario?.id);
+        }}
         disabled={!selectedCampaign || !selectedScenario}
       >
         <Box hideBelow="sm">
           <GiMeepleGroup />
         </Box>
-        Figures
+        Enemies
+      </Tabs.Trigger>
+      <Tabs.Trigger
+        value="allies"
+        onClick={() => {
+          if (activeTab !== "enemies" && activeTab !== "allies")
+            setQueryString(selectedCampaign?.id, selectedScenario?.id);
+        }}
+        disabled={!selectedCampaign || !selectedScenario}
+      >
+        <Box hideBelow="sm">
+          <GiMeepleGroup />
+        </Box>
+        Allies
       </Tabs.Trigger>
     </>
   );
@@ -107,10 +151,24 @@ export default function GloomhavenCompanionPageContent() {
         </Tabs.Content>
       )}
       {selectedCampaign && selectedScenario && (
-        <Tabs.Content value="figures">
-          <GloomhavenCompanionFigureTabContent
+        <Tabs.Content value="enemies">
+          <GloomhavenCompanionAllyEnemyTabContent
             selectedCampaign={selectedCampaign}
             selectedScenario={selectedScenario}
+            type="enemy"
+            selectedEnemyRef={selectedEnemyRef}
+            selectedAllyRef={selectedAllyRef}
+          />
+        </Tabs.Content>
+      )}
+      {selectedCampaign && selectedScenario && (
+        <Tabs.Content value="allies">
+          <GloomhavenCompanionAllyEnemyTabContent
+            selectedCampaign={selectedCampaign}
+            selectedScenario={selectedScenario}
+            type="ally"
+            selectedEnemyRef={selectedEnemyRef}
+            selectedAllyRef={selectedAllyRef}
           />
         </Tabs.Content>
       )}

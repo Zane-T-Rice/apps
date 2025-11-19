@@ -5,7 +5,7 @@ export function SelectableCardRoot<T extends { id: string }>(props: {
   children: ReactNode;
   resource: T;
   selectedResource?: T;
-  ref: RefObject<HTMLDivElement | null>;
+  ref?: RefObject<HTMLDivElement | null>;
 }) {
   const { children, resource, selectedResource, ref } = props;
 

@@ -10,52 +10,49 @@ export function SelectableCardRoot<T extends { id: string }>(props: {
   const { children, resource, selectedResource, ref } = props;
 
   return (
-    <div
+    <Card.Root
       ref={selectedResource && selectedResource.id === resource.id ? ref : null}
-    >
-      <Card.Root
-        overflow="hidden"
-        variant="elevated"
-        width="100%"
-        height="100%"
-        key={`navigation-bar-${resource.id}`}
-        shadow={{
+      overflow="hidden"
+      variant="elevated"
+      width="100%"
+      height="100%"
+      key={`navigation-bar-${resource.id}`}
+      shadow={{
+        base:
+          selectedResource && selectedResource.id === resource.id
+            ? "1px 1px 6px 1px rgba(0, 0, 0, .3)"
+            : "1px 1px 6px 1px rgba(0, 0, 0, .3)",
+        _dark:
+          selectedResource && selectedResource.id === resource.id
+            ? "1px 1px 6px 1px rgba(255, 255, 0, .4)"
+            : "1px 1px 6px 1px rgba(255, 255, 255, .3)",
+      }}
+      bg={
+        selectedResource && selectedResource.id === resource.id
+          ? "#26547C"
+          : "none"
+      }
+      color={
+        selectedResource && selectedResource.id === resource.id
+          ? "#FFD166"
+          : "none"
+      }
+      _hover={{
+        bg: {
           base:
-            selectedResource && selectedResource.id === resource.id
-              ? "1px 1px 6px 1px rgba(0, 0, 0, .3)"
-              : "1px 1px 6px 1px rgba(0, 0, 0, .3)",
+            !selectedResource ||
+            (selectedResource && selectedResource.id !== resource.id)
+              ? "blackAlpha.300"
+              : undefined,
           _dark:
-            selectedResource && selectedResource.id === resource.id
-              ? "1px 1px 6px 1px rgba(255, 255, 0, .4)"
-              : "1px 1px 6px 1px rgba(255, 255, 255, .3)",
-        }}
-        bg={
-          selectedResource && selectedResource.id === resource.id
-            ? "#26547C"
-            : "none"
-        }
-        color={
-          selectedResource && selectedResource.id === resource.id
-            ? "#FFD166"
-            : "none"
-        }
-        _hover={{
-          bg: {
-            base:
-              !selectedResource ||
-              (selectedResource && selectedResource.id !== resource.id)
-                ? "blackAlpha.300"
-                : undefined,
-            _dark:
-              !selectedResource ||
-              (selectedResource && selectedResource.id !== resource.id)
-                ? "whiteAlpha.200"
-                : undefined,
-          },
-        }}
-      >
-        {children}
-      </Card.Root>
-    </div>
+            !selectedResource ||
+            (selectedResource && selectedResource.id !== resource.id)
+              ? "whiteAlpha.200"
+              : undefined,
+        },
+      }}
+    >
+      {children}
+    </Card.Root>
   );
 }

@@ -46,6 +46,7 @@ export function useWebSocket<
         websocket.onopen = () => {
           console.log("WebSocket connection established.");
           setWs(websocket);
+          setRefresh(true);
         };
 
         websocket.onmessage = (event) => {
@@ -127,7 +128,6 @@ export function useWebSocket<
     if (!ws || ws.readyState !== WebSocket.OPEN) {
       console.log("Attempting to connect to the WebSocket.");
       wsHooks(await getAccessTokenSilently());
-      setRefresh(true);
     }
   }, [ws, wsHooks, getAccessTokenSilently]);
 
@@ -160,13 +160,24 @@ export function useWebSocket<
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const sendMessage = async (resource: T, action: string) => {
-    if (ws && ws.readyState === WebSocket.OPEN) {
-      ws.send(
-        JSON.stringify({ action, messageId: websocketId, resource: resource }),
-      );
-    }
-  };
+  useEffect(() => {
+    setRefresh(true);
+  }, [scenarioId, campaignId]);
+
+  const sendMessage = useCallback(
+    async (resource: T, action: string) => {
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(
+          JSON.stringify({
+            action,
+            messageId: websocketId,
+            resource: resource,
+          }),
+        );
+      }
+    },
+    [websocketId, ws],
+  );
 
   return {
     sendMessage,

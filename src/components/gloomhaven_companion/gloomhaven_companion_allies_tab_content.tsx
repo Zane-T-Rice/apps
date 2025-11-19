@@ -13,7 +13,7 @@ export function GloomhavenCompanionAllyTabContent(props: {
   onFigureCreate: (figure: Figure, silent?: boolean) => Promise<boolean>;
   onFigureDelete: (figure: Figure, silent?: boolean) => Promise<boolean>;
   onFigureEdit: (figure: Figure, silent?: boolean) => Promise<boolean>;
-  onFigureSelect: (figure: Figure) => void;
+  onFigureSelect: (figure: Figure, type: string) => void;
   ref: RefObject<HTMLDivElement | null>;
 }) {
   const {
@@ -224,7 +224,7 @@ export function GloomhavenCompanionAllyTabContent(props: {
                           colSpan={1}
                           key={`figure-card-${figureIndex}`}
                           justifyItems="center"
-                          onClick={() => onFigureSelect(figure)}
+                          onClick={() => onFigureSelect(figure, "ally")}
                           minWidth={365}
                         >
                           <FigureCard

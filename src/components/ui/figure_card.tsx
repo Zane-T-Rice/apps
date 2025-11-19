@@ -1,23 +1,13 @@
-import { Card, Stack } from "@chakra-ui/react";
 import { SelectableCardRoot } from "./selectable_card_root";
-import { Button } from "../recipes/button";
-import { FaRegClone } from "react-icons/fa";
-import { IoCloseSharp } from "react-icons/io5";
-import { FigureDataList } from "./figure_data_list";
 import { Figure } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_figures";
-import { RefObject } from "react";
+import { RefObject, useMemo } from "react";
+import { SelectableCardBody } from "./selectable_card_body";
 
 export function FigureCard(props: {
   figure: Figure;
   selectedFigure: Figure | undefined;
-  onFigureCreate: (
-    figure: Figure,
-    showOnlyErrors?: boolean,
-  ) => Promise<boolean>;
-  onFigureDelete: (
-    figure: Figure,
-    showOnlyErrors?: boolean,
-  ) => Promise<boolean>;
+  onFigureCreate: (figure: Figure, silent?: boolean) => Promise<boolean>;
+  onFigureDelete: (figure: Figure, silent?: boolean) => Promise<boolean>;
   onFigureEdit: (figure: Figure, silent?: boolean) => Promise<boolean>;
   ref: RefObject<HTMLDivElement | null>;
 }) {
@@ -30,55 +20,29 @@ export function FigureCard(props: {
     ref,
   } = props;
 
-  const buildTitleText = (figure: Figure) => {
-    const title = [figure.rank, figure.class, figure.name]
-      .filter((e) => !!e)
-      .join(" ");
-    return title;
-  };
-
-  return (
-    <SelectableCardRoot
-      resource={figure}
-      selectedResource={selectedFigure}
-      ref={ref}
-    >
-      <Card.Body
-        paddingTop="0px"
-        paddingLeft="6px"
-        paddingBottom="12px"
-        paddingRight="6px"
+  const figureCard = useMemo(() => {
+    return (
+      <SelectableCardRoot
+        resourceId={figure.id}
+        selectedResourceId={selectedFigure?.id}
+        ref={ref}
       >
-        <Stack gap={0}>
-          <Card.Title>
-            <Stack direction="row" alignItems="center" gap="0">
-              {buildTitleText(figure)}
-              <Button
-                paddingLeft="1"
-                paddingBottom="2"
-                borderWidth="0"
-                onClick={() => onFigureCreate(figure, true)}
-                _hover={{
-                  color: "green",
-                }}
-              >
-                <FaRegClone />
-              </Button>
-              <Button
-                marginLeft="auto"
-                onClick={() => onFigureDelete(figure, true)}
-                _hover={{
-                  color: "red",
-                }}
-                disabled={figure.maximumHP > figure.damage}
-              >
-                <IoCloseSharp />
-              </Button>
-            </Stack>
-          </Card.Title>
-          <FigureDataList figure={figure} onFigureEdit={onFigureEdit} />
-        </Stack>
-      </Card.Body>
-    </SelectableCardRoot>
-  );
+        <SelectableCardBody
+          figure={figure}
+          onFigureCreate={onFigureCreate}
+          onFigureDelete={onFigureDelete}
+          onFigureEdit={onFigureEdit}
+        />
+      </SelectableCardRoot>
+    );
+  }, [
+    figure,
+    selectedFigure?.id,
+    ref,
+    onFigureCreate,
+    onFigureDelete,
+    onFigureEdit,
+  ]);
+
+  return figureCard;
 }

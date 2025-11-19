@@ -18,7 +18,7 @@ export function GloomhavenCompanionEnemyTabContent(props: {
   onFigureCreate: (figure: Figure, silent?: boolean) => Promise<boolean>;
   onFigureDelete: (figure: Figure, silent?: boolean) => Promise<boolean>;
   onFigureEdit: (figure: Figure, silent?: boolean) => Promise<boolean>;
-  onFigureSelect: (figure: Figure) => void;
+  onFigureSelect: (figure: Figure, type: string) => void;
   ref: RefObject<HTMLDivElement | null>;
 }) {
   const {
@@ -324,7 +324,7 @@ export function GloomhavenCompanionEnemyTabContent(props: {
                           colSpan={1}
                           key={`figure-card-${figureIndex}`}
                           justifyItems="center"
-                          onClick={() => onFigureSelect(figure)}
+                          onClick={() => onFigureSelect(figure, "enemy")}
                           minWidth={365}
                         >
                           <FigureCard

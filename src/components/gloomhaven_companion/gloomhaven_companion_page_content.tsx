@@ -3,7 +3,7 @@
 import { Box, Tabs } from "@chakra-ui/react";
 import { NavigationBar } from "../ui/navigation_bar";
 import { FaCity } from "react-icons/fa";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { GloomhavenCompanionCampaignTabContent } from "./gloomhaven_companion_campaign_tab_content";
 import { GloomhavenCompanionScenarioTabContent } from "./gloomhaven_companion_scenario_tab_content";
 import { Campaign } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_campaigns";
@@ -12,16 +12,15 @@ import { GiMeepleGroup } from "react-icons/gi";
 import { FiHexagon } from "react-icons/fi";
 import { useSearchParams } from "next/navigation";
 import { useQueryString } from "@/app/utils/use_query_string";
-import { GloomhavenCompanionAllyEnemyTabContent } from "./gloomhaven_companion_allies_enemies_tab_content";
+import { GloomhavenCompanionAllyEnemyTabSharedContent } from "./gloomhaven_companion_allies_enemies_tab_shared_content";
 
 export default function GloomhavenCompanionPageContent() {
   const searchParams = useSearchParams();
-  const { setQueryString } = useQueryString();
-  const [activeTab, setActiveTab] = useState<string>();
+  const { clearQueryString, setQueryString, replaceQueryString } =
+    useQueryString();
+  const [activeTab, setActiveTab] = useState<string>("campaigns");
   const [selectedCampaign, setSelectedCampaign] = useState<Campaign>();
   const [selectedScenario, setSelectedScenario] = useState<Scenario>();
-  const selectedEnemyRef = useRef<HTMLDivElement | null>(null);
-  const selectedAllyRef = useRef<HTMLDivElement | null>(null);
 
   const onCampaignSelect = (campaign: Campaign) => {
     if (selectedCampaign?.entity === campaign.entity) return;
@@ -31,54 +30,18 @@ export default function GloomhavenCompanionPageContent() {
 
   useEffect(() => {
     const moveToEnemies = async () => {
-      if (
-        searchParams.get("campaignId") &&
-        selectedCampaign &&
-        !selectedScenario
-      ) {
-        setActiveTab("scenarios");
-      }
-
-      if (
-        searchParams.get("campaignId") &&
-        searchParams.get("scenarioId") &&
-        selectedCampaign &&
-        selectedScenario
-      ) {
-        setActiveTab("enemies");
+      if (selectedCampaign && selectedScenario) {
+        if (searchParams.get("selectedEnemyId")) {
+          setActiveTab("enemies");
+        } else if (searchParams.get("selectedAllyId")) {
+          setActiveTab("allies");
+        }
       }
     };
 
     moveToEnemies();
-  }, [selectedCampaign, selectedScenario, searchParams]);
-
-  useEffect(() => {
-    // I cannot figure out how to automatically scroll without
-    // waiting for the next cycle by using setTimeout.
-    if (activeTab === "enemies") {
-      setTimeout(
-        () =>
-          selectedEnemyRef?.current?.scrollIntoView({
-            block: "center",
-            behavior: "instant",
-          }),
-        1,
-      );
-    }
-
-    // I cannot figure out how to automatically scroll without
-    // waiting for the next cycle by using setTimeout.
-    if (activeTab === "allies") {
-      setTimeout(
-        () =>
-          selectedAllyRef?.current?.scrollIntoView({
-            block: "center",
-            behavior: "instant",
-          }),
-        1,
-      );
-    }
-  }, [activeTab, selectedEnemyRef, selectedAllyRef]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedCampaign, selectedScenario]);
 
   const actions = <></>;
 
@@ -86,7 +49,11 @@ export default function GloomhavenCompanionPageContent() {
     <>
       <Tabs.Trigger
         value="campaigns"
-        onClick={() => setQueryString(undefined, undefined)}
+        onClick={() => {
+          if (activeTab !== "campaigns") {
+            clearQueryString();
+          }
+        }}
       >
         <Box hideBelow="sm">
           <FaCity />
@@ -95,7 +62,13 @@ export default function GloomhavenCompanionPageContent() {
       </Tabs.Trigger>
       <Tabs.Trigger
         value="scenarios"
-        onClick={() => setQueryString(selectedCampaign?.id, undefined)}
+        onClick={() => {
+          if (activeTab !== "scenarios") {
+            const params = new URLSearchParams();
+            params.set("campaignId", selectedCampaign?.id || "");
+            replaceQueryString(params);
+          }
+        }}
         disabled={!selectedCampaign}
       >
         <Box hideBelow="sm">
@@ -106,8 +79,12 @@ export default function GloomhavenCompanionPageContent() {
       <Tabs.Trigger
         value="enemies"
         onClick={() => {
-          if (activeTab !== "enemies" && activeTab !== "allies")
-            setQueryString(selectedCampaign?.id, selectedScenario?.id);
+          if (activeTab !== "enemies" && activeTab !== "allies") {
+            const params = new URLSearchParams();
+            params.set("campaignId", selectedCampaign?.id || "");
+            params.set("scenarioId", selectedScenario?.id || "");
+            replaceQueryString(params);
+          }
         }}
         disabled={!selectedCampaign || !selectedScenario}
       >
@@ -119,8 +96,10 @@ export default function GloomhavenCompanionPageContent() {
       <Tabs.Trigger
         value="allies"
         onClick={() => {
-          if (activeTab !== "enemies" && activeTab !== "allies")
-            setQueryString(selectedCampaign?.id, selectedScenario?.id);
+          if (activeTab !== "enemies" && activeTab !== "allies") {
+            setQueryString("campaignId", selectedCampaign?.id || "");
+            setQueryString("scenarioId", selectedScenario?.id || "");
+          }
         }}
         disabled={!selectedCampaign || !selectedScenario}
       >
@@ -150,27 +129,12 @@ export default function GloomhavenCompanionPageContent() {
           />
         </Tabs.Content>
       )}
-      {selectedCampaign && selectedScenario && (
-        <Tabs.Content value="enemies">
-          <GloomhavenCompanionAllyEnemyTabContent
-            selectedCampaign={selectedCampaign}
-            selectedScenario={selectedScenario}
-            type="enemy"
-            selectedEnemyRef={selectedEnemyRef}
-            selectedAllyRef={selectedAllyRef}
-          />
-        </Tabs.Content>
-      )}
-      {selectedCampaign && selectedScenario && (
-        <Tabs.Content value="allies">
-          <GloomhavenCompanionAllyEnemyTabContent
-            selectedCampaign={selectedCampaign}
-            selectedScenario={selectedScenario}
-            type="ally"
-            selectedEnemyRef={selectedEnemyRef}
-            selectedAllyRef={selectedAllyRef}
-          />
-        </Tabs.Content>
+      {selectedCampaign && selectedScenario && activeTab && (
+        <GloomhavenCompanionAllyEnemyTabSharedContent
+          activeTab={activeTab}
+          selectedCampaign={selectedCampaign}
+          selectedScenario={selectedScenario}
+        />
       )}
     </>
   );

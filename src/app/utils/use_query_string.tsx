@@ -5,15 +5,35 @@ export const useQueryString = () => {
   const searchParams = useSearchParams();
   const pathname = usePathname();
 
-  const setQueryString = (campaignId?: string, scenarioId?: string) => {
+  const setQueryString = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString());
-    if (campaignId) params.set("campaignId", campaignId);
-    else params.delete("campaignId");
-    if (scenarioId) params.set("scenarioId", scenarioId);
-    else params.delete("scenarioId");
-    router.replace(pathname + "?" + params.toString());
+    params.set(key, value);
+    router.replace(pathname + "?" + params.toString(), { scroll: false });
   };
+
+  const removeQueryString = (key: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete(key);
+    router.replace(pathname + "?" + params.toString(), { scroll: false });
+  };
+
+  const clearQueryString = () => {
+    router.replace(pathname, { scroll: false });
+  };
+
+  const replaceQueryString = (params: URLSearchParams) => {
+    router.replace(pathname + "?" + params.toString(), { scroll: false });
+  };
+
+  const getQueryString = () => {
+    return new URLSearchParams(searchParams.toString());
+  };
+
   return {
+    getQueryString,
     setQueryString,
+    removeQueryString,
+    clearQueryString,
+    replaceQueryString,
   };
 };

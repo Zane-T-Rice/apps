@@ -164,8 +164,8 @@ export function GloomhavenCompanionScenarioTabContent(props: {
                   onClick={() => onScenarioSelect(scenario)}
                 >
                   <SelectableCardRoot
-                    resource={scenario}
-                    selectedResource={selectedScenario}
+                    resourceId={scenario.id}
+                    selectedResourceId={selectedScenario?.id}
                   >
                     <Card.Body>
                       <Stack gap={3}>

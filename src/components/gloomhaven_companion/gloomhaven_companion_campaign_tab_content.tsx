@@ -221,8 +221,8 @@ export function GloomhavenCompanionCampaignTabContent(props: {
                     onClick={() => onCampaignSelect(campaign)}
                   >
                     <SelectableCardRoot
-                      resource={campaign}
-                      selectedResource={selectedCampaign}
+                      resourceId={campaign.id}
+                      selectedResourceId={selectedCampaign?.id}
                     >
                       <Card.Body>
                         <Stack gap={3}>

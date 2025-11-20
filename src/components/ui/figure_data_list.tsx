@@ -25,14 +25,6 @@ export function FigureDataList(props: {
       figure.damage = figure.damage + 1;
     };
 
-    const increaseNumber = (figure: Figure) => {
-      if (figure.number !== null) figure.number = figure.number + 1;
-    };
-
-    const decreaseNumber = (figure: Figure) => {
-      if (figure.number !== null) figure.number = figure.number - 1;
-    };
-
     const increaseXP = (figure: Figure) => {
       if (figure.xp !== null) figure.xp = figure.xp + 1;
     };
@@ -96,46 +88,21 @@ export function FigureDataList(props: {
 
     return figure ? (
       <Grid templateColumns="repeat(14, 1fr)" gapX={2} gapY={1}>
-        {notNil(figure.number) && (
-          <>
-            <GridItem colSpan={columnOneSpan}>
-              <Text>{"#"}</Text>
-            </GridItem>
-            <GridItem colSpan={columnTwoSpan}>
-              <Stack direction="row" alignItems="center">
-                <IncrementalNumberEditor
-                  increaseCallback={() => {
-                    increaseNumber(figure);
-                    onFigureEdit(figure, true);
-                  }}
-                  decreaseCallback={() => {
-                    decreaseNumber(figure);
-                    onFigureEdit(figure, true);
-                  }}
-                  text={`${figure.number}`}
-                />
-              </Stack>
-            </GridItem>
-            <GridItem colSpan={columnThreeSpan}></GridItem>
-          </>
-        )}
-        <GridItem colSpan={columnOneSpan}>
+        <GridItem colSpan={columnOneSpan} alignContent={"center"}>
           <Text minWidth="1/12">{"HP"}</Text>
         </GridItem>
         <GridItem colSpan={columnTwoSpan}>
-          <Stack direction="row" alignItems={"center"}>
-            <IncrementalNumberEditor
-              increaseCallback={() => {
-                decreaseDamage(figure);
-                onFigureEdit(figure, true);
-              }}
-              decreaseCallback={() => {
-                increaseDamage(figure);
-                onFigureEdit(figure, true);
-              }}
-              text={`${figure.maximumHP - figure.damage} / ${figure.maximumHP}`}
-            />
-          </Stack>
+          <IncrementalNumberEditor
+            increaseCallback={() => {
+              decreaseDamage(figure);
+              onFigureEdit(figure, true);
+            }}
+            decreaseCallback={() => {
+              increaseDamage(figure);
+              onFigureEdit(figure, true);
+            }}
+            text={`${figure.maximumHP - figure.damage} / ${figure.maximumHP}`}
+          />
         </GridItem>
         <GridItem colSpan={columnThreeSpan}></GridItem>
         {notNil(figure.xp) && (
@@ -144,19 +111,17 @@ export function FigureDataList(props: {
               <Text minWidth="1/12">{"XP"}</Text>
             </GridItem>
             <GridItem colSpan={columnTwoSpan}>
-              <Stack direction="row" alignItems="center">
-                <IncrementalNumberEditor
-                  increaseCallback={() => {
-                    increaseXP(figure);
-                    onFigureEdit(figure, true);
-                  }}
-                  decreaseCallback={() => {
-                    decreaseXP(figure);
-                    onFigureEdit(figure, true);
-                  }}
-                  text={`${figure.xp}`}
-                />
-              </Stack>
+              <IncrementalNumberEditor
+                increaseCallback={() => {
+                  increaseXP(figure);
+                  onFigureEdit(figure, true);
+                }}
+                decreaseCallback={() => {
+                  decreaseXP(figure);
+                  onFigureEdit(figure, true);
+                }}
+                text={`${figure.xp}`}
+              />
             </GridItem>
             <GridItem colSpan={columnThreeSpan}></GridItem>
           </>

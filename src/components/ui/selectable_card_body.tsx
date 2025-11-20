@@ -14,7 +14,7 @@ export function SelectableCardBody(props: {
   const { figure, onFigureCreate, onFigureDelete, onFigureEdit } = props;
 
   const buildTitleText = (figure: Figure) => {
-    const title = [figure.rank, figure.class, figure.name]
+    const title = [figure.rank, figure.class, figure.name, figure.number]
       .filter((e) => !!e)
       .join(" ");
     return title;

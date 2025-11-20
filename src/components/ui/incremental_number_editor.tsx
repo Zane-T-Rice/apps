@@ -7,14 +7,15 @@ export function IncrementalNumberEditor(props: {
   text: string;
 }) {
   const { decreaseCallback, increaseCallback, text } = props;
+  const buttonHeight = 8;
   return (
     <Stack direction="row" alignItems="center" flex="auto">
       <Button
-        height="75%"
         variant={"safe"}
         onClick={() => {
           decreaseCallback();
         }}
+        height={buttonHeight}
       >
         -
       </Button>
@@ -22,11 +23,11 @@ export function IncrementalNumberEditor(props: {
         {text}
       </Text>
       <Button
-        height="75%"
         variant={"safe"}
         onClick={() => {
           increaseCallback();
         }}
+        height={buttonHeight}
       >
         +
       </Button>

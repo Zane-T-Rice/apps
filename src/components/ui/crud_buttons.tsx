@@ -11,20 +11,23 @@ export default function CRUDButtons<
   T extends object,
   C extends Schema | undefined,
   E extends Schema | undefined,
->(props: {
-  omitKeys?: (keyof T)[];
-  selectedRecord?: T;
-  createPermission?: string;
-  creationRecord?: T;
-  onCreate?: (record: T) => Promise<boolean>;
-  createResourceSchema?: C;
-  editPermission?: string;
-  onEdit?: (record: T) => Promise<boolean>;
-  editResourceSchema?: E;
-  deletePermission?: string;
-  onDelete?: (record: T) => Promise<boolean>;
-  desiredFieldOrder?: { [Property in keyof T]?: number };
-}) {
+>(
+  props: {
+    omitKeys?: (keyof T)[];
+    selectedRecord?: T;
+    createPermission?: string;
+    creationRecord?: T;
+    onCreate?: (record: T) => Promise<boolean>;
+    createResourceSchema?: C;
+    editPermission?: string;
+    onEdit?: (record: T) => Promise<boolean>;
+    editResourceSchema?: E;
+    deletePermission?: string;
+    onDelete?: (record: T) => Promise<boolean>;
+    desiredFieldOrder?: { [Property in keyof T]?: number };
+    confirmDelete?: boolean;
+  } = { confirmDelete: true },
+) {
   const {
     omitKeys,
     selectedRecord,
@@ -38,6 +41,7 @@ export default function CRUDButtons<
     deletePermission,
     onDelete,
     desiredFieldOrder,
+    confirmDelete,
   } = props;
 
   const [isEditOpen, setIsEditOpen] = useState<boolean>(false);
@@ -123,7 +127,7 @@ export default function CRUDButtons<
             </Button>
           </GridItem>
         ) : null}
-        {deletePermission ? (
+        {deletePermission && confirmDelete ? (
           <GridItem colSpan={createEditDeleteWidth}>
             <Box width="100%">
               <AlertDialog
@@ -148,6 +152,18 @@ export default function CRUDButtons<
                 confirmText="Delete"
               />
             </Box>
+          </GridItem>
+        ) : null}
+        {deletePermission && !confirmDelete ? (
+          <GridItem colSpan={createEditDeleteWidth}>
+            <Button
+              variant="unsafe"
+              disabled={!selectedRecord || !hasDeletePermission}
+              width="100%"
+              onClick={onDeleteConfirm}
+            >
+              Delete
+            </Button>
           </GridItem>
         ) : null}
       </Grid>

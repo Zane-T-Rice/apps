@@ -40,6 +40,10 @@ export function GloomhavenCompanionAllyEnemyTabSharedContent(props: {
   useEffect(() => {
     // I cannot figure out how to automatically scroll without
     // waiting for the next cycle by using setTimeout.
+    //
+    // Using two at different times means the UI can respond
+    // instantly if possible, but if rendering is slow, the
+    // second attempt usually succeeds.
     if (activeTab === "enemies") {
       setTimeout(
         () =>
@@ -47,7 +51,15 @@ export function GloomhavenCompanionAllyEnemyTabSharedContent(props: {
             block: "center",
             behavior: "smooth",
           }),
-        1000,
+        1,
+      );
+      setTimeout(
+        () =>
+          selectedEnemyRef?.current?.scrollIntoView({
+            block: "center",
+            behavior: "smooth",
+          }),
+        250,
       );
     } else if (activeTab === "allies") {
       setTimeout(
@@ -56,7 +68,15 @@ export function GloomhavenCompanionAllyEnemyTabSharedContent(props: {
             block: "center",
             behavior: "smooth",
           }),
-        1000,
+        1,
+      );
+      setTimeout(
+        () =>
+          selectedAllyRef?.current?.scrollIntoView({
+            block: "center",
+            behavior: "smooth",
+          }),
+        250,
       );
     }
   }, [

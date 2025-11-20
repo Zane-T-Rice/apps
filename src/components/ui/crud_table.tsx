@@ -61,6 +61,7 @@ export default function CRUDTable<
           editResourceSchema={editResourceSchema}
           deletePermission={deletePermission}
           onDelete={onDelete}
+          confirmDelete
         />
         <Box overflowX="auto" overflowY="auto" maxHeight="32rem">
           <DataTable

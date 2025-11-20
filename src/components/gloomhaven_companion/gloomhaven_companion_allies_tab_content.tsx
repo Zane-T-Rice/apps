@@ -171,7 +171,6 @@ export function GloomhavenCompanionAllyTabContent(props: {
         deletePermission="gloomhaven-companion:public"
         onDelete={onFigureDelete}
         desiredFieldOrder={desiredFieldOrder}
-        confirmDelete={false}
       />
     );
   };

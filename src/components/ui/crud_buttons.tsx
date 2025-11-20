@@ -11,23 +11,21 @@ export default function CRUDButtons<
   T extends object,
   C extends Schema | undefined,
   E extends Schema | undefined,
->(
-  props: {
-    omitKeys?: (keyof T)[];
-    selectedRecord?: T;
-    createPermission?: string;
-    creationRecord?: T;
-    onCreate?: (record: T) => Promise<boolean>;
-    createResourceSchema?: C;
-    editPermission?: string;
-    onEdit?: (record: T) => Promise<boolean>;
-    editResourceSchema?: E;
-    deletePermission?: string;
-    onDelete?: (record: T) => Promise<boolean>;
-    desiredFieldOrder?: { [Property in keyof T]?: number };
-    confirmDelete?: boolean;
-  } = { confirmDelete: true },
-) {
+>(props: {
+  omitKeys?: (keyof T)[];
+  selectedRecord?: T;
+  createPermission?: string;
+  creationRecord?: T;
+  onCreate?: (record: T) => Promise<boolean>;
+  createResourceSchema?: C;
+  editPermission?: string;
+  onEdit?: (record: T) => Promise<boolean>;
+  editResourceSchema?: E;
+  deletePermission?: string;
+  onDelete?: (record: T) => Promise<boolean>;
+  desiredFieldOrder?: { [Property in keyof T]?: number };
+  confirmDelete?: boolean;
+}) {
   const {
     omitKeys,
     selectedRecord,

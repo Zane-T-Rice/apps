@@ -144,6 +144,7 @@ export function GloomhavenCompanionScenarioTabContent(props: {
             editResourceSchema={editScenarioSchema}
             deletePermission="gloomhaven-companion:public"
             onDelete={onScenarioDelete}
+            confirmDelete
           />
           <Grid
             templateColumns={{

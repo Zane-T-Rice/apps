@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  CloseButton,
-  Drawer,
-  DrawerOpenChangeDetails,
-  Portal,
-} from "@chakra-ui/react";
+import { CloseButton, Drawer, DrawerOpenChangeDetails } from "@chakra-ui/react";
 import { Button } from "../recipes/button";
 import { ReactNode, useState } from "react";
 
@@ -51,45 +46,43 @@ export function SharedDrawer(props: {
         setIsOpen(details.open)
       }
     >
-      <Portal>
-        <Drawer.Backdrop />
-        <Drawer.Positioner>
-          <Drawer.Content>
-            <Drawer.Header>
-              <Drawer.Title>{title}</Drawer.Title>
-            </Drawer.Header>
-            <Drawer.Body
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  submit();
-                }
+      <Drawer.Backdrop />
+      <Drawer.Positioner>
+        <Drawer.Content>
+          <Drawer.Header>
+            <Drawer.Title>{title}</Drawer.Title>
+          </Drawer.Header>
+          <Drawer.Body
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                submit();
+              }
+            }}
+          >
+            {body}
+          </Drawer.Body>
+          <Drawer.Footer>
+            <Button
+              variant="outline"
+              onClick={() => {
+                cancel();
               }}
             >
-              {body}
-            </Drawer.Body>
-            <Drawer.Footer>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  cancel();
-                }}
-              >
-                Cancel
-              </Button>
-              <Button
-                variant="safe"
-                onClick={() => submit()}
-                disabled={disableSave || isSubmitting}
-              >
-                {isSubmitting ? "Saving..." : "Save"}
-              </Button>
-            </Drawer.Footer>
-            <Drawer.CloseTrigger asChild>
-              <CloseButton size="sm" />
-            </Drawer.CloseTrigger>
-          </Drawer.Content>
-        </Drawer.Positioner>
-      </Portal>
+              Cancel
+            </Button>
+            <Button
+              variant="safe"
+              onClick={() => submit()}
+              disabled={disableSave || isSubmitting}
+            >
+              {isSubmitting ? "Saving..." : "Save"}
+            </Button>
+          </Drawer.Footer>
+          <Drawer.CloseTrigger asChild>
+            <CloseButton size="sm" />
+          </Drawer.CloseTrigger>
+        </Drawer.Content>
+      </Drawer.Positioner>
     </Drawer.Root>
   );
 }

@@ -12,7 +12,7 @@
   "dependencies": {
     "@auth0/auth0-react": "^2.3.0",
     "@chakra-ui/icons": "^2.2.4",
-    "@chakra-ui/react": "^3.13.0",
+    "@chakra-ui/react": "3.25.0",
     "@emotion/react": "^11.14.0",
     "jwt-decode": "^4.0.0",
     "next": "^15.5.6",

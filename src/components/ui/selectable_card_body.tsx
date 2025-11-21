@@ -14,9 +14,18 @@ export function SelectableCardBody(props: {
   const { figure, onFigureCreate, onFigureDelete, onFigureEdit } = props;
 
   const buildTitleText = (figure: Figure) => {
-    const title = [figure.rank, figure.class, figure.name, figure.number]
-      .filter((e) => !!e)
-      .join(" ");
+    let title = "";
+    if (figure.rank?.toLowerCase() === "character") {
+      title = [figure.class, figure.name].filter((e) => !!e).join(" ");
+    } else if (figure.rank?.toLowerCase() === "summon") {
+      title = [figure.name].filter((e) => !!e).join(" ");
+    } else if (figure.class?.toLowerCase() === "npc / obstacle") {
+      title = [figure.name].filter((e) => !!e).join(" ");
+    } else {
+      title = [figure.rank, figure.class, figure.name, figure.number]
+        .filter((e) => !!e)
+        .join(" ");
+    }
     return title;
   };
 

@@ -5,9 +5,10 @@ import { FigureCard } from "../ui/figure_card";
 import { Template } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_templates";
 import { Button } from "../recipes/button";
 import { Group } from "./gloomhaven_companion_allies_enemies_tab_content";
-import { RefObject, useCallback, useState } from "react";
-import CRUDButtons from "../ui/crud_buttons";
-import { number, object, string } from "yup";
+import { RefObject, useCallback } from "react";
+import AddMonsterButton from "../ui/add_monster_button";
+import { getStandeeNumber } from "@/app/utils/gloomhaven_companion_ui/get_standee_number";
+import AddNPCButton from "../ui/add_npc_button";
 
 export function GloomhavenCompanionEnemyTabContent(props: {
   selectedScenario: Scenario;
@@ -34,27 +35,6 @@ export function GloomhavenCompanionEnemyTabContent(props: {
     ref,
   } = props;
 
-  const playerClasses = [
-    "bruiser",
-    "mindthief",
-    "silent knife",
-    "spellweaver",
-    "wildfury",
-    "berserker",
-    "quartermaster",
-    "elementalist",
-    "doomstalker",
-    "bladeswarm",
-    "soothsinger",
-    "sawbones",
-    "plagueherald",
-    "cragheart",
-    "tinkerer",
-    "sunkeeper",
-    "nightshroud",
-    "soultether",
-  ];
-
   const collectGroups = (figures: Figure[]): Group[] => {
     const groups: { [Property in string]: Group } = {};
 
@@ -69,11 +49,7 @@ export function GloomhavenCompanionEnemyTabContent(props: {
       });
 
     figures.forEach((figure) => {
-      if (
-        !playerClasses.some(
-          (playerClass) => playerClass === figure.class.toLocaleLowerCase(),
-        )
-      ) {
+      if (figure.alignment === "enemy") {
         const groupClass = figure.class;
         if (!groups[groupClass])
           groups[groupClass] = { class: groupClass, figures: [figure] };
@@ -107,12 +83,6 @@ export function GloomhavenCompanionEnemyTabContent(props: {
               )
                 return -1;
               else return 0;
-            })
-            // Class sorting really only effects the Player group.
-            .sort((figureA, figureB) => {
-              if (figureA.class < figureB.class) return -1;
-              if (figureA.class > figureB.class) return 1;
-              else return 0;
             })),
       );
 
@@ -123,132 +93,23 @@ export function GloomhavenCompanionEnemyTabContent(props: {
   const addEnemy = useCallback(
     (enemyClass: string, rank: "normal" | "elite") => {
       const template: Template | undefined = templates.find(
-        (template) => template.class === enemyClass,
+        (template) => template.class.toLowerCase() === enemyClass.toLowerCase(),
       );
       if (template) {
-        const group = groups.find((group) => group.class === enemyClass);
-        const currentStandeeNumbers = group?.figures.map(
-          (figure) => figure.number,
-        );
-        const standeeNumbers = new Array(template.standeeLimit)
-          .fill(0)
-          .map((_, index) => index + 1)
-          .filter((standeeNumber) => {
-            if (currentStandeeNumbers) {
-              return !currentStandeeNumbers.some(
-                (sNumber) => sNumber === standeeNumber,
-              );
-            } else {
-              return true;
-            }
-          });
-        if (standeeNumbers.length > 0) {
-          const standeeNumber =
-            standeeNumbers[Math.floor(Math.random() * standeeNumbers.length)];
-          const figure: Figure =
-            template.stats[selectedScenario.scenarioLevel][rank];
-          figure.number = standeeNumber;
-          onFigureCreate(figure, true);
+        const figure: Figure | undefined =
+          template.stats[selectedScenario.scenarioLevel][rank];
+        if (figure) {
+          const standeeNumber = getStandeeNumber(figure, groups, templates);
+          if (standeeNumber !== -1) {
+            figure.alignment = "enemy";
+            figure.number = standeeNumber;
+            onFigureCreate(figure, true);
+          }
         }
       }
     },
     [templates, onFigureCreate, groups, selectedScenario],
   );
-
-  // START OF THINGS I HOPE TO CHANGE OR UPGRADE
-  // Hopefully a lot of this will be changed, moved or deleted
-  // as the templating system gets more advanced.
-  const transformInt = (value: number) => {
-    return isNaN(value) ? undefined : value;
-  };
-  const stringSchema = string().nullable();
-  const numberSchema = number().transform(transformInt).integer().nullable();
-  const createFigureSchema = object({
-    rank: stringSchema.optional(),
-    class: stringSchema.required(),
-    maximumHP: numberSchema.required(),
-    damage: numberSchema.required(),
-    name: stringSchema.optional(),
-    number: numberSchema.optional(),
-    shield: numberSchema.optional(),
-    retaliate: numberSchema.optional(),
-    move: numberSchema.optional(),
-    attack: numberSchema.optional(),
-    target: numberSchema.optional(),
-    xp: numberSchema.optional(),
-    innateDefenses: stringSchema.optional(),
-    innateOffenses: stringSchema.optional(),
-    statuses: stringSchema.optional(),
-    pierce: numberSchema.optional(),
-    special: stringSchema.optional(),
-  }).stripUnknown();
-  const editFigureSchema = createFigureSchema
-    .concat(
-      object({
-        id: string().required(),
-        updatedAt: string().required(),
-      }),
-    )
-    .stripUnknown();
-  const [createFigureRecord] = useState<Figure>({
-    id: "",
-    parent: "",
-    entity: "",
-    rank: null,
-    class: "",
-    name: null,
-    number: null,
-    maximumHP: 0,
-    damage: 0,
-    xp: null,
-    move: null,
-    attack: null,
-    innateOffenses: null,
-    shield: null,
-    innateDefenses: null,
-    statuses: null,
-    target: null,
-    retaliate: null,
-    updatedAt: null,
-    pierce: null,
-    special: null,
-  });
-  const desiredFieldOrder: { [Property in keyof Figure]?: number } = {
-    rank: 0,
-    class: 1,
-    name: 2,
-    number: 3,
-    maximumHP: 4,
-    damage: 5,
-    xp: 6,
-    move: 7,
-    attack: 8,
-    target: 9,
-    innateOffenses: 10,
-    shield: 11,
-    retaliate: 12,
-    innateDefenses: 13,
-    statuses: 14,
-  };
-  const crudButtons = () => {
-    return (
-      <CRUDButtons
-        omitKeys={["id", "parent", "entity", "updatedAt"]}
-        selectedRecord={selectedFigure}
-        createPermission="gloomhaven-companion:public"
-        creationRecord={createFigureRecord}
-        onCreate={onFigureCreate}
-        createResourceSchema={createFigureSchema}
-        editPermission="gloomhaven-companion:public"
-        onEdit={onFigureEdit}
-        editResourceSchema={editFigureSchema}
-        deletePermission="gloomhaven-companion:public"
-        onDelete={onFigureDelete}
-        desiredFieldOrder={desiredFieldOrder}
-      />
-    );
-  };
-  // END OF THINGS I HOPE TO CHANGE OR UPGRADE
 
   return (
     <>
@@ -260,7 +121,26 @@ export function GloomhavenCompanionEnemyTabContent(props: {
         </Stack>
       ) : (
         <Stack gap={3}>
-          {crudButtons()}
+          <Grid
+            key={`add-buttons`}
+            templateColumns={{
+              base: "repeat(6, 1fr)",
+            }}
+            gap="3"
+            marginLeft={3}
+            marginRight={3}
+          >
+            <GridItem colSpan={2}>
+              <AddMonsterButton
+                onCreate={onFigureCreate}
+                templates={templates}
+                alignment="enemy"
+              />
+            </GridItem>
+            <GridItem colSpan={2}>
+              <AddNPCButton onCreate={onFigureCreate} alignment="enemy" />
+            </GridItem>
+          </Grid>
           {groups.map((group, groupIndex) => {
             return (
               <Card.Root

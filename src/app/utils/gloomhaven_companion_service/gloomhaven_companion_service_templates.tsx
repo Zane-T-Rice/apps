@@ -13,8 +13,10 @@ export type Template = {
   class: string;
   stats: {
     [key: number]: {
-      normal: Figure;
-      elite: Figure;
+      normal?: Figure;
+      elite?: Figure;
+      character?: Figure;
+      summon?: Figure;
     };
   };
 };

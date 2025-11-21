@@ -2,12 +2,17 @@ import { Card, Grid, GridItem, Skeleton, Stack, Text } from "@chakra-ui/react";
 import { Figure } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_figures";
 import { FigureCard } from "../ui/figure_card";
 import { Group } from "./gloomhaven_companion_allies_enemies_tab_content";
-import { RefObject, useState } from "react";
-import CRUDButtons from "../ui/crud_buttons";
-import { number, object, string } from "yup";
+import { RefObject, useCallback } from "react";
+import AddPlayerButton from "../ui/add_player_button";
+import { Template } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_templates";
+import AddSummonButton from "../ui/add_summon_button";
+import AddMonsterButton from "../ui/add_monster_button";
+import AddNPCButton from "../ui/add_npc_button";
+import { getStandeeNumber } from "@/app/utils/gloomhaven_companion_ui/get_standee_number";
 
 export function GloomhavenCompanionAllyTabContent(props: {
   figures: Figure[];
+  templates: Template[];
   isLoading: boolean;
   selectedFigure?: Figure;
   onFigureCreate: (figure: Figure, silent?: boolean) => Promise<boolean>;
@@ -18,45 +23,21 @@ export function GloomhavenCompanionAllyTabContent(props: {
 }) {
   const {
     figures,
+    templates,
     isLoading,
     selectedFigure,
-    onFigureCreate,
+    onFigureCreate: _onFigureCreate,
     onFigureDelete,
     onFigureEdit,
     onFigureSelect,
     ref,
   } = props;
 
-  const playerClasses = [
-    "bruiser",
-    "mindthief",
-    "silent knife",
-    "spellweaver",
-    "wildfury",
-    "berserker",
-    "quartermaster",
-    "elementalist",
-    "doomstalker",
-    "bladeswarm",
-    "soothsinger",
-    "sawbones",
-    "plagueherald",
-    "cragheart",
-    "tinkerer",
-    "sunkeeper",
-    "nightshroud",
-    "soultether",
-  ];
-
   const collectGroups = (figures: Figure[]): Group[] => {
     const groups: { [Property in string]: Group } = {};
 
     figures.forEach((figure) => {
-      if (
-        playerClasses.some(
-          (playerClass) => playerClass === figure.class.toLocaleLowerCase(),
-        )
-      ) {
+      if (figure.alignment === "ally") {
         const groupClass = figure.class;
         if (!groups[groupClass])
           groups[groupClass] = { class: groupClass, figures: [figure] };
@@ -68,113 +49,36 @@ export function GloomhavenCompanionAllyTabContent(props: {
       .sort()
       .forEach(
         (key) =>
-          (groups[key].figures = groups[key].figures
-            // Class sorting really only effects the Player group.
-            .sort((figureA, figureB) => {
-              if (figureA.class < figureB.class) return -1;
-              if (figureA.class > figureB.class) return 1;
+          (groups[key].figures = groups[key].figures.sort(
+            (figureA, figureB) => {
+              if (figureA.number === null) return 1;
+              if (figureB.number === null) return -1;
+              if (figureA.number < figureB.number) return -1;
+              if (figureA.number > figureB.number) return 1;
               else return 0;
-            })),
+            },
+          )),
       );
 
-    return Object.keys(groups).map((key) => groups[key]);
+    return Object.keys(groups)
+      .map((key) => groups[key])
+      .sort((a, b) => {
+        if (a.class > b.class) return 1;
+        if (a.class < b.class) return -1;
+        return 0;
+      });
   };
   const groups = collectGroups(figures);
 
-  // START OF THINGS I HOPE TO CHANGE OR UPGRADE
-  // Hopefully a lot of this will be changed, moved or deleted
-  // as the templating system gets more advanced.
-  const transformInt = (value: number) => {
-    return isNaN(value) ? undefined : value;
-  };
-  const stringSchema = string().nullable();
-  const numberSchema = number().transform(transformInt).integer().nullable();
-  const createFigureSchema = object({
-    rank: stringSchema.optional(),
-    class: stringSchema.required(),
-    maximumHP: numberSchema.required(),
-    damage: numberSchema.required(),
-    name: stringSchema.optional(),
-    number: numberSchema.optional(),
-    shield: numberSchema.optional(),
-    retaliate: numberSchema.optional(),
-    move: numberSchema.optional(),
-    attack: numberSchema.optional(),
-    target: numberSchema.optional(),
-    xp: numberSchema.optional(),
-    innateDefenses: stringSchema.optional(),
-    innateOffenses: stringSchema.optional(),
-    statuses: stringSchema.optional(),
-    pierce: numberSchema.optional(),
-    special: stringSchema.optional(),
-  }).stripUnknown();
-  const editFigureSchema = createFigureSchema
-    .concat(
-      object({
-        id: string().required(),
-        updatedAt: string().required(),
-      }),
-    )
-    .stripUnknown();
-  const [createFigureRecord] = useState<Figure>({
-    id: "",
-    parent: "",
-    entity: "",
-    rank: null,
-    class: "",
-    name: null,
-    number: null,
-    maximumHP: 0,
-    damage: 0,
-    xp: null,
-    move: null,
-    attack: null,
-    innateOffenses: null,
-    shield: null,
-    innateDefenses: null,
-    statuses: null,
-    target: null,
-    retaliate: null,
-    updatedAt: null,
-    pierce: null,
-    special: null,
-  });
-  const desiredFieldOrder: { [Property in keyof Figure]?: number } = {
-    rank: 0,
-    class: 1,
-    name: 2,
-    number: 3,
-    maximumHP: 4,
-    damage: 5,
-    xp: 6,
-    move: 7,
-    attack: 8,
-    target: 9,
-    innateOffenses: 10,
-    shield: 11,
-    retaliate: 12,
-    innateDefenses: 13,
-    statuses: 14,
-  };
-  const crudButtons = () => {
-    return (
-      <CRUDButtons
-        omitKeys={["id", "parent", "entity", "updatedAt"]}
-        selectedRecord={selectedFigure}
-        createPermission="gloomhaven-companion:public"
-        creationRecord={createFigureRecord}
-        onCreate={onFigureCreate}
-        createResourceSchema={createFigureSchema}
-        editPermission="gloomhaven-companion:public"
-        onEdit={onFigureEdit}
-        editResourceSchema={editFigureSchema}
-        deletePermission="gloomhaven-companion:public"
-        onDelete={onFigureDelete}
-        desiredFieldOrder={desiredFieldOrder}
-      />
-    );
-  };
-  // END OF THINGS I HOPE TO CHANGE OR UPGRADE
+  const onFigureCreate = useCallback(
+    async (figure: Figure, silent?: boolean): Promise<boolean> => {
+      const standeeNumber = getStandeeNumber(figure, groups, templates);
+      if (standeeNumber === -1) return false;
+      if (standeeNumber !== null) figure.number = standeeNumber;
+      return _onFigureCreate(figure, silent);
+    },
+    [_onFigureCreate, groups, templates],
+  );
 
   return (
     <>
@@ -186,7 +90,38 @@ export function GloomhavenCompanionAllyTabContent(props: {
         </Stack>
       ) : (
         <Stack gap={3}>
-          {crudButtons()}
+          <Grid
+            key={`add-buttons`}
+            templateColumns={{
+              base: "repeat(8, 1fr)",
+            }}
+            gap="3"
+            marginLeft={3}
+            marginRight={3}
+          >
+            <GridItem colSpan={2}>
+              <AddPlayerButton
+                onCreate={onFigureCreate}
+                templates={templates}
+              />
+            </GridItem>
+            <GridItem colSpan={2}>
+              <AddSummonButton
+                onCreate={onFigureCreate}
+                templates={templates}
+              />
+            </GridItem>
+            <GridItem colSpan={2}>
+              <AddNPCButton onCreate={onFigureCreate} alignment="ally" />
+            </GridItem>
+            <GridItem colSpan={2}>
+              <AddMonsterButton
+                onCreate={onFigureCreate}
+                templates={templates}
+                alignment="ally"
+              />
+            </GridItem>
+          </Grid>
           {groups.map((group, groupIndex) => {
             return (
               <Card.Root

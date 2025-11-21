@@ -25,6 +25,7 @@ export type Figure = {
   retaliate: number | null;
   pierce: number | null;
   special: string | null;
+  alignment: string | null;
 };
 
 export function useFigures(

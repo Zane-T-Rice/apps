@@ -184,6 +184,7 @@ export function GloomhavenCompanionAllyEnemyTabContent(props: {
       {type === "ally" && (
         <GloomhavenCompanionAllyTabContent
           figures={figures}
+          templates={templates}
           isLoading={isLoading}
           selectedFigure={selectedFigure}
           onFigureCreate={onFigureCreate}

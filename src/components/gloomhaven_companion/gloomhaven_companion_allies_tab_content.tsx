@@ -165,7 +165,6 @@ export function GloomhavenCompanionAllyTabContent(props: {
                           <FigureCard
                             figure={figure}
                             selectedFigure={selectedFigure}
-                            onFigureCreate={onFigureCreate}
                             onFigureDelete={onFigureDelete}
                             onFigureEdit={onFigureEdit}
                             ref={ref}

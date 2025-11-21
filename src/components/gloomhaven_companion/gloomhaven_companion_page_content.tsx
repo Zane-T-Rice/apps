@@ -13,6 +13,11 @@ import { FiHexagon } from "react-icons/fi";
 import { useSearchParams } from "next/navigation";
 import { useQueryString } from "@/app/utils/use_query_string";
 import { GloomhavenCompanionAllyEnemyTabSharedContent } from "./gloomhaven_companion_allies_enemies_tab_shared_content";
+import {
+  Template,
+  useTemplates,
+} from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_templates";
+import { responseTransformer } from "@/app/utils/gloomhaven_companion_service/response_transformer";
 
 export default function GloomhavenCompanionPageContent() {
   const searchParams = useSearchParams();
@@ -21,6 +26,18 @@ export default function GloomhavenCompanionPageContent() {
   const [activeTab, setActiveTab] = useState<string>("campaigns");
   const [selectedCampaign, setSelectedCampaign] = useState<Campaign>();
   const [selectedScenario, setSelectedScenario] = useState<Scenario>();
+  const [templates, setTemplates] = useState<Template[]>([]);
+  const { getAllREST: getTemplates } = useTemplates(responseTransformer);
+
+  useEffect(() => {
+    const getAllTemplates = async () => {
+      getTemplates().then((responseTemplates) => {
+        if (responseTemplates) setTemplates(responseTemplates);
+      });
+    };
+    getAllTemplates();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const onCampaignSelect = (campaign: Campaign) => {
     if (selectedCampaign?.entity === campaign.entity) return;
@@ -126,6 +143,7 @@ export default function GloomhavenCompanionPageContent() {
             selectedCampaign={selectedCampaign}
             selectedScenario={selectedScenario}
             setSelectedScenario={setSelectedScenario}
+            templates={templates}
           />
         </Tabs.Content>
       )}
@@ -134,6 +152,7 @@ export default function GloomhavenCompanionPageContent() {
           activeTab={activeTab}
           selectedCampaign={selectedCampaign}
           selectedScenario={selectedScenario}
+          templates={templates}
         />
       )}
     </>

@@ -1,17 +1,15 @@
 import { Card, Stack } from "@chakra-ui/react";
 import { Button } from "../recipes/button";
-import { FaRegClone } from "react-icons/fa";
 import { IoCloseSharp } from "react-icons/io5";
 import { FigureDataList } from "./figure_data_list";
 import { Figure } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_figures";
 
-export function SelectableCardBody(props: {
+export function SelectableFigureCardBody(props: {
   figure: Figure;
-  onFigureCreate: (figure: Figure, silent?: boolean) => Promise<boolean>;
   onFigureDelete: (figure: Figure, silent?: boolean) => Promise<boolean>;
   onFigureEdit: (figure: Figure, silent?: boolean) => Promise<boolean>;
 }) {
-  const { figure, onFigureCreate, onFigureDelete, onFigureEdit } = props;
+  const { figure, onFigureDelete, onFigureEdit } = props;
 
   const buildTitleText = (figure: Figure) => {
     let title = "";
@@ -40,17 +38,6 @@ export function SelectableCardBody(props: {
         <Card.Title>
           <Stack direction="row" alignItems="center" gap="0">
             {buildTitleText(figure)}
-            <Button
-              paddingLeft="1"
-              paddingBottom="2"
-              borderWidth="0"
-              onClick={() => onFigureCreate(figure, true)}
-              _hover={{
-                color: "green",
-              }}
-            >
-              <FaRegClone />
-            </Button>
             <Button
               marginLeft="auto"
               onClick={() => onFigureDelete(figure, true)}

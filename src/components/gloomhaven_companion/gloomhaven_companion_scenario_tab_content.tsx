@@ -6,12 +6,16 @@ import {
   useScenarios,
 } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_scenarios";
 import { number, object, string } from "yup";
-import CRUDButtons from "../ui/crud_buttons";
 import { responseTransformer } from "@/app/utils/gloomhaven_companion_service/response_transformer";
 import { Campaign } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_campaigns";
 import { useOnCRUD } from "@/app/utils/rest/use_on_crud";
 import { SelectableCardRoot } from "../ui/selectable_card_root";
 import { useSearchParams } from "next/navigation";
+import AddScenarioButton from "../ui/add_scenario_button";
+import { Template } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_templates";
+import EditScenarioButton from "../ui/edit_scenario_button";
+import { IoCloseSharp } from "react-icons/io5";
+import { Button } from "../recipes/button";
 
 const createScenarioSchema = object({
   name: string().required(),
@@ -36,20 +40,13 @@ export function GloomhavenCompanionScenarioTabContent(props: {
   selectedCampaign: Campaign;
   selectedScenario?: Scenario;
   setSelectedScenario: Dispatch<SetStateAction<Scenario | undefined>>;
+  templates: Template[];
 }) {
-  const { selectedCampaign, selectedScenario, setSelectedScenario } = props;
+  const { selectedCampaign, selectedScenario, setSelectedScenario, templates } =
+    props;
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
-  const [createScenarioRecord] = useState<Scenario>({
-    id: "",
-    name: "",
-    parent: "",
-    entity: "",
-    scenarioLevel: 0,
-    groups: "",
-    updatedAt: null,
-  });
 
   const {
     getAllREST: getScenarios,
@@ -132,20 +129,29 @@ export function GloomhavenCompanionScenarioTabContent(props: {
         </Stack>
       ) : (
         <Stack gap={3}>
-          <CRUDButtons
-            omitKeys={["id", "parent", "entity", "updatedAt"]}
-            selectedRecord={selectedScenario}
-            createPermission="gloomhaven-companion:public"
-            creationRecord={createScenarioRecord}
-            onCreate={onScenarioCreate}
-            createResourceSchema={createScenarioSchema}
-            editPermission="gloomhaven-companion:public"
-            onEdit={onScenarioEdit}
-            editResourceSchema={editScenarioSchema}
-            deletePermission="gloomhaven-companion:public"
-            onDelete={onScenarioDelete}
-            confirmDelete
-          />
+          <Grid
+            key={`add-buttons`}
+            templateColumns={{
+              base: "repeat(6, 1fr)",
+            }}
+            gap="3"
+            marginLeft={3}
+            marginRight={3}
+          >
+            <GridItem colSpan={3}>
+              <AddScenarioButton
+                onCreate={onScenarioCreate}
+                templates={templates}
+              />
+            </GridItem>
+            <GridItem colSpan={3}>
+              <EditScenarioButton
+                onEdit={onScenarioEdit}
+                templates={templates}
+                scenario={selectedScenario}
+              />
+            </GridItem>
+          </Grid>
           <Grid
             templateColumns={{
               base: "repeat(1, 1fr)",
@@ -170,7 +176,18 @@ export function GloomhavenCompanionScenarioTabContent(props: {
                   >
                     <Card.Body>
                       <Stack gap={3}>
-                        <Card.Title>{`${scenario.name}`}</Card.Title>
+                        <Stack direction="row" gap={0} alignItems="center">
+                          <Card.Title>{`${scenario.name}`}</Card.Title>
+                          <Button
+                            marginLeft="auto"
+                            onClick={() => onScenarioDelete(scenario, true)}
+                            _hover={{
+                              color: "red",
+                            }}
+                          >
+                            <IoCloseSharp />
+                          </Button>
+                        </Stack>
                         <AutoDataList
                           record={scenarioToScenarioInfo(scenario)}
                         />

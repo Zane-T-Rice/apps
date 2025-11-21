@@ -8,10 +8,7 @@ import { Scenario } from "@/app/utils/gloomhaven_companion_service/gloomhaven_co
 import { Tabs } from "@chakra-ui/react";
 import { GloomhavenCompanionAllyEnemyTabContent } from "./gloomhaven_companion_allies_enemies_tab_content";
 import { responseTransformer } from "@/app/utils/gloomhaven_companion_service/response_transformer";
-import {
-  Template,
-  useTemplates,
-} from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_templates";
+import { Template } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_templates";
 import { useWebSocket } from "@/app/utils/use_websocket";
 import { v4 as uuid } from "uuid";
 import { useQueryString } from "@/app/utils/use_query_string";
@@ -20,8 +17,9 @@ export function GloomhavenCompanionAllyEnemyTabSharedContent(props: {
   selectedCampaign: Campaign;
   selectedScenario: Scenario;
   activeTab: string;
+  templates: Template[];
 }) {
-  const { selectedCampaign, selectedScenario, activeTab } = props;
+  const { selectedCampaign, selectedScenario, activeTab, templates } = props;
 
   const [selectedEnemyFigure, setSelectedEnemyFigure] = useState<
     Figure | undefined
@@ -32,10 +30,8 @@ export function GloomhavenCompanionAllyEnemyTabSharedContent(props: {
   const selectedEnemyRef = useRef<HTMLDivElement | null>(null);
   const selectedAllyRef = useRef<HTMLDivElement | null>(null);
   const [figures, setFigures] = useState<Figure[]>([]);
-  const [templates, setTemplates] = useState<Template[]>([]);
   const { setQueryString } = useQueryString();
   const [figuresLoading, setFiguresLoading] = useState<boolean>(true);
-  const [templatesLoading, setTemplatesLoading] = useState<boolean>(true);
 
   useEffect(() => {
     // I cannot figure out how to automatically scroll without
@@ -96,8 +92,6 @@ export function GloomhavenCompanionAllyEnemyTabSharedContent(props: {
     deleteREST: deleteFigure,
   } = useFigures(selectedCampaign.id, selectedScenario.id, responseTransformer);
 
-  const { getAllREST: getTemplates } = useTemplates(responseTransformer);
-
   const onFigureSelect = (figure: Figure, type: string) => {
     if (type === "ally") {
       if (figure.id !== selectedAllyFigure?.id) {
@@ -130,22 +124,15 @@ export function GloomhavenCompanionAllyEnemyTabSharedContent(props: {
       });
     };
     getAllFigures();
-  }, [refresh, getFigures, getTemplates, setRefresh, figuresLoading]);
+  }, [refresh, getFigures, setRefresh, figuresLoading]);
 
   useEffect(() => {
-    const getAllTemplates = async () => {
-      getTemplates().then((responseTemplates) => {
-        if (responseTemplates) setTemplates(responseTemplates);
-        setTemplatesLoading(false);
-      });
-    };
     const getAllFigures = async () => {
       getFigures().then((responseFigures) => {
         if (responseFigures) setFigures(responseFigures);
         setFiguresLoading(false);
       });
     };
-    getAllTemplates();
     getAllFigures();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -177,7 +164,7 @@ export function GloomhavenCompanionAllyEnemyTabSharedContent(props: {
           sendMessage={sendMessage}
           getFigures={getFigures}
           onFigureSelect={onFigureSelect}
-          isLoading={figuresLoading || templatesLoading}
+          isLoading={figuresLoading}
         />
       </Tabs.Content>
       <Tabs.Content value="allies">
@@ -198,7 +185,7 @@ export function GloomhavenCompanionAllyEnemyTabSharedContent(props: {
           sendMessage={sendMessage}
           getFigures={getFigures}
           onFigureSelect={onFigureSelect}
-          isLoading={figuresLoading || templatesLoading}
+          isLoading={figuresLoading}
         />
       </Tabs.Content>
     </>

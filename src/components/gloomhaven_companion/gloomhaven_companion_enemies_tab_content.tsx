@@ -130,14 +130,14 @@ export function GloomhavenCompanionEnemyTabContent(props: {
             marginLeft={3}
             marginRight={3}
           >
-            <GridItem colSpan={2}>
+            <GridItem colSpan={3}>
               <AddMonsterButton
                 onCreate={onFigureCreate}
                 templates={templates}
                 alignment="enemy"
               />
             </GridItem>
-            <GridItem colSpan={2}>
+            <GridItem colSpan={3}>
               <AddNPCButton onCreate={onFigureCreate} alignment="enemy" />
             </GridItem>
           </Grid>
@@ -210,7 +210,6 @@ export function GloomhavenCompanionEnemyTabContent(props: {
                           <FigureCard
                             figure={figure}
                             selectedFigure={selectedFigure}
-                            onFigureCreate={onFigureCreate}
                             onFigureDelete={onFigureDelete}
                             onFigureEdit={onFigureEdit}
                             ref={ref}

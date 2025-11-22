@@ -99,22 +99,22 @@ export function GloomhavenCompanionAllyTabContent(props: {
             marginLeft={3}
             marginRight={3}
           >
-            <GridItem colSpan={2}>
+            <GridItem colSpan={4}>
               <AddPlayerButton
                 onCreate={onFigureCreate}
                 templates={templates}
               />
             </GridItem>
-            <GridItem colSpan={2}>
+            <GridItem colSpan={4}>
               <AddSummonButton
                 onCreate={onFigureCreate}
                 templates={templates}
               />
             </GridItem>
-            <GridItem colSpan={2}>
+            <GridItem colSpan={4}>
               <AddNPCButton onCreate={onFigureCreate} alignment="ally" />
             </GridItem>
-            <GridItem colSpan={2}>
+            <GridItem colSpan={4}>
               <AddMonsterButton
                 onCreate={onFigureCreate}
                 templates={templates}

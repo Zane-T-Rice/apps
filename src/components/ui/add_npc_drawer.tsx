@@ -41,11 +41,7 @@ export function AddNPCDrawer(props: {
       alignment,
       class: "NPC / Obstacle",
     } as Figure;
-    const response = await onSubmit(figure);
-    if (response) {
-      return true;
-    }
-    return false;
+    return await onSubmit(figure);
   }, [name, maximumHP, damage, move, attack, special, alignment, onSubmit]);
 
   const body = useMemo(() => {

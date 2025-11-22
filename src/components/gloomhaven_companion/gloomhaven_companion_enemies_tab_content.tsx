@@ -9,6 +9,7 @@ import { RefObject, useCallback } from "react";
 import AddMonsterButton from "../ui/add_monster_button";
 import { getStandeeNumber } from "@/app/utils/gloomhaven_companion_ui/get_standee_number";
 import AddNPCButton from "../ui/add_npc_button";
+import AddBossButton from "../ui/add_boss_button";
 
 export function GloomhavenCompanionEnemyTabContent(props: {
   selectedScenario: Scenario;
@@ -93,7 +94,7 @@ export function GloomhavenCompanionEnemyTabContent(props: {
   const addEnemy = useCallback(
     (enemyClass: string, rank: "normal" | "elite") => {
       const template: Template | undefined = templates.find(
-        (template) => template.class.toLowerCase() === enemyClass.toLowerCase(),
+        (template) => template.type.toLowerCase() === enemyClass.toLowerCase(),
       );
       if (template) {
         const figure: Figure | undefined =
@@ -130,15 +131,18 @@ export function GloomhavenCompanionEnemyTabContent(props: {
             marginLeft={3}
             marginRight={3}
           >
-            <GridItem colSpan={3}>
+            <GridItem colSpan={2}>
               <AddMonsterButton
                 onCreate={onFigureCreate}
                 templates={templates}
                 alignment="enemy"
               />
             </GridItem>
-            <GridItem colSpan={3}>
+            <GridItem colSpan={2}>
               <AddNPCButton onCreate={onFigureCreate} alignment="enemy" />
+            </GridItem>
+            <GridItem colSpan={2}>
+              <AddBossButton onCreate={onFigureCreate} templates={templates} />
             </GridItem>
           </Grid>
           {groups.map((group, groupIndex) => {
@@ -160,7 +164,7 @@ export function GloomhavenCompanionEnemyTabContent(props: {
                     <Stack direction="row" alignItems="center">
                       <Text>{group.class}</Text>
                       {templates.find(
-                        (template) => template.class === group.class,
+                        (template) => template.type === group.class,
                       ) && (
                         <>
                           <Button

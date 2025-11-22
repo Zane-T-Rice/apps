@@ -43,8 +43,8 @@ export function ScenarioDrawer(props: {
     const selectOptions = enemyTemplates
       .map((template) => {
         return {
-          label: template.class,
-          value: template.class,
+          label: template.type,
+          value: template.type,
         };
       })
       .sort((a, b) => {

@@ -35,7 +35,7 @@ export function SharedDrawer(props: {
   };
 
   const submit = async () => {
-    if (isSubmitting) return;
+    if (disableSave || isSubmitting) return;
     setIsSubmitting(true);
     const response = await onSubmit();
     if (response) {

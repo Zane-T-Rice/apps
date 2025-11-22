@@ -30,7 +30,7 @@ export const getStandeeNumber = (
   ) {
     // Enemies get a random available standee number.
     const template: Template | undefined = templates.find(
-      (template) => template.class === figure.class,
+      (template) => template.type === figure.class,
     );
     if (template) {
       const group = groups.find((group) => group.class === figure.class);

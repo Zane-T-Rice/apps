@@ -29,8 +29,8 @@ export function AddMonsterDrawer(props: {
     const selectOptions = enemyTemplates
       .map((template) => {
         return {
-          label: template.class,
-          value: template.class,
+          label: template.type,
+          value: template.type,
         };
       })
       .sort((a, b) => {
@@ -71,7 +71,7 @@ export function AddMonsterDrawer(props: {
     let figure: Figure | undefined;
 
     const figureStats = templates.find(
-      (template) => template.class == selectedClass[0],
+      (template) => template.type == selectedClass[0],
     )?.stats[parseInt(selectedLevel[0])];
 
     if (selectedRank[0] === "Normal")
@@ -86,11 +86,7 @@ export function AddMonsterDrawer(props: {
       } as Figure;
 
     if (figure === undefined) return false;
-    const response = await onSubmit(figure);
-    if (response) {
-      return true;
-    }
-    return false;
+    return await onSubmit(figure);
   };
 
   const body = useMemo(() => {

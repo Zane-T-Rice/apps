@@ -26,6 +26,7 @@ export type Figure = {
   pierce: number | null;
   special: string | null;
   alignment: string | null;
+  attackPlusC: boolean | null;
 };
 
 export function useFigures(

@@ -10,13 +10,14 @@ export type Template = {
   updatedAt: string;
 
   standeeLimit: number;
-  class: string;
+  type: string;
   stats: {
     [key: number]: {
       normal?: Figure;
       elite?: Figure;
       character?: Figure;
       summon?: Figure;
+      boss?: Figure;
     };
   };
 };

@@ -38,7 +38,10 @@ export function GloomhavenCompanionAllyTabContent(props: {
 
     figures.forEach((figure) => {
       if (figure.alignment === "ally") {
-        const groupClass = figure.class;
+        const groupClass =
+          figure.class.toLowerCase() === "wildfury bear"
+            ? "Wildfury"
+            : figure.class;
         if (!groups[groupClass])
           groups[groupClass] = { class: groupClass, figures: [figure] };
         else groups[groupClass].figures.push(figure);

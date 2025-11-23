@@ -44,7 +44,7 @@ export function SelectableFigureCardBody(props: {
               _hover={{
                 color: "red",
               }}
-              disabled={figure.maximumHP > figure.damage}
+              // disabled={figure.maximumHP > figure.damage}
             >
               <IoCloseSharp />
             </Button>

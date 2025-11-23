@@ -56,6 +56,7 @@ export function useWebSocket<
           // This only really happens in "next dev" mode
           // because the React hooks are invoked multiple times.
           if (websocketId !== data.messageId) {
+            console.log("MESSAGE GET", data);
             setResources((prev) => {
               const existingResourceIndex = prev.findIndex((prevResource) => {
                 return (

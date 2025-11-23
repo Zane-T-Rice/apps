@@ -11,7 +11,10 @@ export const getStandeeNumber = (
   templates: Template[],
 ): number | null => {
   let result = null;
-  if (figure.rank?.toLowerCase() === "summon") {
+  if (
+    figure.rank?.toLowerCase() === "summon" ||
+    figure.class?.toLowerCase() === "Wildfury Bear"
+  ) {
     // Summons get the next highest standee number.
     const group = groups.find((figures) => figures.class === figure.class);
     if (group === undefined) return 1;

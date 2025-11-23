@@ -21,8 +21,7 @@ import { responseTransformer } from "@/app/utils/gloomhaven_companion_service/re
 
 export default function GloomhavenCompanionPageContent() {
   const searchParams = useSearchParams();
-  const { clearQueryString, setQueryString, replaceQueryString } =
-    useQueryString();
+  const { clearQueryString, replaceQueryString } = useQueryString();
   const [activeTab, setActiveTab] = useState<string>("campaigns");
   const [selectedCampaign, setSelectedCampaign] = useState<Campaign>();
   const [selectedScenario, setSelectedScenario] = useState<Scenario>();

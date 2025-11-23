@@ -142,11 +142,11 @@ export function useOnCRUD<
 
       setResources((prev) => {
         return prev.filter(
-          (currentResource) => currentResource.id !== resource.id,
+          (currentResource) => currentResource.id !== resourceToDelete.id,
         );
       });
       setSelectedResource(undefined);
-      sendMessage?.(resource, "DELETE");
+      sendMessage?.(resourceToDelete, "DELETE");
 
       return true;
     },

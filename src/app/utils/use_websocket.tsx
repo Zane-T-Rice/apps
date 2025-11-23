@@ -44,7 +44,6 @@ export function useWebSocket<
         );
 
         websocket.onopen = () => {
-          console.log("WebSocket connection established.");
           setWs(websocket);
           setRefresh(true);
         };
@@ -56,7 +55,6 @@ export function useWebSocket<
           // This only really happens in "next dev" mode
           // because the React hooks are invoked multiple times.
           if (websocketId !== data.messageId) {
-            console.log("MESSAGE GET", data);
             setResources((prev) => {
               const existingResourceIndex = prev.findIndex((prevResource) => {
                 return (
@@ -108,13 +106,10 @@ export function useWebSocket<
         };
 
         websocket.onclose = () => {
-          console.log("WebSocket connection closed.");
           setWs(null);
         };
 
-        websocket.onerror = (error) => {
-          console.error("WebSocket error:", error);
-        };
+        websocket.onerror = () => {};
 
         // Cleanup function to close the connection
         return () => {
@@ -127,7 +122,6 @@ export function useWebSocket<
 
   const connect = useCallback(async () => {
     if (!ws || ws.readyState !== WebSocket.OPEN) {
-      console.log("Attempting to connect to the WebSocket.");
       wsHooks(await getAccessTokenSilently());
     }
   }, [ws, wsHooks, getAccessTokenSilently]);

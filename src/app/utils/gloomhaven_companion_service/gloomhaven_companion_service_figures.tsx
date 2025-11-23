@@ -27,6 +27,7 @@ export type Figure = {
   special: string | null;
   alignment: string | null;
   attackPlusC: boolean | null;
+  flying: boolean | null;
 };
 
 export function useFigures(

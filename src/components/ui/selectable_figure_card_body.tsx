@@ -1,8 +1,9 @@
-import { Card, Stack } from "@chakra-ui/react";
+import { Box, Card, Stack, Text } from "@chakra-ui/react";
 import { Button } from "../recipes/button";
 import { IoCloseSharp } from "react-icons/io5";
 import { FigureDataList } from "./figure_data_list";
 import { Figure } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_figures";
+import { GiCurlyWing } from "react-icons/gi";
 
 export function SelectableFigureCardBody(props: {
   figure: Figure;
@@ -36,8 +37,13 @@ export function SelectableFigureCardBody(props: {
     >
       <Stack gap={0}>
         <Card.Title>
-          <Stack direction="row" alignItems="center" gap="0">
-            {buildTitleText(figure)}
+          <Stack direction="row" alignItems="center" gap="1">
+            <Text>{buildTitleText(figure)}</Text>
+            {figure.flying && (
+              <Box marginBottom={1}>
+                <GiCurlyWing />
+              </Box>
+            )}
             <Button
               marginLeft="auto"
               onClick={() => onFigureDelete(figure, true)}

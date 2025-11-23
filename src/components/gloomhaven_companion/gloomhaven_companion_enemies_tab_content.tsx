@@ -164,7 +164,10 @@ export function GloomhavenCompanionEnemyTabContent(props: {
                     <Stack direction="row" alignItems="center">
                       <Text>{group.class}</Text>
                       {templates.find(
-                        (template) => template.type === group.class,
+                        (template) =>
+                          template.type === group.class &&
+                          (template.stats?.[0].normal?.class ||
+                            template.stats?.[0].elite?.class),
                       ) && (
                         <>
                           <Button

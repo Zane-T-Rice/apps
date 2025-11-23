@@ -13,7 +13,7 @@ export const getStandeeNumber = (
   let result = null;
   if (
     figure.rank?.toLowerCase() === "summon" ||
-    figure.class?.toLowerCase() === "Wildfury Bear"
+    figure.class?.toLowerCase() === "wildfury bear"
   ) {
     // Summons get the next highest standee number.
     const group = groups.find((figures) => figures.class === figure.class);

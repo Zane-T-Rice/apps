@@ -28,6 +28,7 @@ export default function GloomhavenCompanionPageContent() {
   const [selectedScenario, setSelectedScenario] = useState<Scenario>();
   const [templates, setTemplates] = useState<Template[]>([]);
   const { getAllREST: getTemplates } = useTemplates(responseTransformer);
+  const [scroll, setScroll] = useState<boolean>(false);
 
   useEffect(() => {
     const getAllTemplates = async () => {
@@ -96,6 +97,7 @@ export default function GloomhavenCompanionPageContent() {
       <Tabs.Trigger
         value="enemies"
         onClick={() => {
+          setScroll(true);
           if (activeTab !== "enemies" && activeTab !== "allies") {
             const params = new URLSearchParams();
             params.set("campaignId", selectedCampaign?.id || "");
@@ -113,9 +115,12 @@ export default function GloomhavenCompanionPageContent() {
       <Tabs.Trigger
         value="allies"
         onClick={() => {
+          setScroll(true);
           if (activeTab !== "enemies" && activeTab !== "allies") {
-            setQueryString("campaignId", selectedCampaign?.id || "");
-            setQueryString("scenarioId", selectedScenario?.id || "");
+            const params = new URLSearchParams();
+            params.set("campaignId", selectedCampaign?.id || "");
+            params.set("scenarioId", selectedScenario?.id || "");
+            replaceQueryString(params);
           }
         }}
         disabled={!selectedCampaign || !selectedScenario}
@@ -153,6 +158,8 @@ export default function GloomhavenCompanionPageContent() {
           selectedCampaign={selectedCampaign}
           selectedScenario={selectedScenario}
           templates={templates}
+          scroll={scroll}
+          setScroll={setScroll}
         />
       )}
     </>

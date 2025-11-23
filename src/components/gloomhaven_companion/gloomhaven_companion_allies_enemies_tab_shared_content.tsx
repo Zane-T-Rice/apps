@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import {
   Figure,
   useFigures,
@@ -18,8 +18,17 @@ export function GloomhavenCompanionAllyEnemyTabSharedContent(props: {
   selectedScenario: Scenario;
   activeTab: string;
   templates: Template[];
+  scroll: boolean;
+  setScroll: Dispatch<SetStateAction<boolean>>;
 }) {
-  const { selectedCampaign, selectedScenario, activeTab, templates } = props;
+  const {
+    selectedCampaign,
+    selectedScenario,
+    activeTab,
+    templates,
+    scroll,
+    setScroll,
+  } = props;
 
   const [selectedEnemyFigure, setSelectedEnemyFigure] = useState<
     Figure | undefined
@@ -34,49 +43,54 @@ export function GloomhavenCompanionAllyEnemyTabSharedContent(props: {
   const [figuresLoading, setFiguresLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    // I cannot figure out how to automatically scroll without
-    // waiting for the next cycle by using setTimeout.
-    //
-    // Using two at different times means the UI can respond
-    // instantly if possible, but if rendering is slow, the
-    // second attempt usually succeeds.
-    if (activeTab === "enemies") {
-      setTimeout(
-        () =>
-          selectedEnemyRef?.current?.scrollIntoView({
-            block: "center",
-            behavior: "smooth",
-          }),
-        1,
-      );
-      setTimeout(
-        () =>
-          selectedEnemyRef?.current?.scrollIntoView({
-            block: "center",
-            behavior: "smooth",
-          }),
-        250,
-      );
-    } else if (activeTab === "allies") {
-      setTimeout(
-        () =>
-          selectedAllyRef?.current?.scrollIntoView({
-            block: "center",
-            behavior: "smooth",
-          }),
-        1,
-      );
-      setTimeout(
-        () =>
-          selectedAllyRef?.current?.scrollIntoView({
-            block: "center",
-            behavior: "smooth",
-          }),
-        250,
-      );
-    }
+    const doScroll = async () => {
+      // I cannot figure out how to automatically scroll without
+      // waiting for the next cycle by using setTimeout.
+      //
+      // Using two at different times means the UI can respond
+      // instantly if possible, but if rendering is slow, the
+      // second attempt usually succeeds.
+      if (scroll || activeTab === "scenarios" || activeTab === "campaigns") {
+        setTimeout(
+          () =>
+            selectedEnemyRef?.current?.scrollIntoView({
+              block: "center",
+              behavior: "smooth",
+            }),
+          1,
+        );
+        setTimeout(
+          () =>
+            selectedEnemyRef?.current?.scrollIntoView({
+              block: "center",
+              behavior: "smooth",
+            }),
+          500,
+        );
+        setTimeout(
+          () =>
+            selectedAllyRef?.current?.scrollIntoView({
+              block: "center",
+              behavior: "smooth",
+            }),
+          1,
+        );
+        setTimeout(
+          () =>
+            selectedAllyRef?.current?.scrollIntoView({
+              block: "center",
+              behavior: "smooth",
+            }),
+          250,
+        );
+        setScroll(false);
+      }
+    };
+    doScroll();
   }, [
     activeTab,
+    scroll,
+    setScroll,
     selectedEnemyRef,
     selectedAllyRef,
     selectedEnemyFigure,

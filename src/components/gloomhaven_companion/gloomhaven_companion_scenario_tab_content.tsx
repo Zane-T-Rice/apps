@@ -62,9 +62,13 @@ export function GloomhavenCompanionScenarioTabContent(props: {
         const scenario = responseScenarios?.find(
           (scenario) => scenario.id === searchParams.get("scenarioId"),
         );
-        if (scenario) {
-          setSelectedScenario(scenario);
-        }
+        setSelectedScenario((prev) => {
+          if (prev && selectedScenario === undefined) {
+            return prev;
+          } else {
+            return scenario;
+          }
+        });
       }
       setIsLoading(false);
     });

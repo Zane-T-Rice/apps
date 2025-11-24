@@ -98,6 +98,7 @@ export default function GloomhavenCompanionPageContent() {
       <Tabs.Trigger
         value="enemies"
         onClick={() => {
+          setActiveTab("enemies");
           setScroll(true);
           if (activeTab !== "enemies" && activeTab !== "allies") {
             const params = new URLSearchParams();
@@ -116,6 +117,7 @@ export default function GloomhavenCompanionPageContent() {
       <Tabs.Trigger
         value="allies"
         onClick={() => {
+          setActiveTab("allies");
           setScroll(true);
           if (activeTab !== "enemies" && activeTab !== "allies") {
             const params = new URLSearchParams();

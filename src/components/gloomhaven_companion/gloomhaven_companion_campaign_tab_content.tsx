@@ -82,9 +82,13 @@ export function GloomhavenCompanionCampaignTabContent(props: {
         const campaign = responseCampaigns?.find(
           (campaign) => campaign.id === searchParams.get("campaignId"),
         );
-        if (campaign) {
-          setSelectedCampaign(campaign);
-        }
+        setSelectedCampaign((prev) => {
+          if (prev && selectedCampaign === undefined) {
+            return prev;
+          } else {
+            return campaign;
+          }
+        });
       }
       setIsLoading(false);
     });

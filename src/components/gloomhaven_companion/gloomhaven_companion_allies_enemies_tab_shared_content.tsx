@@ -39,62 +39,73 @@ export function GloomhavenCompanionAllyEnemyTabSharedContent(props: {
   const selectedEnemyRef = useRef<HTMLDivElement | null>(null);
   const selectedAllyRef = useRef<HTMLDivElement | null>(null);
   const [figures, setFigures] = useState<Figure[]>([]);
-  const { setQueryString } = useQueryString();
+  const { setQueryString, getQueryString } = useQueryString();
   const [figuresLoading, setFiguresLoading] = useState<boolean>(true);
+  const [scrollAttempts, setScrollAttempts] = useState<number>(0);
 
   useEffect(() => {
     const doScroll = async () => {
-      // I cannot figure out how to automatically scroll without
-      // waiting for the next cycle by using setTimeout.
-      //
-      // Using two at different times means the UI can respond
-      // instantly if possible, but if rendering is slow, the
-      // second attempt usually succeeds.
       if (scroll) {
-        setTimeout(
-          () =>
-            selectedEnemyRef?.current?.scrollIntoView({
-              block: "center",
-              behavior: "smooth",
-            }),
-          1,
-        );
-        setTimeout(
-          () =>
-            selectedEnemyRef?.current?.scrollIntoView({
-              block: "center",
-              behavior: "smooth",
-            }),
-          250,
-        );
-        setTimeout(
-          () =>
-            selectedAllyRef?.current?.scrollIntoView({
-              block: "center",
-              behavior: "smooth",
-            }),
-          1,
-        );
-        setTimeout(
-          () =>
-            selectedAllyRef?.current?.scrollIntoView({
-              block: "center",
-              behavior: "smooth",
-            }),
-          250,
-        );
+        const [ref, queryStringName] =
+          activeTab === "enemies"
+            ? [selectedEnemyRef, "selectedEnemyId"]
+            : activeTab === "allies"
+              ? [selectedAllyRef, "selectedAllyId"]
+              : [null, null];
+
+        setTimeout(() => {
+          ref?.current?.scrollIntoView({
+            block: "center",
+            behavior: "smooth",
+          });
+          // If the system is automatically going to select something that exists,
+          // but it has not managed to render it to select it yet,
+          // then keep trying to scroll to it until it works.
+          //
+          // This happens both during hard refreshes and when simply switching
+          // between the enemies and allies tabs when there are a few cards
+          // present already.
+          if (
+            figuresLoading ||
+            ((activeTab === "enemies" || activeTab === "allies") &&
+              !ref?.current?.checkVisibility() &&
+              figures.findIndex(
+                (figure) =>
+                  figure.id === getQueryString().get(queryStringName || ""),
+              ) !== -1)
+          ) {
+            setScrollAttempts((prev) => prev + 1);
+
+            if (scrollAttempts < 25) setScroll(true);
+            else {
+              // Stop trying to scroll. Maybe the client lost internet connection
+              // and cannot load the figures.
+              setScroll(false);
+              setScrollAttempts(0);
+            }
+          } else {
+            setScrollAttempts(0);
+          }
+        }, 250);
+
         setScroll(false);
       }
     };
+
     doScroll();
   }, [
     activeTab,
     scroll,
     setScroll,
+    scrollAttempts,
+    setScrollAttempts,
     selectedEnemyRef,
     selectedAllyRef,
     selectedEnemyFigure,
     selectedAllyFigure,
+    getQueryString,
+    figures,
+    figuresLoading,
   ]);
 
   const [websocketID] = useState<string>(uuid());
@@ -141,6 +152,7 @@ export function GloomhavenCompanionAllyEnemyTabSharedContent(props: {
   }, [refresh, getFigures, setRefresh, figuresLoading]);
 
   useEffect(() => {
+    setFiguresLoading(true);
     const getAllFigures = async () => {
       getFigures().then((responseFigures) => {
         if (responseFigures) setFigures(responseFigures);
@@ -149,7 +161,7 @@ export function GloomhavenCompanionAllyEnemyTabSharedContent(props: {
     };
     getAllFigures();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [selectedScenario]);
 
   useEffect(() => {
     setSelectedAllyFigure(undefined);

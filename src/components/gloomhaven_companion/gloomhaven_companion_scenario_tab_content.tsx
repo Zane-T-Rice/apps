@@ -85,7 +85,7 @@ export function GloomhavenCompanionScenarioTabContent(props: {
   }, [scenarios, searchParams, selectedScenario, setSelectedScenario]);
 
   const {
-    onResourceCreate: onScenarioCreate,
+    onResourceCreate: _onScenarioCreate,
     onResourceEdit: _onScenarioEdit,
     onResourceDelete: onScenarioDelete,
   } = useOnCRUD<
@@ -105,6 +105,25 @@ export function GloomhavenCompanionScenarioTabContent(props: {
     setSelectedResource: setSelectedScenario,
   });
 
+  const compareScenarios = (a: Scenario, b: Scenario) => {
+    if (a.name > b.name) return 1;
+    if (a.name < b.name) return -1;
+    return 0;
+  };
+
+  const onScenarioCreate = async (
+    newResource: Scenario,
+    silent?: boolean,
+  ): Promise<boolean> => {
+    const result = await _onScenarioCreate(newResource, silent);
+    if (result) {
+      setScenarios((prev) => {
+        return prev.sort(compareScenarios);
+      });
+    }
+    return result;
+  };
+
   const onScenarioEdit = async (
     newResource: Scenario,
     silent?: boolean,
@@ -115,8 +134,12 @@ export function GloomhavenCompanionScenarioTabContent(props: {
     if (!result) {
       const responseScenarios = await getScenarios();
       if (responseScenarios) {
-        setScenarios(responseScenarios);
+        setScenarios(responseScenarios.sort(compareScenarios));
       }
+    } else {
+      setScenarios((prev) => {
+        return prev.sort(compareScenarios);
+      });
     }
     return result;
   };

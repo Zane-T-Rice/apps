@@ -99,7 +99,7 @@ export function GloomhavenCompanionCampaignTabContent(props: {
   }, [campaigns, searchParams, selectedCampaign, setSelectedCampaign]);
 
   const {
-    onResourceCreate: onCampaignCreate,
+    onResourceCreate: _onCampaignCreate,
     onResourceEdit: _onCampaignEdit,
     onResourceDelete: onCampaignDelete,
   } = useOnCRUD<
@@ -119,6 +119,25 @@ export function GloomhavenCompanionCampaignTabContent(props: {
     setSelectedResource: setSelectedCampaign,
   });
 
+  const compareCampaigns = (a: Campaign, b: Campaign) => {
+    if (a.name > b.name) return 1;
+    if (a.name < b.name) return -1;
+    return 0;
+  };
+
+  const onCampaignCreate = async (
+    newResource: Campaign,
+    silent?: boolean,
+  ): Promise<boolean> => {
+    const result = await _onCampaignCreate(newResource, silent);
+    if (result) {
+      setCampaigns((prev) => {
+        return prev.sort(compareCampaigns);
+      });
+    }
+    return result;
+  };
+
   const onCampaignEdit = async (
     newResource: Campaign,
     silent?: boolean,
@@ -129,8 +148,12 @@ export function GloomhavenCompanionCampaignTabContent(props: {
     if (!result) {
       const responseCampaigns = await getCampaigns();
       if (responseCampaigns) {
-        setCampaigns(responseCampaigns);
+        setCampaigns(responseCampaigns.sort(compareCampaigns));
       }
+    } else {
+      setCampaigns((prev) => {
+        return prev.sort(compareCampaigns);
+      });
     }
     return result;
   };

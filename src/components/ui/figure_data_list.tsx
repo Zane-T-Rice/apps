@@ -26,11 +26,13 @@ export function FigureDataList(props: {
     };
 
     const increaseXP = (figure: Figure) => {
-      if (figure.xp !== null) figure.xp = figure.xp + 1;
+      if (figure.xp !== null && figure.xp !== undefined)
+        figure.xp = figure.xp + 1;
     };
 
     const decreaseXP = (figure: Figure) => {
-      if (figure.xp !== null) figure.xp = figure.xp - 1;
+      if (figure.xp !== null && figure.xp !== undefined)
+        figure.xp = figure.xp - 1;
     };
 
     const notNil = (value: string | number | null | undefined) => {

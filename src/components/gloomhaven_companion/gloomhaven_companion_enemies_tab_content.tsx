@@ -73,8 +73,9 @@ export function GloomhavenCompanionEnemyTabContent(props: {
               else return 1;
             })
             .sort((figureA, figureB) => {
-              if (figureA.rank === null) return -1;
-              if (figureB.rank === null) return 1;
+              if (figureA.rank === null || figureA.rank === undefined)
+                return -1;
+              if (figureB.rank === null || figureB.rank === undefined) return 1;
               if (
                 figureA.rank.toLowerCase() === "normal" &&
                 figureB.rank.toLowerCase() === "elite"

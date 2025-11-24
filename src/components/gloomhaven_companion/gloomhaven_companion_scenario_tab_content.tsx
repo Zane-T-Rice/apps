@@ -58,22 +58,25 @@ export function GloomhavenCompanionScenarioTabContent(props: {
   useEffect(() => {
     getScenarios().then((responseScenarios) => {
       if (responseScenarios) setScenarios(responseScenarios);
-      if (searchParams.get("scenarioId")) {
-        const scenario = responseScenarios?.find(
-          (scenario) => scenario.id === searchParams.get("scenarioId"),
-        );
-        setSelectedScenario((prev) => {
-          if (prev && selectedScenario === undefined) {
-            return prev;
-          } else {
-            return scenario;
-          }
-        });
-      }
       setIsLoading(false);
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedCampaign]);
+  }, [getScenarios]);
+
+  useEffect(() => {
+    if (selectedScenario) return;
+    if (searchParams.get("scenarioId")) {
+      const scenario = scenarios?.find(
+        (scenario) => scenario.id === searchParams.get("scenarioId"),
+      );
+      setSelectedScenario((prev) => {
+        if (prev && selectedScenario === undefined) {
+          return prev;
+        } else {
+          return scenario;
+        }
+      });
+    }
+  }, [scenarios, searchParams, selectedScenario, setSelectedScenario]);
 
   const onScenarioSelect = (scenario: Scenario) => {
     if (scenario.entity === selectedScenario?.entity) return;

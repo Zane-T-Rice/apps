@@ -78,22 +78,25 @@ export function GloomhavenCompanionCampaignTabContent(props: {
   useEffect(() => {
     getCampaigns().then((responseCampaigns) => {
       if (responseCampaigns) setCampaigns(responseCampaigns);
-      if (searchParams.get("campaignId")) {
-        const campaign = responseCampaigns?.find(
-          (campaign) => campaign.id === searchParams.get("campaignId"),
-        );
-        setSelectedCampaign((prev) => {
-          if (prev && selectedCampaign === undefined) {
-            return prev;
-          } else {
-            return campaign;
-          }
-        });
-      }
       setIsLoading(false);
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [getCampaigns]);
+
+  useEffect(() => {
+    if (selectedCampaign) return;
+    if (searchParams.get("campaignId")) {
+      const campaign = campaigns?.find(
+        (campaign) => campaign.id === searchParams.get("campaignId"),
+      );
+      setSelectedCampaign((prev) => {
+        if (prev && selectedCampaign === undefined) {
+          return prev;
+        } else {
+          return campaign;
+        }
+      });
+    }
+  }, [campaigns, searchParams, selectedCampaign, setSelectedCampaign]);
 
   const {
     onResourceCreate: onCampaignCreate,

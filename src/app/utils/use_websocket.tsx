@@ -156,7 +156,10 @@ export function useWebSocket<
   }, []);
 
   useEffect(() => {
-    setRefresh(true);
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      setRefresh(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scenarioId, campaignId]);
 
   const sendMessage = useCallback(

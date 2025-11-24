@@ -38,7 +38,7 @@ export function GloomhavenCompanionAllyEnemyTabSharedContent(props: {
   >();
   const selectedEnemyRef = useRef<HTMLDivElement | null>(null);
   const selectedAllyRef = useRef<HTMLDivElement | null>(null);
-  const [figures, setFigures] = useState<Figure[]>([]);
+  const [figures, setFigures] = useState<Figure[]>([{ id: "" } as Figure]);
   const { setQueryString, getQueryString } = useQueryString();
   const [figuresLoading, setFiguresLoading] = useState<boolean>(true);
   const [scrollAttempts, setScrollAttempts] = useState<number>(0);
@@ -79,7 +79,7 @@ export function GloomhavenCompanionAllyEnemyTabSharedContent(props: {
             if (scrollAttempts < 25) setScroll(true);
             else {
               // Stop trying to scroll. Maybe the client lost internet connection
-              // and cannot load the figures.
+              // and cannot load the figures or has a really weak processor.
               setScroll(false);
               setScrollAttempts(0);
             }
@@ -141,34 +141,39 @@ export function GloomhavenCompanionAllyEnemyTabSharedContent(props: {
   // Sometimes the websocket will tell the listener to refresh all data
   // whenever it (re)connects.
   useEffect(() => {
-    if (!refresh || figuresLoading) return;
-    setRefresh(false);
+    if (!refresh) return;
     const getAllFigures = async () => {
+      setRefresh(false);
       getFigures().then((responseFigures) => {
-        if (responseFigures) setFigures(responseFigures);
+        if (responseFigures) {
+          setFigures((prev) => {
+            if (
+              prev[0] &&
+              prev[0].id !== "" &&
+              figures[0] &&
+              figures[0].id === ""
+            )
+              return prev;
+            return responseFigures;
+          });
+          setFiguresLoading(false);
+        }
       });
     };
     getAllFigures();
-  }, [refresh, getFigures, setRefresh, figuresLoading]);
+  }, [refresh, figures, setRefresh, setFiguresLoading, setFigures, getFigures]);
 
   useEffect(() => {
-    setFiguresLoading(true);
-    const getAllFigures = async () => {
-      getFigures().then((responseFigures) => {
-        if (responseFigures) setFigures(responseFigures);
-        setFiguresLoading(false);
-      });
+    const reset = async () => {
+      setFiguresLoading(true);
+      setFigures([{ id: "" } as Figure]);
+      setSelectedAllyFigure(undefined);
+      setSelectedEnemyFigure(undefined);
+      selectedAllyRef.current = null;
+      selectedEnemyRef.current = null;
     };
-    getAllFigures();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedScenario]);
-
-  useEffect(() => {
-    setSelectedAllyFigure(undefined);
-    setSelectedEnemyFigure(undefined);
-    selectedAllyRef.current = null;
-    selectedEnemyRef.current = null;
-  }, [selectedScenario, selectedCampaign]);
+    reset();
+  }, [selectedScenario, selectedCampaign, setRefresh]);
 
   return (
     <>

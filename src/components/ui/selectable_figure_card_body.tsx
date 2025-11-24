@@ -46,7 +46,11 @@ export function SelectableFigureCardBody(props: {
             )}
             <Button
               marginLeft="auto"
-              onClick={() => onFigureDelete(figure, true)}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onFigureDelete(figure, true);
+              }}
               _hover={{
                 color: "red",
               }}

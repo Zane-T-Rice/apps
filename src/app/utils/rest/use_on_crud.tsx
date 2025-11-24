@@ -145,7 +145,10 @@ export function useOnCRUD<
           (currentResource) => currentResource.id !== resourceToDelete.id,
         );
       });
-      setSelectedResource(undefined);
+      setSelectedResource((prev) => {
+        if (prev?.id === resourceToDelete.id) return undefined;
+        return prev;
+      });
       sendMessage?.(resourceToDelete, "DELETE");
 
       return true;

@@ -21,7 +21,7 @@ import { responseTransformer } from "@/app/utils/gloomhaven_companion_service/re
 
 export default function GloomhavenCompanionPageContent() {
   const searchParams = useSearchParams();
-  const { clearQueryString, replaceQueryString } = useQueryString();
+  const { setQueryString } = useQueryString();
   const [activeTab, setActiveTab] = useState<string>("campaigns");
   const [selectedCampaign, setSelectedCampaign] = useState<Campaign>();
   const [selectedScenario, setSelectedScenario] = useState<Scenario>();
@@ -35,7 +35,14 @@ export default function GloomhavenCompanionPageContent() {
         if (responseTemplates) setTemplates(responseTemplates);
       });
     };
+    const selectActiveTab = async () => {
+      const lastActiveTab = searchParams.get("activeTab");
+      if (lastActiveTab) setActiveTab(lastActiveTab);
+      if (lastActiveTab === "enemies" || lastActiveTab === "allies")
+        setScroll(true);
+    };
     getAllTemplates();
+    selectActiveTab();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -43,24 +50,14 @@ export default function GloomhavenCompanionPageContent() {
     if (selectedCampaign?.entity === campaign.entity) return;
     setSelectedCampaign(campaign);
     setSelectedScenario(undefined);
+    setQueryString("campaignId", campaign.id);
   };
 
-  useEffect(() => {
-    const moveToEnemies = async () => {
-      if (selectedCampaign && selectedScenario) {
-        if (searchParams.get("selectedEnemyId")) {
-          setActiveTab("enemies");
-          setScroll(true);
-        } else if (searchParams.get("selectedAllyId")) {
-          setActiveTab("allies");
-          setScroll(true);
-        }
-      }
-    };
-
-    moveToEnemies();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedCampaign, selectedScenario]);
+  const onScenarioSelect = (scenario: Scenario) => {
+    if (scenario.entity === selectedScenario?.entity) return;
+    setSelectedScenario(scenario);
+    setQueryString("scenarioId", scenario.id);
+  };
 
   const actions = <></>;
 
@@ -69,9 +66,8 @@ export default function GloomhavenCompanionPageContent() {
       <Tabs.Trigger
         value="campaigns"
         onClick={() => {
-          if (activeTab !== "campaigns") {
-            clearQueryString();
-          }
+          if (activeTab !== "campaigns")
+            setQueryString("activeTab", "campaigns");
         }}
       >
         <Box hideBelow="sm">
@@ -82,11 +78,8 @@ export default function GloomhavenCompanionPageContent() {
       <Tabs.Trigger
         value="scenarios"
         onClick={() => {
-          if (activeTab !== "scenarios") {
-            const params = new URLSearchParams();
-            params.set("campaignId", selectedCampaign?.id || "");
-            replaceQueryString(params);
-          }
+          if (activeTab !== "scenarios")
+            setQueryString("activeTab", "scenarios");
         }}
         disabled={!selectedCampaign}
       >
@@ -98,14 +91,8 @@ export default function GloomhavenCompanionPageContent() {
       <Tabs.Trigger
         value="enemies"
         onClick={() => {
-          setActiveTab("enemies");
           setScroll(true);
-          if (activeTab !== "enemies" && activeTab !== "allies") {
-            const params = new URLSearchParams();
-            params.set("campaignId", selectedCampaign?.id || "");
-            params.set("scenarioId", selectedScenario?.id || "");
-            replaceQueryString(params);
-          }
+          if (activeTab !== "enemies") setQueryString("activeTab", "enemies");
         }}
         disabled={!selectedCampaign || !selectedScenario}
       >
@@ -117,14 +104,8 @@ export default function GloomhavenCompanionPageContent() {
       <Tabs.Trigger
         value="allies"
         onClick={() => {
-          setActiveTab("allies");
           setScroll(true);
-          if (activeTab !== "enemies" && activeTab !== "allies") {
-            const params = new URLSearchParams();
-            params.set("campaignId", selectedCampaign?.id || "");
-            params.set("scenarioId", selectedScenario?.id || "");
-            replaceQueryString(params);
-          }
+          if (activeTab !== "allies") setQueryString("activeTab", "allies");
         }}
         disabled={!selectedCampaign || !selectedScenario}
       >
@@ -151,6 +132,7 @@ export default function GloomhavenCompanionPageContent() {
             selectedCampaign={selectedCampaign}
             selectedScenario={selectedScenario}
             setSelectedScenario={setSelectedScenario}
+            onScenarioSelect={onScenarioSelect}
             templates={templates}
           />
         </Tabs.Content>

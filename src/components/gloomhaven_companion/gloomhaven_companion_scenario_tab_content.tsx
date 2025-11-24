@@ -40,10 +40,16 @@ export function GloomhavenCompanionScenarioTabContent(props: {
   selectedCampaign: Campaign;
   selectedScenario?: Scenario;
   setSelectedScenario: Dispatch<SetStateAction<Scenario | undefined>>;
+  onScenarioSelect: (scenario: Scenario) => void;
   templates: Template[];
 }) {
-  const { selectedCampaign, selectedScenario, setSelectedScenario, templates } =
-    props;
+  const {
+    selectedCampaign,
+    selectedScenario,
+    setSelectedScenario,
+    onScenarioSelect,
+    templates,
+  } = props;
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
@@ -77,11 +83,6 @@ export function GloomhavenCompanionScenarioTabContent(props: {
       });
     }
   }, [scenarios, searchParams, selectedScenario, setSelectedScenario]);
-
-  const onScenarioSelect = (scenario: Scenario) => {
-    if (scenario.entity === selectedScenario?.entity) return;
-    setSelectedScenario(scenario);
-  };
 
   const {
     onResourceCreate: onScenarioCreate,

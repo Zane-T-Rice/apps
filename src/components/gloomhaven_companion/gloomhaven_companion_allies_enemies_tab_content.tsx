@@ -150,13 +150,13 @@ export function GloomhavenCompanionAllyEnemyTabContent(props: {
     const params = getQueryString();
 
     if (type === "enemy") {
-      const selectedEnemyId = params.get("selectedEnemyId");
+      const selectedEnemyId = params.get("enemyId");
       if (selectedEnemyId) {
         const figure = figures?.find((figure) => figure.id === selectedEnemyId);
         if (figure) onFigureSelect(figure, "enemy");
       }
     } else if (type === "ally") {
-      const selectedAllyId = params.get("selectedAllyId");
+      const selectedAllyId = params.get("allyId");
       if (selectedAllyId) {
         const figure = figures?.find((figure) => figure.id === selectedAllyId);
         if (figure) onFigureSelect(figure, "ally");

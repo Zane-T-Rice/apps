@@ -48,9 +48,9 @@ export function GloomhavenCompanionAllyEnemyTabSharedContent(props: {
       if (scroll) {
         const [ref, queryStringName] =
           activeTab === "enemies"
-            ? [selectedEnemyRef, "selectedEnemyId"]
+            ? [selectedEnemyRef, "enemyId"]
             : activeTab === "allies"
-              ? [selectedAllyRef, "selectedAllyId"]
+              ? [selectedAllyRef, "allyId"]
               : [null, null];
 
         setTimeout(() => {
@@ -121,12 +121,12 @@ export function GloomhavenCompanionAllyEnemyTabSharedContent(props: {
     if (type === "ally") {
       if (figure.id !== selectedAllyFigure?.id) {
         setSelectedAllyFigure(figure);
-        setQueryString("selectedAllyId", figure.id);
+        setQueryString("allyId", figure.id);
       }
     } else if (type == "enemy") {
       if (figure.id !== selectedEnemyFigure?.id) {
         setSelectedEnemyFigure(figure);
-        setQueryString("selectedEnemyId", figure.id);
+        setQueryString("enemyId", figure.id);
       }
     }
   };
@@ -173,7 +173,13 @@ export function GloomhavenCompanionAllyEnemyTabSharedContent(props: {
       selectedEnemyRef.current = null;
     };
     reset();
-  }, [selectedScenario, selectedCampaign, setRefresh]);
+  }, [
+    selectedScenario,
+    selectedCampaign,
+    setSelectedEnemyFigure,
+    setSelectedAllyFigure,
+    setRefresh,
+  ]);
 
   return (
     <>

@@ -174,8 +174,8 @@ export function GloomhavenCompanionAllyEnemyTabSharedContent(props: {
     };
     reset();
   }, [
-    selectedScenario,
-    selectedCampaign,
+    selectedScenario.id,
+    selectedCampaign.id,
     setSelectedEnemyFigure,
     setSelectedAllyFigure,
     setRefresh,

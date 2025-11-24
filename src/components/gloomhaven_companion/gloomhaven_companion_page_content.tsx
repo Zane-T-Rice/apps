@@ -50,8 +50,10 @@ export default function GloomhavenCompanionPageContent() {
       if (selectedCampaign && selectedScenario) {
         if (searchParams.get("selectedEnemyId")) {
           setActiveTab("enemies");
+          setScroll(true);
         } else if (searchParams.get("selectedAllyId")) {
           setActiveTab("allies");
+          setScroll(true);
         }
       }
     };

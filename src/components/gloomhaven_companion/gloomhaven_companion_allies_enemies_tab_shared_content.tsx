@@ -50,7 +50,7 @@ export function GloomhavenCompanionAllyEnemyTabSharedContent(props: {
       // Using two at different times means the UI can respond
       // instantly if possible, but if rendering is slow, the
       // second attempt usually succeeds.
-      if (scroll || activeTab === "scenarios" || activeTab === "campaigns") {
+      if (scroll) {
         setTimeout(
           () =>
             selectedEnemyRef?.current?.scrollIntoView({
@@ -65,7 +65,7 @@ export function GloomhavenCompanionAllyEnemyTabSharedContent(props: {
               block: "center",
               behavior: "smooth",
             }),
-          500,
+          250,
         );
         setTimeout(
           () =>

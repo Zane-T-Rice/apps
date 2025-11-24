@@ -11,9 +11,10 @@ export function SharedNumberInput(props: {
     <Field.Root>
       <Field.Label>{title}</Field.Label>
       <NumberInput.Root
-        value={value !== null ? value?.toString() : ""}
+        value={value !== null && value !== undefined ? value?.toString() : ""}
         onValueChange={(e) => {
-          if (e.value !== undefined) setValue(parseInt(e.value));
+          if (e.value !== null && e.value !== undefined)
+            setValue(parseInt(e.value));
           else setValue(null);
         }}
       >

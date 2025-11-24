@@ -64,8 +64,10 @@ export function GloomhavenCompanionEnemyTabContent(props: {
         (key) =>
           (groups[key].figures = groups[key].figures
             .sort((figureA, figureB) => {
-              if (figureA.number === null) return -1;
-              if (figureB.number === null) return 1;
+              if (figureA.number === null || figureA.number === undefined)
+                return -1;
+              if (figureB.number === null || figureB.number === undefined)
+                return 1;
               if (figureA.number < figureB.number) return -1;
               else if (figureA.number === figureB.number) return 0;
               else return 1;

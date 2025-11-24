@@ -74,7 +74,12 @@ export function AddNPCDrawer(props: {
   }, [name, maximumHP, damage, move, attack, special]);
 
   const doDisableSave = useCallback(() => {
-    return maximumHP === null || damage === null;
+    return (
+      maximumHP === null ||
+      maximumHP === undefined ||
+      damage === null ||
+      damage === undefined
+    );
   }, [maximumHP, damage]);
 
   return (

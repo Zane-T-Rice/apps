@@ -120,7 +120,10 @@ export function ScenarioDrawer(props: {
 
   const doDisableSave = useCallback(() => {
     return (
-      name === null || selectedClass.length === 0 || selectedLevel.length === 0
+      name === null ||
+      name === undefined ||
+      selectedClass.length === 0 ||
+      selectedLevel.length === 0
     );
   }, [name, selectedClass, selectedLevel]);
 

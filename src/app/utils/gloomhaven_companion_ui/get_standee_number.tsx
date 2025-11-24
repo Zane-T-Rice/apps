@@ -20,7 +20,7 @@ export const getStandeeNumber = (
     if (group === undefined) return 1;
     const currentStandeeNumbers = group.figures
       .map((figure) => figure.number)
-      .filter((number) => number !== null)
+      .filter((number) => number !== null && number !== undefined)
       .sort();
     let i = currentStandeeNumbers.length
       ? currentStandeeNumbers[currentStandeeNumbers.length - 1]

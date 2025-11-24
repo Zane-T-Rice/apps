@@ -43,7 +43,7 @@ export function useOnCRUD<
     silent?: boolean,
   ) => Promise<boolean> = useCallback(
     async (newResource: T, silent: boolean = false): Promise<boolean> => {
-      const title = `Creating resource ${newResource?.[resourceNameKey]}`;
+      const title = `Creating ${newResource?.[resourceNameKey]}`;
       const resource = await fetchWithValidateAndToast({
         title,
         setErrors: setCreateErrors,
@@ -81,7 +81,7 @@ export function useOnCRUD<
   const onResourceEdit: (newResource: T, silent?: boolean) => Promise<boolean> =
     useCallback(
       async (newResource: T, silent: boolean = false): Promise<boolean> => {
-        const title = `Editing resource ${newResource?.[resourceNameKey]}`;
+        const title = `Editing ${newResource?.[resourceNameKey]}`;
         const resource = await fetchWithValidateAndToast({
           title,
           setErrors: setEditErrors,
@@ -124,7 +124,7 @@ export function useOnCRUD<
     silent?: boolean,
   ) => Promise<boolean> = useCallback(
     async (resourceToDelete: T, silent: boolean = false): Promise<boolean> => {
-      const title = `Deleting resource ${resourceToDelete?.[resourceNameKey]}`;
+      const title = `Deleting ${resourceToDelete?.[resourceNameKey]}`;
       const resource = await fetchWithValidateAndToast({
         title,
         setErrors: setEditErrors,

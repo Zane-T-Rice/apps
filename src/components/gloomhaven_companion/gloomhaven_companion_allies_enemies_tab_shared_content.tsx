@@ -45,7 +45,7 @@ export function GloomhavenCompanionAllyEnemyTabSharedContent(props: {
 
   useEffect(() => {
     const doScroll = async () => {
-      if (scroll) {
+      if (scroll && (activeTab === "enemies" || activeTab === "allies")) {
         const [ref, queryStringName] =
           activeTab === "enemies"
             ? [selectedEnemyRef, "enemyId"]
@@ -67,15 +67,13 @@ export function GloomhavenCompanionAllyEnemyTabSharedContent(props: {
           // present already.
           if (
             figuresLoading ||
-            ((activeTab === "enemies" || activeTab === "allies") &&
-              !ref?.current?.checkVisibility() &&
+            (!ref?.current?.checkVisibility() &&
               figures.findIndex(
                 (figure) =>
                   figure.id === getQueryString().get(queryStringName || ""),
               ) !== -1)
           ) {
             setScrollAttempts((prev) => prev + 1);
-
             if (scrollAttempts < 25) setScroll(true);
             else {
               // Stop trying to scroll. Maybe the client lost internet connection
@@ -84,11 +82,10 @@ export function GloomhavenCompanionAllyEnemyTabSharedContent(props: {
               setScrollAttempts(0);
             }
           } else {
+            setScroll(false);
             setScrollAttempts(0);
           }
         }, 250);
-
-        setScroll(false);
       }
     };
 

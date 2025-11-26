@@ -1,4 +1,4 @@
-import { Box, Card, Stack, Text } from "@chakra-ui/react";
+import { Box, Card, Grid, GridItem, Stack, Text } from "@chakra-ui/react";
 import { Button } from "../recipes/button";
 import { IoCloseSharp } from "react-icons/io5";
 import { FigureDataList } from "./figure_data_list";
@@ -37,27 +37,32 @@ export function SelectableFigureCardBody(props: {
     >
       <Stack gap={0}>
         <Card.Title>
-          <Stack direction="row" alignItems="center" gap="1">
-            <Text>{buildTitleText(figure)}</Text>
-            {figure.flying && (
-              <Box marginBottom={1}>
-                <GiCurlyWing />
-              </Box>
-            )}
-            <Button
-              marginLeft="auto"
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                onFigureDelete(figure, true);
-              }}
-              _hover={{
-                color: "red",
-              }}
-            >
-              <IoCloseSharp />
-            </Button>
-          </Stack>
+          <Grid templateColumns="repeat(10, 1fr)" alignItems="center">
+            <GridItem colSpan={9}>
+              <Text>{buildTitleText(figure)}</Text>
+              {figure.flying && (
+                <Box marginBottom={1}>
+                  <GiCurlyWing />
+                </Box>
+              )}
+            </GridItem>
+            <GridItem colSpan={1} marginLeft="auto">
+              <Button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onFigureDelete(figure, true);
+                }}
+                _hover={{
+                  color: "red",
+                }}
+                disabled={figure.maximumHP > figure.damage}
+                padding={0}
+              >
+                <IoCloseSharp />
+              </Button>
+            </GridItem>
+          </Grid>
         </Card.Title>
         <FigureDataList figure={figure} onFigureEdit={onFigureEdit} />
       </Stack>

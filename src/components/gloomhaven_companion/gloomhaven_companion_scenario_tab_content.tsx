@@ -1,4 +1,11 @@
-import { Card, Grid, GridItem, Skeleton, Stack } from "@chakra-ui/react";
+import {
+  Card,
+  DataList,
+  Grid,
+  GridItem,
+  Skeleton,
+  Stack,
+} from "@chakra-ui/react";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { AutoDataList } from "../ui/auto_data_list";
 import {
@@ -150,6 +157,17 @@ export function GloomhavenCompanionScenarioTabContent(props: {
     Enemies: scenario.groups,
   });
 
+  const stats = [
+    [0, 0, 2, 2, 1, 4],
+    [1, 1, 2, 3, 2, 6],
+    [2, 2, 3, 4, 2, 8],
+    [3, 3, 3, 5, 2, 10],
+    [4, 4, 4, 6, 3, 12],
+    [5, 5, 4, 7, 3, 14],
+    [6, 6, 5, 8, 3, 16],
+    [7, 7, 6, 9, 4, 18],
+  ];
+
   return (
     <>
       {isLoading ? (
@@ -182,6 +200,36 @@ export function GloomhavenCompanionScenarioTabContent(props: {
                 scenario={selectedScenario}
               />
             </GridItem>
+            {selectedScenario?.scenarioLevel !== undefined &&
+              [
+                "Scenario Level",
+                "Monster Level",
+                "Gold Conversion",
+                "Trap Damage",
+                "Hazardous Terrain",
+                "Bonus Experience",
+              ].map((stat, index) => {
+                return (
+                  <GridItem colSpan={2} key={stat}>
+                    <DataList.Root>
+                      <DataList.Item>
+                        <DataList.ItemLabel
+                          marginLeft="auto"
+                          marginRight="auto"
+                        >
+                          {stat}
+                        </DataList.ItemLabel>
+                        <DataList.ItemValue
+                          marginLeft="auto"
+                          marginRight="auto"
+                        >
+                          {stats[selectedScenario.scenarioLevel][index]}
+                        </DataList.ItemValue>
+                      </DataList.Item>
+                    </DataList.Root>
+                  </GridItem>
+                );
+              })}
           </Grid>
           <Grid
             templateColumns={{

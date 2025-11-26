@@ -51,9 +51,9 @@ resource "aws_s3_bucket_website_configuration" "zanesworld_apps_website_configur
 resource "aws_s3_object" "directory_files" {
   for_each = fileset("${path.module}/../../out", "**/*")
 
-  bucket = aws_s3_bucket.zanesworld_apps_bucket.id
-  key    = each.value
-  source = "${path.module}/../../out/${each.value}"
-  etag   = filemd5("${path.module}/../../out/${each.value}") # Optional: for content change detection
+  bucket       = aws_s3_bucket.zanesworld_apps_bucket.id
+  key          = each.value
+  source       = "${path.module}/../../out/${each.value}"
+  etag         = filemd5("${path.module}/../../out/${each.value}") # Optional: for content change detection
   content_type = "text/html"
 }

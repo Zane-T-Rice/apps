@@ -39,12 +39,14 @@ export function SelectableFigureCardBody(props: {
         <Card.Title>
           <Grid templateColumns="repeat(10, 1fr)" alignItems="center">
             <GridItem colSpan={9}>
-              <Text>{buildTitleText(figure)}</Text>
-              {figure.flying && (
-                <Box marginBottom={1}>
-                  <GiCurlyWing />
-                </Box>
-              )}
+              <Stack direction="row" alignItems="center" gap={1}>
+                <Text>{buildTitleText(figure)}</Text>
+                {figure.flying && (
+                  <Box marginBottom={1}>
+                    <GiCurlyWing />
+                  </Box>
+                )}
+              </Stack>
             </GridItem>
             <GridItem colSpan={1} marginLeft="auto">
               <Button

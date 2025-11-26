@@ -57,8 +57,11 @@ export default function GloomhavenCompanionPageContent() {
 
   const onScenarioSelect = (scenario: Scenario) => {
     if (scenario.entity === selectedScenario?.entity) return;
+    const params: URLSearchParams = new URLSearchParams();
+    params.set("campaignId", selectedCampaign?.id || "");
+    params.set("scenarioId", scenario.id);
+    replaceQueryString(params);
     setSelectedScenario(scenario);
-    setQueryString("scenarioId", scenario.id);
   };
 
   const actions = <></>;

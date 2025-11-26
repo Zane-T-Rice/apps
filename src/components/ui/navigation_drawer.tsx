@@ -46,7 +46,7 @@ export function NavigationDrawer() {
                 <CheckPermissionsForContent
                   requiredPermissions={["server-manager:admin"]}
                 >
-                  <Link href="/calories" variant="button">
+                  <Link href="/calories/" variant="button">
                     Calories
                   </Link>
                 </CheckPermissionsForContent>
@@ -57,14 +57,14 @@ export function NavigationDrawer() {
                     "server-manager:public",
                   ]}
                 >
-                  <Link href="/myservers" variant="button">
+                  <Link href="/myservers/" variant="button">
                     My Servers
                   </Link>
                 </CheckPermissionsForContent>
                 <CheckPermissionsForContent
                   requiredPermissions={["server-manager:admin"]}
                 >
-                  <Link href="/servers" variant="button">
+                  <Link href="/servers/" variant="button">
                     Server Manager
                   </Link>
                 </CheckPermissionsForContent>
@@ -75,7 +75,7 @@ export function NavigationDrawer() {
                     "gloomhaven-companion:admin",
                   ]}
                 >
-                  <Link href="/gloomhaven_companion" variant="button">
+                  <Link href="/gloomhaven_companion/" variant="button">
                     Gloomhaven Companion
                   </Link>
                 </CheckPermissionsForContent>

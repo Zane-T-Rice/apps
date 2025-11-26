@@ -3,11 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 3100;",
+    "dev": "cp .env.dev .env.local && next dev -p 3100;",
+    "build-dev": "cp .env.dev .env.local && next build && mkdir apps && mv out apps/apps && mv apps out",
+    "start-dev": "npx serve out -p 3100",
     "build": "next build && mkdir apps && mv out apps/apps && mv apps out",
-    "start": "npx serve out -p 3100",
-    "lint": "eslint .",
-    "build:workers": "tsc -p tsconfig.worker.json"
+    "build-prod": "cp .env.prod .env.local && npm run build",
+    "deploy": "terraform -chdir=deployments/terraform init && terraform -chdir=deployments/terraform apply",
+    "destroy": "terraform -chdir=deployments/terraform init && terraform -chdir=deployments/terraform destroy"
   },
   "dependencies": {
     "@auth0/auth0-react": "^2.3.0",

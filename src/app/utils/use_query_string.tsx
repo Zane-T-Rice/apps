@@ -1,8 +1,7 @@
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useMemo } from "react";
 
 export const useQueryString = () => {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
 
@@ -10,21 +9,33 @@ export const useQueryString = () => {
     const setQueryString = (key: string, value: string) => {
       const params = new URLSearchParams(searchParams.toString());
       params.set(key, value);
-      router.replace(pathname + "?" + params.toString(), { scroll: false });
+      window.history.replaceState(
+        {},
+        "",
+        "/apps" + pathname + "?" + params.toString(),
+      );
     };
 
     const removeQueryString = (key: string) => {
       const params = new URLSearchParams(searchParams.toString());
       params.delete(key);
-      router.replace(pathname + "?" + params.toString(), { scroll: false });
+      window.history.replaceState(
+        {},
+        "",
+        "/apps" + pathname + "?" + params.toString(),
+      );
     };
 
     const clearQueryString = () => {
-      router.replace(pathname, { scroll: false });
+      window.history.replaceState({}, "", "/apps" + pathname);
     };
 
     const replaceQueryString = (params: URLSearchParams) => {
-      router.replace(pathname + "?" + params.toString(), { scroll: false });
+      window.history.replaceState(
+        {},
+        "",
+        "/apps" + pathname + "?" + params.toString(),
+      );
     };
 
     const getQueryString = () => {
@@ -38,5 +49,5 @@ export const useQueryString = () => {
       clearQueryString,
       replaceQueryString,
     };
-  }, [router, searchParams, pathname]);
+  }, [searchParams, pathname]);
 };

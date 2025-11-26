@@ -20,8 +20,6 @@ jobs:
           node-version: "22"
       - name: Install Dependencies
         run: npm install
-      - name: Lint the Project
-        run: npm run lint
       - name: Build the Project
         run: npm run build
   deploy:

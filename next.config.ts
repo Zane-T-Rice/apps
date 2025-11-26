@@ -6,8 +6,8 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ["@chakra-ui/react"],
   },
-  basePath: "",
-  assetPrefix: "",
+  basePath: "/apps",
+  assetPrefix: "/apps",
   trailingSlash: true,
 };
 

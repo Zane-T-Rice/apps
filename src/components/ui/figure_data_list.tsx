@@ -73,19 +73,25 @@ export function FigureDataList(props: {
     };
 
     const columnOneSpan = {
-      base: 1,
+      base: 2,
       smDown: 2,
     };
     const columnTwoSpan = {
-      base: 6,
-      smDown: 9,
-    };
-    const columnThreeSpan = {
-      base: 7,
-      smDown: 3,
+      base: 12,
+      smDown: 12,
     };
     const totalColumnSpan = {
       base: 14,
+    };
+
+    const currentHP = figure.maximumHP - figure.damage;
+    const percentHP = currentHP / figure.maximumHP;
+
+    const getHPBar = () => {
+      let color = "rgba(0,200,0,1)";
+      if (percentHP < 0.75) color = "rgba(200,200,0,1)";
+      if (percentHP < 0.5) color = "rgba(200,0,0,1)";
+      return `linear-gradient(to right, transparent ${50 * (1 - percentHP)}%, ${color} 50%, transparent ${50 * percentHP + 50}%)`;
     };
 
     return figure ? (
@@ -103,10 +109,10 @@ export function FigureDataList(props: {
               increaseDamage(figure);
               onFigureEdit(figure, true);
             }}
-            text={`${figure.maximumHP - figure.damage} / ${figure.maximumHP}`}
+            text={`${currentHP} / ${figure.maximumHP}`}
+            bg={getHPBar()}
           />
         </GridItem>
-        <GridItem colSpan={columnThreeSpan}></GridItem>
         {notNil(figure.xp) && (
           <>
             <GridItem colSpan={columnOneSpan}>
@@ -125,7 +131,6 @@ export function FigureDataList(props: {
                 text={`${figure.xp}`}
               />
             </GridItem>
-            <GridItem colSpan={columnThreeSpan}></GridItem>
           </>
         )}
         <GridItem colSpan={totalColumnSpan}>

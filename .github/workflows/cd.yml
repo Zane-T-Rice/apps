@@ -8,8 +8,7 @@ on:
 
 jobs:
   build:
-    name: Build and Test
-    uses: Zane-T-Rice/apps/.github/workflows/ci.yml@main
+    name: Build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code

@@ -21,7 +21,7 @@ import { responseTransformer } from "@/app/utils/gloomhaven_companion_service/re
 
 export default function GloomhavenCompanionPageContent() {
   const searchParams = useSearchParams();
-  const { setQueryString } = useQueryString();
+  const { setQueryString, replaceQueryString } = useQueryString();
   const [activeTab, setActiveTab] = useState<string>("campaigns");
   const [selectedCampaign, setSelectedCampaign] = useState<Campaign>();
   const [selectedScenario, setSelectedScenario] = useState<Scenario>();
@@ -48,9 +48,11 @@ export default function GloomhavenCompanionPageContent() {
 
   const onCampaignSelect = (campaign: Campaign) => {
     if (selectedCampaign?.entity === campaign.entity) return;
+    const params: URLSearchParams = new URLSearchParams();
+    params.set("campaignId", campaign.id);
+    replaceQueryString(params);
     setSelectedCampaign(campaign);
     setSelectedScenario(undefined);
-    setQueryString("campaignId", campaign.id);
   };
 
   const onScenarioSelect = (scenario: Scenario) => {

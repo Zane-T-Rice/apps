@@ -91,6 +91,10 @@ export function GloomhavenCompanionScenarioTabContent(props: {
     }
   }, [scenarios, searchParams, selectedScenario, setSelectedScenario]);
 
+  useEffect(() => {
+    setSelectedScenario(undefined);
+  }, [selectedCampaign.id, setSelectedScenario]);
+
   const {
     onResourceCreate: _onScenarioCreate,
     onResourceEdit: _onScenarioEdit,

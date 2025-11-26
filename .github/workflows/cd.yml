@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    name: Build
+    name: Build and Deploy
     environment: production
     runs-on: ubuntu-latest
     steps:
@@ -20,7 +20,7 @@ jobs:
           node-version: "22"
       - name: Install Dependencies
         run: npm install
-      - name: Build the Project
+      - name: Build
         run: npm run build
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2

@@ -60,7 +60,7 @@ export function StatusSwitch(props: {
       <Switch.Label>
         <Tooltip content={status}>
           <Image
-            src={`${status.toLowerCase()}.png`}
+            src={`/apps/${status.toLowerCase()}.png`}
             width="9"
             height="9"
             alt={status}

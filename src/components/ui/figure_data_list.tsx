@@ -58,7 +58,7 @@ export function FigureDataList(props: {
               <Tooltip content={status}>
                 {!textStatuses[lowerCaseStatus] ? (
                   <Image
-                    src={`${status.toLowerCase()}.png`}
+                    src={`/apps/${status.toLowerCase()}.png`}
                     width="6"
                     height="6"
                     alt={status}
@@ -143,7 +143,7 @@ export function FigureDataList(props: {
               {notNil(figure.pierce) && (
                 <Tooltip content={"Pierce"}>
                   <Image
-                    src={"pierce.png"}
+                    src={"/apps/pierce.png"}
                     width="6"
                     height="6"
                     alt={"pierce"}

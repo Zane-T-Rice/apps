@@ -24,6 +24,7 @@ export type Figure = {
   target: number | null;
   retaliate: number | null;
   pierce: number | null;
+  range: number | null;
   special: string | null;
   alignment: string | null;
   attackPlusC: boolean | null;

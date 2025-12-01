@@ -9,6 +9,7 @@ import { Tooltip } from "@/components/ui/tooltip";
 import { FiTarget } from "react-icons/fi";
 import { FaHandFist } from "react-icons/fa6";
 import { useMemo } from "react";
+import { TbBow } from "react-icons/tb";
 
 export function FigureDataList(props: {
   figure: Figure;
@@ -143,6 +144,8 @@ export function FigureDataList(props: {
               {figure.innateOffenses &&
                 notNil(figure.innateOffenses) &&
                 statusesToIcons(figure.innateOffenses, false)}
+              {notNil(figure.range) && <TbBow />}
+              {notNil(figure.range) && figure.range}
               {notNil(figure.target) && <FiTarget />}
               {notNil(figure.target) && figure.target}
               {notNil(figure.pierce) && (

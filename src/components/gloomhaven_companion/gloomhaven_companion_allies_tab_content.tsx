@@ -66,12 +66,8 @@ export function GloomhavenCompanionAllyTabContent(props: {
       );
 
     return Object.keys(groups)
-      .map((key) => groups[key])
-      .sort((a, b) => {
-        if (a.class > b.class) return 1;
-        if (a.class < b.class) return -1;
-        return 0;
-      });
+      .sort()
+      .map((key) => groups[key]);
   };
   const groups = collectGroups(figures);
 

@@ -44,7 +44,6 @@ export function GloomhavenCompanionEnemyTabContent(props: {
     selectedScenario.groups
       .split(",")
       .map((group) => group.trim())
-      .sort()
       .forEach((group) => {
         if (!groups[group]) groups[group] = { class: group, figures: [] };
       });
@@ -58,39 +57,38 @@ export function GloomhavenCompanionEnemyTabContent(props: {
       }
     });
 
-    Object.keys(groups)
-      .sort()
-      .forEach(
-        (key) =>
-          (groups[key].figures = groups[key].figures
-            .sort((figureA, figureB) => {
-              if (figureA.number === null || figureA.number === undefined)
-                return -1;
-              if (figureB.number === null || figureB.number === undefined)
-                return 1;
-              if (figureA.number < figureB.number) return -1;
-              else if (figureA.number === figureB.number) return 0;
-              else return 1;
-            })
-            .sort((figureA, figureB) => {
-              if (figureA.rank === null || figureA.rank === undefined)
-                return -1;
-              if (figureB.rank === null || figureB.rank === undefined) return 1;
-              if (
-                figureA.rank.toLowerCase() === "normal" &&
-                figureB.rank.toLowerCase() === "elite"
-              )
-                return 1;
-              else if (
-                figureA.rank.toLowerCase() === "elite" &&
-                figureB.rank.toLowerCase() === "normal"
-              )
-                return -1;
-              else return 0;
-            })),
-      );
+    Object.keys(groups).forEach(
+      (key) =>
+        (groups[key].figures = groups[key].figures
+          .sort((figureA, figureB) => {
+            if (figureA.number === null || figureA.number === undefined)
+              return -1;
+            if (figureB.number === null || figureB.number === undefined)
+              return 1;
+            if (figureA.number < figureB.number) return -1;
+            else if (figureA.number === figureB.number) return 0;
+            else return 1;
+          })
+          .sort((figureA, figureB) => {
+            if (figureA.rank === null || figureA.rank === undefined) return -1;
+            if (figureB.rank === null || figureB.rank === undefined) return 1;
+            if (
+              figureA.rank.toLowerCase() === "normal" &&
+              figureB.rank.toLowerCase() === "elite"
+            )
+              return 1;
+            else if (
+              figureA.rank.toLowerCase() === "elite" &&
+              figureB.rank.toLowerCase() === "normal"
+            )
+              return -1;
+            else return 0;
+          })),
+    );
 
-    return Object.keys(groups).map((key) => groups[key]);
+    return Object.keys(groups)
+      .sort()
+      .map((key) => groups[key]);
   };
   const groups = collectGroups(figures);
 

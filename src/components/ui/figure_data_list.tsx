@@ -95,6 +95,10 @@ export function FigureDataList(props: {
       return `linear-gradient(to right, transparent ${50 * (1 - percentHP)}%, ${color} 50%, transparent ${50 * percentHP + 50}%)`;
     };
 
+    const hasSpecialsImage =
+      figure.rank?.toLowerCase() === "boss" ||
+      figure.name?.toLowerCase() === "kill bot";
+
     return figure ? (
       <Grid templateColumns="repeat(14, 1fr)" gapX={2} gapY={1}>
         <GridItem colSpan={columnOneSpan} alignContent={"center"}>
@@ -177,9 +181,17 @@ export function FigureDataList(props: {
                 statusesToIcons(figure.innateDefenses, true)}
             </Stack>
             {figure.special &&
+              !hasSpecialsImage &&
               figure.special.split("|").map((special, index) => {
                 return <Text key={special + "-" + index}>{special}</Text>;
               })}
+            {hasSpecialsImage && (
+              <Image
+                width={figure.class === "Tinkerer" ? "10" : "80"}
+                src={`/apps/specials/${figure.class.toLowerCase().split(" ").join("-")}-specials.png`}
+                alt={`${figure.class}-specials`}
+              />
+            )}
           </Stack>
         </GridItem>
         <GridItem rowSpan={1} colSpan={totalColumnSpan}>

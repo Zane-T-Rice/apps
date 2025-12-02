@@ -98,6 +98,11 @@ export function FigureDataList(props: {
     const hasSpecialsImage =
       figure.rank?.toLowerCase() === "boss" ||
       figure.name?.toLowerCase() === "kill bot";
+    const specialsImage = hasSpecialsImage
+      ? figure.name?.toLowerCase() === "kill bot"
+        ? `/apps/specials/${figure.name.toLowerCase().split(" ").join("-")}-specials.png`
+        : `/apps/specials/${figure.class.toLowerCase().split(" ").join("-")}-specials.png`
+      : "";
 
     return figure ? (
       <Grid templateColumns="repeat(14, 1fr)" gapX={2} gapY={1}>
@@ -187,8 +192,8 @@ export function FigureDataList(props: {
               })}
             {hasSpecialsImage && (
               <Image
-                width={figure.class === "Tinkerer" ? "10" : "80"}
-                src={`/apps/specials/${figure.class.toLowerCase().split(" ").join("-")}-specials.png`}
+                width={figure.name?.toLowerCase() === "kill bot" ? "10" : "80"}
+                src={specialsImage}
                 alt={`${figure.class}-specials`}
               />
             )}

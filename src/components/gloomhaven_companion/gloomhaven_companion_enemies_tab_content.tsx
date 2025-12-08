@@ -110,7 +110,10 @@ export function GloomhavenCompanionEnemyTabContent(props: {
       if (template) {
         const figure: Figure | undefined =
           template.stats[selectedScenario.scenarioLevel][rank];
-        if (figure) onFigureCreate(figure, true);
+        if (figure) {
+          figure.alignment = "enemy";
+          onFigureCreate(figure, true);
+        }
       }
     },
     [templates, onFigureCreate, selectedScenario],

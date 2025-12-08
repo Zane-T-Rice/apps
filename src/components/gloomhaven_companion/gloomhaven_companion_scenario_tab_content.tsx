@@ -68,9 +68,16 @@ export function GloomhavenCompanionScenarioTabContent(props: {
     deleteREST: deleteScenario,
   } = useScenarios(selectedCampaign.id, responseTransformer);
 
+  const compareScenarios = (a: Scenario, b: Scenario) => {
+    if (a.name > b.name) return 1;
+    if (a.name < b.name) return -1;
+    return 0;
+  };
+
   useEffect(() => {
     getScenarios().then((responseScenarios) => {
-      if (responseScenarios) setScenarios(responseScenarios);
+      if (responseScenarios)
+        setScenarios(responseScenarios.sort(compareScenarios));
       setIsLoading(false);
     });
   }, [getScenarios]);
@@ -115,12 +122,6 @@ export function GloomhavenCompanionScenarioTabContent(props: {
     setResources: setScenarios,
     setSelectedResource: setSelectedScenario,
   });
-
-  const compareScenarios = (a: Scenario, b: Scenario) => {
-    if (a.name > b.name) return 1;
-    if (a.name < b.name) return -1;
-    return 0;
-  };
 
   const onScenarioCreate = async (
     newResource: Scenario,

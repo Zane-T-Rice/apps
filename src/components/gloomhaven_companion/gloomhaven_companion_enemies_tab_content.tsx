@@ -7,9 +7,9 @@ import { Button } from "../recipes/button";
 import { Group } from "./gloomhaven_companion_allies_enemies_tab_content";
 import { RefObject, useCallback } from "react";
 import AddMonsterButton from "../ui/add_monster_button";
-import { getStandeeNumber } from "@/app/utils/gloomhaven_companion_ui/get_standee_number";
 import AddNPCButton from "../ui/add_npc_button";
 import AddBossButton from "../ui/add_boss_button";
+import { getStandeeNumber } from "@/app/utils/gloomhaven_companion_ui/get_standee_number";
 
 export function GloomhavenCompanionEnemyTabContent(props: {
   selectedScenario: Scenario;
@@ -29,7 +29,7 @@ export function GloomhavenCompanionEnemyTabContent(props: {
     templates,
     isLoading,
     selectedFigure,
-    onFigureCreate,
+    onFigureCreate: _onFigureCreate,
     onFigureDelete,
     onFigureEdit,
     onFigureSelect,
@@ -92,6 +92,16 @@ export function GloomhavenCompanionEnemyTabContent(props: {
   };
   const groups = collectGroups(figures);
 
+  const onFigureCreate = useCallback(
+    async (figure: Figure, silent?: boolean): Promise<boolean> => {
+      const standeeNumber = getStandeeNumber(figure, groups, templates);
+      if (standeeNumber === -1) return false;
+      if (standeeNumber !== null) figure.number = standeeNumber;
+      return _onFigureCreate(figure, silent);
+    },
+    [_onFigureCreate, groups, templates],
+  );
+
   const addEnemy = useCallback(
     (enemyClass: string, rank: "normal" | "elite") => {
       const template: Template | undefined = templates.find(
@@ -100,17 +110,10 @@ export function GloomhavenCompanionEnemyTabContent(props: {
       if (template) {
         const figure: Figure | undefined =
           template.stats[selectedScenario.scenarioLevel][rank];
-        if (figure) {
-          const standeeNumber = getStandeeNumber(figure, groups, templates);
-          if (standeeNumber !== -1) {
-            figure.alignment = "enemy";
-            figure.number = standeeNumber;
-            onFigureCreate(figure, true);
-          }
-        }
+        if (figure) onFigureCreate(figure, true);
       }
     },
-    [templates, onFigureCreate, groups, selectedScenario],
+    [templates, onFigureCreate, selectedScenario],
   );
 
   return (

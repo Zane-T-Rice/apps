@@ -13,9 +13,11 @@ export const getStandeeNumber = (
   let result = null;
   if (
     figure.rank?.toLowerCase() === "summon" ||
-    figure.class?.toLowerCase() === "wildfury bear"
+    figure.rank?.toLowerCase() === "boss" ||
+    figure.class?.toLowerCase() === "wildfury bear" ||
+    figure.class?.toLowerCase() === "npc / obstacle"
   ) {
-    // Summons get the next highest standee number.
+    // Summons, Bosses, NPCs, and Obstacles get the next highest standee number.
     const group = groups.find((figures) => figures.class === figure.class);
     if (group === undefined) return 1;
     const currentStandeeNumbers = group.figures

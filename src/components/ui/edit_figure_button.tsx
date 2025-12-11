@@ -10,12 +10,19 @@ const transformInt = (value: number): number | null => {
 };
 const numberSchema = number().transform(transformInt).integer();
 
-const editFigureSchema = object({
+const editMonsterFigureSchema = object({
   maximumHP: numberSchema.required(),
   move: numberSchema.nullable().optional(),
   attack: numberSchema.nullable().optional(),
-  range: numberSchema.nullable().optional(),
 }).stripUnknown();
+
+const editSummonFigureSchema = editMonsterFigureSchema
+  .concat(
+    object({
+      range: numberSchema.nullable().optional(),
+    }),
+  )
+  .stripUnknown();
 
 const desiredFieldOrder = {
   maximumHP: 1,
@@ -38,11 +45,19 @@ export default function EditFigureButton(
     return _onFigureEdit({ ...figure, ...updatedFigure });
   };
 
+  const isSummon = figure.rank && figure.rank.toLowerCase() === "summon";
+  const isMonster =
+    figure.rank &&
+    (figure.rank.toLowerCase() === "normal" ||
+      figure.rank.toLowerCase() === "elite" ||
+      figure.rank.toLowerCase() === "boss");
+
   return (
     <>
       <Button
         onClick={() => onCreateButton()}
         disabled={!hasCreatePermission}
+        hidden={!isSummon && !isMonster}
         {...buttonProps}
       >
         <CiEdit />
@@ -53,7 +68,9 @@ export default function EditFigureButton(
         isOpen={isCreateOpen}
         setIsOpen={setIsCreateOpen}
         onSubmit={onEdit}
-        resourceSchema={editFigureSchema}
+        resourceSchema={
+          isSummon ? editSummonFigureSchema : editMonsterFigureSchema
+        }
         desiredFieldOrder={desiredFieldOrder}
       />
     </>

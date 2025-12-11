@@ -96,7 +96,6 @@ export function AddSummonDrawer(props: {
         selectedType[0].toLowerCase() !== "item"
       ) {
         setSelectedSummoner(selectedType);
-      } else {
       }
     };
 

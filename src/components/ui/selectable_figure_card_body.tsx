@@ -4,6 +4,7 @@ import { IoCloseSharp } from "react-icons/io5";
 import { FigureDataList } from "./figure_data_list";
 import { Figure } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_figures";
 import { GiCurlyWing } from "react-icons/gi";
+import EditFigureButton from "./edit_figure_button";
 
 export function SelectableFigureCardBody(props: {
   figure: Figure;
@@ -38,7 +39,7 @@ export function SelectableFigureCardBody(props: {
       <Stack gap={0}>
         <Card.Title>
           <Grid templateColumns="repeat(10, 1fr)" alignItems="center">
-            <GridItem colSpan={9}>
+            <GridItem colSpan={8}>
               <Stack direction="row" alignItems="center" gap={1}>
                 <Text>{buildTitleText(figure)}</Text>
                 {figure.flying && (
@@ -47,6 +48,13 @@ export function SelectableFigureCardBody(props: {
                   </Box>
                 )}
               </Stack>
+            </GridItem>
+            <GridItem colSpan={1}>
+              <EditFigureButton
+                onFigureEdit={onFigureEdit}
+                figure={figure}
+                padding={0}
+              />
             </GridItem>
             <GridItem colSpan={1} marginLeft="auto">
               <Button

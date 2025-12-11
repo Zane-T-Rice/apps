@@ -58,16 +58,24 @@ export function AutoFormDrawer<T extends object, S extends Schema>(props: {
     };
 
     return record
-      ? (Object.keys(record) as (keyof T)[])
-          // Filter out any non-primitives. Maybe later make an AutoForm that
-          // does something sane for arrays and associative arrays.
+      ? (
+          Object.keys(
+            (resourceSchema.describe() as SchemaObjectDescription).fields,
+          ) as (keyof T)[]
+        )
           .filter((fieldName) => {
-            return !(record[fieldName] instanceof Object);
+            const result =
+              // Filter out any non-primitives. Maybe later make an AutoForm that
+              // does something sane for arrays and associative arrays.
+              !(record[fieldName] instanceof Object) &&
+              // Filter out any fields which are in the omit array.
+              !omitFields?.find((name) => name === fieldName) &&
+              // Only include fields which are in the schema.
+              (resourceSchema.describe() as SchemaObjectDescription).fields[
+                fieldName as string
+              ] !== undefined;
+            return result;
           })
-          // Filter out any fields which are in the omit array.
-          .filter(
-            (fieldName) => !omitFields?.find((name) => name === fieldName),
-          )
           .sort((aField, bField) => {
             if (!desiredFieldOrder) return 0;
 

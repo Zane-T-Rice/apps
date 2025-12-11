@@ -1,9 +1,14 @@
 "use client";
 
-import { chakra, RecipeVariantProps } from "@chakra-ui/react";
+import {
+  ButtonProps as ChakraButtonProps,
+  chakra,
+  RecipeVariantProps,
+} from "@chakra-ui/react";
 import { buttonRecipe } from "./button.recipe";
 
-type ButtonVariantProps = RecipeVariantProps<typeof buttonRecipe>;
+type ButtonVariantProps = RecipeVariantProps<typeof buttonRecipe> &
+  ChakraButtonProps;
 
 // eslint-disable-next-line
 export interface ButtonProps

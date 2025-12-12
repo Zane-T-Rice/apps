@@ -56,18 +56,24 @@ export function FigureDataList(props: {
               gap="0"
               key={`statuses-${status}-${isImmunity}-${index}`}
             >
-              <Tooltip content={status}>
-                {!textStatuses[lowerCaseStatus] ? (
-                  <Image
-                    src={`/apps/${status.toLowerCase()}.png`}
-                    width="6"
-                    height="6"
-                    alt={status}
-                  />
-                ) : (
-                  <Text>{textStatuses[lowerCaseStatus]}</Text>
-                )}
-              </Tooltip>
+              {!textStatuses[lowerCaseStatus] ? (
+                <Image
+                  src={`/apps/${status.toLowerCase()}.png`}
+                  width="6"
+                  height="6"
+                  alt={status}
+                />
+              ) : (
+                <Tooltip
+                  content={
+                    status === "AttackersGainDisadvantage"
+                      ? "Attackers Gain Disadvantage"
+                      : status
+                  }
+                >
+                  <Text tabIndex={index}>{textStatuses[lowerCaseStatus]}</Text>
+                </Tooltip>
+              )}
             </Stack>
           );
         });
@@ -199,30 +205,28 @@ export function FigureDataList(props: {
             )}
           </Stack>
         </GridItem>
-        <GridItem rowSpan={1} colSpan={totalColumnSpan}>
-          <Stack direction="row" gapX="0">
-            {[
-              "Strengthen",
-              "Invisible",
-              "Ward",
-              "Safeguard",
-              "Immobilize",
-              "Muddle",
-              "Disarm",
-              "Poison",
-              "Wound",
-              "Stun",
-            ].map((status) => {
-              return (
-                <StatusSwitch
-                  key={`status-switch-${figure.id}-${status}`}
-                  figure={figure}
-                  onFigureEdit={onFigureEdit}
-                  status={status}
-                />
-              );
-            })}
-          </Stack>
+        <GridItem colSpan={totalColumnSpan}>
+          {[
+            "Strengthen",
+            "Invisible",
+            "Ward",
+            "Safeguard",
+            "Immobilize",
+            "Muddle",
+            "Disarm",
+            "Poison",
+            "Wound",
+            "Stun",
+          ].map((status) => {
+            return (
+              <StatusSwitch
+                key={`status-switch-${figure.id}-${status}`}
+                figure={figure}
+                onFigureEdit={onFigureEdit}
+                status={status}
+              />
+            );
+          })}
         </GridItem>
       </Grid>
     ) : null;

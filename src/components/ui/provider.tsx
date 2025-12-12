@@ -9,7 +9,14 @@ import {
 import { ThemeProvider, ThemeProviderProps } from "next-themes";
 import { ColorModeProvider } from "./color-mode";
 
-const customConfig = defineConfig({});
+const customConfig = defineConfig({
+  theme: {
+    breakpoints: {
+      md: "56em",
+      lg: "82em",
+    },
+  },
+});
 
 export const system = createSystem(defaultConfig, customConfig);
 

@@ -223,7 +223,7 @@ export function GloomhavenCompanionEnemyTabContent(props: {
                         >
                           <FigureCard
                             figure={figure}
-                            selectedFigure={selectedFigure}
+                            selected={selectedFigure?.id === figure.id}
                             onFigureDelete={onFigureDelete}
                             onFigureEdit={onFigureEdit}
                             ref={ref}

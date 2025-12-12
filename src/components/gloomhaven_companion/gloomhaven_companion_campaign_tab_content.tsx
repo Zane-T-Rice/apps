@@ -1,6 +1,5 @@
-import { Card, Grid, GridItem, Skeleton, Stack, Text } from "@chakra-ui/react";
+import { Grid, GridItem, Skeleton, Stack } from "@chakra-ui/react";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { AutoDataList } from "../ui/auto_data_list";
 import {
   Campaign,
   useCampaigns,
@@ -9,17 +8,13 @@ import { object, string } from "yup";
 import CRUDButtons from "../ui/crud_buttons";
 import { responseTransformer } from "@/app/utils/gloomhaven_companion_service/response_transformer";
 import { useOnCRUD } from "@/app/utils/rest/use_on_crud";
-import { SelectableCardRoot } from "../ui/selectable_card_root";
 import { Button } from "../recipes/button";
-import {
-  JoinCampaign,
-  useCreateJoinCampaignCode,
-} from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_create_join_campaign_code";
+import { JoinCampaign } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_create_join_campaign_code";
 import { fetchWithToast } from "@/app/utils/fetch/fetch_with_toast";
-import { AlertDialog } from "../ui/alert_dialog";
 import { AutoFormDrawer } from "../ui/auto_form_drawer";
 import { useJoinCampaign } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_join_campaign";
 import { useSearchParams } from "next/navigation";
+import { CampaignCard } from "../ui/campaign_card";
 
 const createCampaignSchema = object({
   name: string().required(),
@@ -58,7 +53,6 @@ export function GloomhavenCompanionCampaignTabContent(props: {
     entity: "",
     updatedAt: null,
   });
-  const [joinCampaign, setJoinCampaign] = useState<JoinCampaign>();
   const [isJoinCampaignDrawerOpen, setIsJoinCampaignDrawerOpen] =
     useState<boolean>(false);
 
@@ -68,9 +62,6 @@ export function GloomhavenCompanionCampaignTabContent(props: {
     editREST: editCampaign,
     deleteREST: deleteCampaign,
   } = useCampaigns(responseTransformer);
-
-  const { actionREST: actionCreateJoinCampaignCode } =
-    useCreateJoinCampaignCode();
 
   const { customREST: actionJoinCampaign } =
     useJoinCampaign(responseTransformer);
@@ -158,26 +149,6 @@ export function GloomhavenCompanionCampaignTabContent(props: {
     return result;
   };
 
-  const campaignToCampaignInfo = (campaign: Campaign) => ({
-    Name: campaign.name,
-  });
-
-  const generateJoinCode = async (campaign: Campaign) => {
-    const response = await fetchWithToast(
-      "Generating Invite Code",
-      async () => {
-        return await actionCreateJoinCampaignCode(campaign, "create-join-code");
-      },
-    );
-    if (response) {
-      setJoinCampaign(response);
-    }
-  };
-
-  const joinCodeBody = () => {
-    return <Text>{joinCampaign ? joinCampaign.code : null}</Text>;
-  };
-
   const openJoinCampaignDrawer = () => {
     setIsJoinCampaignDrawerOpen(true);
   };
@@ -251,33 +222,10 @@ export function GloomhavenCompanionCampaignTabContent(props: {
                     justifyItems="center"
                     onClick={() => onCampaignSelect(campaign)}
                   >
-                    <SelectableCardRoot
-                      resourceId={campaign.id}
-                      selectedResourceId={selectedCampaign?.id}
-                    >
-                      <Card.Body>
-                        <Stack gap={3}>
-                          <Card.Title>{`${campaign.name}`}</Card.Title>
-                          <AutoDataList
-                            record={campaignToCampaignInfo(campaign)}
-                          />
-                          <AlertDialog
-                            trigger={
-                              <Button
-                                variant="safe"
-                                onClick={() => generateJoinCode(campaign)}
-                              >
-                                Generate Join Code
-                              </Button>
-                            }
-                            onConfirm={() => null}
-                            confirmVariant="safe"
-                            titleText="This join code is good for 5 minutes."
-                            body={joinCodeBody()}
-                          />
-                        </Stack>
-                      </Card.Body>
-                    </SelectableCardRoot>
+                    <CampaignCard
+                      campaign={campaign}
+                      selected={selectedCampaign?.id === campaign.id}
+                    />
                   </GridItem>
                 );
               })}
@@ -285,7 +233,6 @@ export function GloomhavenCompanionCampaignTabContent(props: {
           </Stack>
         </>
       )}
-
       <AutoFormDrawer
         record={{ id: selectedCampaign?.id || "", code: "" }}
         title="Enter the join code."

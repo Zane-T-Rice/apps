@@ -1,13 +1,5 @@
-import {
-  Card,
-  DataList,
-  Grid,
-  GridItem,
-  Skeleton,
-  Stack,
-} from "@chakra-ui/react";
+import { DataList, Grid, GridItem, Skeleton, Stack } from "@chakra-ui/react";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { AutoDataList } from "../ui/auto_data_list";
 import {
   Scenario,
   useScenarios,
@@ -16,13 +8,11 @@ import { number, object, string } from "yup";
 import { responseTransformer } from "@/app/utils/gloomhaven_companion_service/response_transformer";
 import { Campaign } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_campaigns";
 import { useOnCRUD } from "@/app/utils/rest/use_on_crud";
-import { SelectableCardRoot } from "../ui/selectable_card_root";
 import { useSearchParams } from "next/navigation";
 import AddScenarioButton from "../ui/add_scenario_button";
 import { Template } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_templates";
 import EditScenarioButton from "../ui/edit_scenario_button";
-import { IoCloseSharp } from "react-icons/io5";
-import { Button } from "../recipes/button";
+import { ScenarioCard } from "../ui/scenario_card";
 
 const createScenarioSchema = object({
   name: string().required(),
@@ -156,12 +146,6 @@ export function GloomhavenCompanionScenarioTabContent(props: {
     return result;
   };
 
-  const scenarioToScenarioInfo = (scenario: Scenario) => ({
-    Name: scenario.name,
-    "Scenario Level": scenario.scenarioLevel,
-    Enemies: scenario.groups,
-  });
-
   const stats = [
     [0, 0, 2, 2, 1, 4],
     [1, 1, 2, 3, 2, 6],
@@ -254,30 +238,11 @@ export function GloomhavenCompanionScenarioTabContent(props: {
                   justifyItems="center"
                   onClick={() => onScenarioSelect(scenario)}
                 >
-                  <SelectableCardRoot
-                    resourceId={scenario.id}
-                    selectedResourceId={selectedScenario?.id}
-                  >
-                    <Card.Body>
-                      <Stack gap={3}>
-                        <Stack direction="row" gap={0} alignItems="center">
-                          <Card.Title>{`${scenario.name}`}</Card.Title>
-                          <Button
-                            marginLeft="auto"
-                            onClick={() => onScenarioDelete(scenario, true)}
-                            _hover={{
-                              color: "red",
-                            }}
-                          >
-                            <IoCloseSharp />
-                          </Button>
-                        </Stack>
-                        <AutoDataList
-                          record={scenarioToScenarioInfo(scenario)}
-                        />
-                      </Stack>
-                    </Card.Body>
-                  </SelectableCardRoot>
+                  <ScenarioCard
+                    scenario={scenario}
+                    onScenarioDelete={onScenarioDelete}
+                    selected={selectedScenario?.id == scenario.id}
+                  />
                 </GridItem>
               );
             })}

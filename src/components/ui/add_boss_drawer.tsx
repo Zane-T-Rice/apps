@@ -72,17 +72,17 @@ export function AddBossDrawer(props: {
 
     if (!figureStats) return false;
 
-    if (figureStats.attackPlusC) {
-      figureStats.attack =
-        figureStats.attack! + parseInt(selectedNumberOfCharacters[0]);
-    }
-
     const figure: Figure = {
       ...figureStats,
       maximumHP:
         figureStats.maximumHP * parseInt(selectedNumberOfCharacters[0]),
       alignment: "enemy",
     } as Figure;
+
+    if (figureStats.attackPlusC) {
+      figure.attack =
+        figureStats.attack! + parseInt(selectedNumberOfCharacters[0]);
+    }
 
     return await onSubmit(figure);
   };

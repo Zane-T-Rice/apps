@@ -19,7 +19,10 @@ export default function CheckPermissionsForContent(props: {
 
   useEffect(() => {
     const getHasPermission = async () => {
-      if (isLoading) setHasPermission(null);
+      if (isLoading) {
+        setHasPermission(null);
+        return;
+      }
       const hasRequiredPermissions = await hasPermissions(requiredPermissions);
       const hasOneOfRequiredPermissions =
         requiresOneOfPermissions && requiresOneOfPermissions.length

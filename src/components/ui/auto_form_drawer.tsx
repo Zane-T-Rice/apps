@@ -57,6 +57,24 @@ export function AutoFormDrawer<T extends object, S extends Schema>(props: {
       )?.optional;
     };
 
+    const getFieldValue = (record: T, fieldName: keyof T) => {
+      let result;
+      if (typeof record[fieldName] === "number") {
+        result = record[fieldName];
+      } else if (
+        typeof record[fieldName] === "string" ||
+        typeof record[fieldName] === "boolean"
+      ) {
+        result = `${record[fieldName]}`;
+      } else {
+        console.warn(
+          `Unsupported field type: ${typeof record[fieldName]} for field ${String(fieldName)}`,
+        );
+        result = "";
+      }
+      return result;
+    };
+
     return record
       ? (
           Object.keys(
@@ -123,12 +141,7 @@ export function AutoFormDrawer<T extends object, S extends Schema>(props: {
                 ];
               });
             },
-            value:
-              typeof record[fieldName] === "number"
-                ? record[fieldName]
-                : record[fieldName]
-                  ? `${record[fieldName]}`
-                  : "",
+            value: getFieldValue(record, fieldName),
           }))
       : [];
   }, [record, omitFields, resourceSchema, setFields, desiredFieldOrder]);

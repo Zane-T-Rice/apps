@@ -1,4 +1,4 @@
-import { Field, Input, NumberInput } from "@chakra-ui/react";
+import { Checkbox, Field, Input, NumberInput } from "@chakra-ui/react";
 import { FormFields } from "./auto_form_drawer";
 import { validateWithErrors } from "@/app/utils/fetch/validate_with_errors";
 import { Schema, SchemaDescription, SchemaObjectDescription } from "yup";
@@ -83,6 +83,20 @@ export function AutoFormField<
             }
           }}
         />
+      )}
+      {resourceType === "boolean" && (
+        <Checkbox.Root
+          variant="solid"
+          checked={field.value === "true"}
+          onCheckedChange={(e) => {
+            const checked = e.checked ? "true" : "false";
+            field.setField({ target: { value: checked } });
+            validate(checked);
+          }}
+        >
+          <Checkbox.HiddenInput />
+          <Checkbox.Control />
+        </Checkbox.Root>
       )}
       <Field.ErrorText>{errors[field.name]}</Field.ErrorText>
     </Field.Root>

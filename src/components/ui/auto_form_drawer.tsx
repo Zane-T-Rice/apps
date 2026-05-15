@@ -147,7 +147,9 @@ export function AutoFormDrawer<T extends object, S extends Schema>(props: {
   }, [record, omitFields, resourceSchema, setFields, desiredFieldOrder]);
 
   useEffect(() => {
-    setFields(resetFields());
+    (async () => {
+      setFields(resetFields());
+    })();
   }, [resetFields]);
 
   // Cancelling the drawer should reset the fields.

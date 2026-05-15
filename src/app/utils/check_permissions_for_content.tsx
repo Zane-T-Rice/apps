@@ -19,6 +19,7 @@ export default function CheckPermissionsForContent(props: {
 
   useEffect(() => {
     const getHasPermission = async () => {
+      if (isLoading) setHasPermission(null);
       const hasRequiredPermissions = await hasPermissions(requiredPermissions);
       const hasOneOfRequiredPermissions =
         requiresOneOfPermissions && requiresOneOfPermissions.length
@@ -32,8 +33,7 @@ export default function CheckPermissionsForContent(props: {
           : true;
       setHasPermission(!!hasRequiredPermissions && hasOneOfRequiredPermissions);
     };
-    if (isLoading) setHasPermission(null);
-    else getHasPermission();
+    getHasPermission();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoading]);
 

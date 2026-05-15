@@ -157,7 +157,9 @@ export function useWebSocket<
 
   useEffect(() => {
     if (ws && ws.readyState === WebSocket.OPEN) {
-      setRefresh(true);
+      (async () => {
+        setRefresh(true);
+      })();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scenarioId, campaignId]);

@@ -12,7 +12,7 @@ env:
   NEXT_PUBLIC_AUTH0_SCOPES: "server-manager:admin gloomhaven-companion:admin server-manager:public gloomhaven-companion:public"
   NEXT_PUBLIC_GLOOMHAVEN_COMPANION_SERVICE_DOMAIN: "https://api.zanesworld.click/gloomhaven-companion-service"
   NEXT_PUBLIC_GLOOMHAVEN_COMPANION_WEBSOCKETS_URL: "wss://ws.zanesworld.click/gloomhaven-companion-service"
-  NEXT_PUBLIC_SERVER_MANAGER_SERVICE_DOMAIN: "https://zanesworld.click/server-manager-service"
+  NEXT_PUBLIC_SERVER_MANAGER_SERVICE_DOMAIN: "https://server-manager-service.zanesworld.click"
   NEXT_PUBLIC_WEBSITE_DOMAIN: "https://apps.zanesworld.click"
 
 jobs:

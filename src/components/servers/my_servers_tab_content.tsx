@@ -1,6 +1,14 @@
-import { Card, Grid, GridItem, Skeleton, Stack } from "@chakra-ui/react";
+import {
+  Card,
+  Grid,
+  GridItem,
+  Input,
+  Skeleton,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
 import { Server } from "@/app/utils/server-manager-service/server_manager_service_user_servers";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { string, object } from "yup";
 import { fetchWithValidateAndToast } from "@/app/utils/fetch/fetch_with_validate_and_toast";
 import { useUserServers } from "@/app/utils/server-manager-service/server_manager_service_user_servers";
@@ -16,6 +24,7 @@ const stopServerSchema = rebootServerSchema;
 export function MyServersTabContent() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [servers, setServers] = useState<Server[]>([]);
+  const [filterText, setFilterText] = useState<string>("");
 
   const { getAllREST: getServers, actionREST: actionServer } = useUserServers();
 
@@ -63,6 +72,26 @@ export function MyServersTabContent() {
     return true;
   };
 
+  // Show the servers that match the filter: by application name and then by container name.
+  const visibleServers = useMemo(() => {
+    const filter = filterText.trim().toLowerCase();
+    const matchesFilter = (server: Server) =>
+      !filter ||
+      [
+        server.applicationName,
+        server.containerName,
+        ...server.ports.map((port) => String(port.number)),
+      ].some((value) => value.toLowerCase().includes(filter));
+
+    return servers
+      .filter(matchesFilter)
+      .sort(
+        (a, b) =>
+          a.applicationName.localeCompare(b.applicationName) ||
+          a.containerName.localeCompare(b.containerName),
+      );
+  }, [servers, filterText]);
+
   const serverToServerInfo = (server: Server) => ({
     Host: `${new URL(server.host.url).hostname}`,
     Ports: `${Object.keys(
@@ -79,26 +108,39 @@ export function MyServersTabContent() {
       <Skeleton height={50} variant="shine" />
     </Stack>
   ) : (
-    <Grid
-      templateColumns={{
-        base: "repeat(1, 1fr)",
-        md: "repeat(2, 1fr)",
-        lg: "repeat(3, 1fr)",
-      }}
-      gap="0"
-    >
-      {servers.map((server, index) => {
-        return (
-          <GridItem
-            colSpan={1}
-            key={`navigation-bar-grid-item-${index}`}
-            justifyItems="center"
-          >
+    <Stack direction="column" gap={6}>
+      <Input
+        placeholder="Filter by application, container or port"
+        value={filterText}
+        onChange={(e) => setFilterText(e.target.value)}
+        marginLeft={2}
+        width="calc(100% - var(--chakra-spacing-4))"
+        maxWidth="md"
+      />
+      {visibleServers.length === 0 && filterText.trim() ? (
+        <Text marginLeft={2} opacity={0.7}>
+          No servers match the filter.
+        </Text>
+      ) : null}
+      <Grid
+        templateColumns={{
+          base: "repeat(1, 1fr)",
+          md: "repeat(2, 1fr)",
+          lg: "repeat(3, 1fr)",
+          xl: "repeat(4, 1fr)",
+          "2xl": "repeat(5, 1fr)",
+        }}
+        gap="4"
+        marginLeft={2}
+        marginRight={2}
+      >
+        {visibleServers.map((server) => (
+          <GridItem colSpan={1} key={`my-servers-grid-item-${server.id}`}>
             <Card.Root
               variant="elevated"
-              width="95%"
-              height="95%"
-              key={`navigation-bar-${index}`}
+              width="100%"
+              height="100%"
+              key={`my-servers-${server.id}`}
             >
               <Card.Body>
                 <Stack gap={6}>
@@ -115,8 +157,8 @@ export function MyServersTabContent() {
               </Card.Body>
             </Card.Root>
           </GridItem>
-        );
-      })}
-    </Grid>
+        ))}
+      </Grid>
+    </Stack>
   );
 }

@@ -14,6 +14,8 @@ const customConfig = defineConfig({
     breakpoints: {
       md: "56em",
       lg: "82em",
+      xl: "96em",
+      "2xl": "120em",
     },
   },
 });

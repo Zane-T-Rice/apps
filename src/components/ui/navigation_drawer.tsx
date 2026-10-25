@@ -44,13 +44,6 @@ export function NavigationDrawer() {
                   </Link>
                 </CheckPermissionsForContent>
                 <CheckPermissionsForContent
-                  requiredPermissions={["server-manager:admin"]}
-                >
-                  <Link href="/calories/" variant="button">
-                    Calories
-                  </Link>
-                </CheckPermissionsForContent>
-                <CheckPermissionsForContent
                   requiredPermissions={[]}
                   requiresOneOfPermissions={[
                     "server-manager:admin",

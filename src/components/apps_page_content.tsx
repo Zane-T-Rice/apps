@@ -12,22 +12,14 @@ import {
 } from "@chakra-ui/react";
 import { HiHome } from "react-icons/hi";
 import NextLink from "next/link";
+import { spaceActivatesLinkProps } from "@/app/utils/keyboard_select";
 import CheckPermissionsForContent from "@/app/utils/check_permissions_for_content";
-import { FaChartPie, FaGhost, FaServer } from "react-icons/fa";
+import { FaGhost, FaServer } from "react-icons/fa";
 import { GiCompanionCube } from "react-icons/gi";
 
 const iconSize = 250;
 
 const apps = [
-  {
-    name: "Calories",
-    description: `Daily calorie goal tracker.`,
-    link: "/calories",
-    icon: <FaChartPie size={iconSize} />,
-    imageDescription: "Calories pie chart.",
-    requiredPermissions: ["server-manager:admin"],
-    requiresOneOfPermissions: [],
-  },
   {
     name: "Server Manager Admin Console",
     description: "Server Manager Service Admin UI.",
@@ -61,14 +53,14 @@ const apps = [
 ];
 
 const tabTriggers = (
-  <Tabs.Trigger value="apps">
+  <Tabs.Trigger tabIndex={0} value="apps">
     <HiHome />
     Apps
   </Tabs.Trigger>
 );
 
 const tabContents = (
-  <Tabs.Content value="apps">
+  <Tabs.Content tabIndex={-1} value="apps">
     <Grid
       templateColumns={{
         base: "repeat(1, 1fr)",
@@ -116,7 +108,7 @@ const tabContents = (
                   </Card.Body>
                 </LinkBox>
                 <LinkOverlay asChild>
-                  <NextLink href={app.link} />
+                  <NextLink href={app.link} {...spaceActivatesLinkProps} />
                 </LinkOverlay>
               </Card.Root>
             </GridItem>

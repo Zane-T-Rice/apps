@@ -21,7 +21,10 @@ export function StatusSwitch(props: {
   return (
     <Tooltip content={status}>
       <Button
-        width={10}
+        // 2.5rem wide, but shrinks (keeping the icon square) when the row is too narrow to fit.
+        flex="0 1 2.5rem"
+        minWidth={0}
+        height="auto"
         padding={0}
         margin={0}
         onClick={() => {
@@ -53,6 +56,7 @@ export function StatusSwitch(props: {
         <Image
           src={`/apps/${status.toLowerCase()}.png`}
           alt={status}
+          width="100%"
           bgColor={{
             _dark: checked ? "rgba(100,200,100,.7)" : "none",
             base: checked ? "rgba(100,200,100,.7)" : "none",

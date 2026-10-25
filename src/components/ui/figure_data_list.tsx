@@ -1,5 +1,5 @@
 import { Figure } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_figures";
-import { Grid, GridItem, Stack, Text } from "@chakra-ui/react";
+import { Flex, Grid, GridItem, Stack, Text } from "@chakra-ui/react";
 import { GiBroadsword, GiLeatherBoot } from "react-icons/gi";
 import { IoShield } from "react-icons/io5";
 import { IncrementalNumberEditor } from "./incremental_number_editor";
@@ -206,27 +206,30 @@ export function FigureDataList(props: {
           </Stack>
         </GridItem>
         <GridItem colSpan={totalColumnSpan}>
-          {[
-            "Strengthen",
-            "Invisible",
-            "Ward",
-            "Safeguard",
-            "Immobilize",
-            "Muddle",
-            "Disarm",
-            "Poison",
-            "Wound",
-            "Stun",
-          ].map((status) => {
-            return (
-              <StatusSwitch
-                key={`status-switch-${figure.id}-${status}`}
-                figure={figure}
-                onFigureEdit={onFigureEdit}
-                status={status}
-              />
-            );
-          })}
+          {/* One row that never wraps. The buttons shrink if the card is narrower than they are. */}
+          <Flex wrap="nowrap">
+            {[
+              "Strengthen",
+              "Invisible",
+              "Ward",
+              "Safeguard",
+              "Immobilize",
+              "Muddle",
+              "Disarm",
+              "Poison",
+              "Wound",
+              "Stun",
+            ].map((status) => {
+              return (
+                <StatusSwitch
+                  key={`status-switch-${figure.id}-${status}`}
+                  figure={figure}
+                  onFigureEdit={onFigureEdit}
+                  status={status}
+                />
+              );
+            })}
+          </Flex>
         </GridItem>
       </Grid>
     ) : null;

@@ -1,5 +1,6 @@
 "use client";
 
+import { useRestoreFocus } from "@/app/utils/use_restore_focus";
 import {
   CloseButton,
   Drawer,
@@ -12,6 +13,7 @@ import {
 import { useEffect, useState } from "react";
 import { Auth0User } from "@/app/utils/server-manager-service/server_manager_service_auth0_users";
 import { Button } from "../recipes/button";
+import { keyboardSelectProps } from "@/app/utils/keyboard_select";
 
 const SEARCH_DEBOUNCE_MS = 300;
 // Must match the number of users the service returns per page when listing all.
@@ -129,9 +131,12 @@ export function UserSearchDrawer(props: {
       ? results.filter((user) => matches(user, searchText.trim()))
       : results;
 
+  const finalFocusEl = useRestoreFocus(isOpen);
+
   return (
     <Drawer.Root
       open={isOpen}
+      finalFocusEl={finalFocusEl}
       onOpenChange={(details: DrawerOpenChangeDetails) => {
         if (details.open) setIsOpen(true);
         else close();
@@ -171,6 +176,12 @@ export function UserSearchDrawer(props: {
                     opacity={isSelecting ? 0.5 : 1}
                     _hover={{ bg: "blackAlpha.500" }}
                     onClick={() => select(user)}
+                    role="button"
+                    {...keyboardSelectProps(() => select(user))}
+                    _focusVisible={{
+                      outline: "2px solid",
+                      outlineColor: "blue.500",
+                    }}
                   >
                     <Text truncate>
                       {user.email ?? user.applicationName ?? user.userId}

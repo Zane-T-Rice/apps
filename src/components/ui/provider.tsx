@@ -8,6 +8,8 @@ import {
 } from "@chakra-ui/react";
 import { ThemeProvider, ThemeProviderProps } from "next-themes";
 import { ColorModeProvider } from "./color-mode";
+import { useEffect } from "react";
+import { keepFocusUsable } from "@/app/utils/keyboard_select";
 
 const customConfig = defineConfig({
   theme: {
@@ -23,6 +25,8 @@ const customConfig = defineConfig({
 export const system = createSystem(defaultConfig, customConfig);
 
 export function Provider(props: ThemeProviderProps) {
+  useEffect(() => keepFocusUsable(), []);
+
   return (
     <ChakraProvider value={system}>
       <ColorModeProvider>

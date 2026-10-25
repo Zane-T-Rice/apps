@@ -1,5 +1,6 @@
 "use client";
 
+import { useRestoreFocus } from "@/app/utils/use_restore_focus";
 import {
   CloseButton,
   Drawer,
@@ -44,9 +45,12 @@ export function SharedDrawer(props: {
     setIsSubmitting(false);
   };
 
+  const finalFocusEl = useRestoreFocus(isOpen);
+
   return (
     <Drawer.Root
       open={isOpen}
+      finalFocusEl={finalFocusEl}
       onOpenChange={(details: DrawerOpenChangeDetails) =>
         setIsOpen(details.open)
       }

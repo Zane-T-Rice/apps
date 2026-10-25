@@ -69,6 +69,7 @@ export default function GloomhavenCompanionPageContent() {
   const tabTriggers = (
     <>
       <Tabs.Trigger
+        tabIndex={0}
         value="campaigns"
         onClick={() => {
           if (activeTab !== "campaigns")
@@ -81,6 +82,7 @@ export default function GloomhavenCompanionPageContent() {
         Campaigns
       </Tabs.Trigger>
       <Tabs.Trigger
+        tabIndex={0}
         value="scenarios"
         onClick={() => {
           if (activeTab !== "scenarios")
@@ -94,6 +96,7 @@ export default function GloomhavenCompanionPageContent() {
         Scenarios
       </Tabs.Trigger>
       <Tabs.Trigger
+        tabIndex={0}
         value="enemies"
         onClick={() => {
           setScroll(true);
@@ -107,6 +110,7 @@ export default function GloomhavenCompanionPageContent() {
         Enemies
       </Tabs.Trigger>
       <Tabs.Trigger
+        tabIndex={0}
         value="allies"
         onClick={() => {
           setScroll(true);
@@ -124,7 +128,7 @@ export default function GloomhavenCompanionPageContent() {
 
   const tabContents = (
     <>
-      <Tabs.Content value="campaigns">
+      <Tabs.Content tabIndex={-1} value="campaigns">
         <GloomhavenCompanionCampaignTabContent
           selectedCampaign={selectedCampaign}
           setSelectedCampaign={setSelectedCampaign}
@@ -132,7 +136,7 @@ export default function GloomhavenCompanionPageContent() {
         />
       </Tabs.Content>
       {selectedCampaign && (
-        <Tabs.Content value="scenarios">
+        <Tabs.Content tabIndex={-1} value="scenarios">
           <GloomhavenCompanionScenarioTabContent
             selectedCampaign={selectedCampaign}
             selectedScenario={selectedScenario}

@@ -1,3 +1,4 @@
+import { keyboardSelectProps } from "@/app/utils/keyboard_select";
 import { DataList, Grid, GridItem, Skeleton, Stack } from "@chakra-ui/react";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import {
@@ -239,6 +240,11 @@ export function GloomhavenCompanionScenarioTabContent(props: {
                   key={`navigation-bar-grid-item-${index}`}
                   justifyItems="center"
                   onClick={() => onScenarioSelect(scenario)}
+                  {...keyboardSelectProps(() => onScenarioSelect(scenario))}
+                  _focusVisible={{
+                    outline: "2px solid",
+                    outlineColor: "blue.500",
+                  }}
                 >
                   <ScenarioCard
                     scenario={scenario}

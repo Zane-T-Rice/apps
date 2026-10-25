@@ -13,7 +13,7 @@ export default function MyServersPageContent() {
 
   const tabTriggers = (
     <>
-      <Tabs.Trigger value="servers">
+      <Tabs.Trigger tabIndex={0} value="servers">
         <Box hideBelow="sm">
           <FaServer />
         </Box>
@@ -24,7 +24,7 @@ export default function MyServersPageContent() {
 
   const tabContents = (
     <>
-      <Tabs.Content value="servers">
+      <Tabs.Content value="servers" tabIndex={-1}>
         <MyServersTabContent />
       </Tabs.Content>
     </>

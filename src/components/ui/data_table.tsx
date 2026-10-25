@@ -1,4 +1,5 @@
 import { Table, Text } from "@chakra-ui/react";
+import { keyboardSelectProps } from "@/app/utils/keyboard_select";
 
 export default function DataTable<T extends object>(props: {
   records: T[];
@@ -26,6 +27,14 @@ export default function DataTable<T extends object>(props: {
             key={`data-row-${index}`}
             onClick={() => {
               onRowSelect?.(record);
+            }}
+            {...(onRowSelect
+              ? keyboardSelectProps(() => onRowSelect(record))
+              : {})}
+            _focusVisible={{
+              outline: "2px solid",
+              outlineColor: "blue.500",
+              outlineOffset: "-2px",
             }}
             bg={
               onRowSelect &&

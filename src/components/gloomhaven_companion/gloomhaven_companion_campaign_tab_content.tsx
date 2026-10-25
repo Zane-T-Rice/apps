@@ -1,3 +1,4 @@
+import { keyboardSelectProps } from "@/app/utils/keyboard_select";
 import { Grid, GridItem, Skeleton, Stack } from "@chakra-ui/react";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import {
@@ -216,6 +217,11 @@ export function GloomhavenCompanionCampaignTabContent(props: {
                     key={`navigation-bar-grid-item-${index}`}
                     justifyItems="center"
                     onClick={() => onCampaignSelect(campaign)}
+                    {...keyboardSelectProps(() => onCampaignSelect(campaign))}
+                    _focusVisible={{
+                      outline: "2px solid",
+                      outlineColor: "blue.500",
+                    }}
                   >
                     <CampaignCard
                       campaign={campaign}

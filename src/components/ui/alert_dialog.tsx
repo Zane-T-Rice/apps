@@ -1,5 +1,6 @@
 import { CloseButton, Dialog, Portal } from "@chakra-ui/react";
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
+import { useRestoreFocus } from "@/app/utils/use_restore_focus";
 import { Button } from "../recipes/button";
 
 export function AlertDialog(props: {
@@ -21,8 +22,16 @@ export function AlertDialog(props: {
     confirmVariant,
   } = props;
 
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const finalFocusEl = useRestoreFocus(isOpen);
+
   return (
-    <Dialog.Root role="alertdialog">
+    <Dialog.Root
+      role="alertdialog"
+      open={isOpen}
+      onOpenChange={(details) => setIsOpen(details.open)}
+      finalFocusEl={finalFocusEl}
+    >
       <Dialog.Trigger asChild>{trigger}</Dialog.Trigger>
       <Portal>
         <Dialog.Backdrop />

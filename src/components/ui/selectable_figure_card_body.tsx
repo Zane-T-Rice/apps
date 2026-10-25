@@ -4,6 +4,7 @@ import { IoCloseSharp } from "react-icons/io5";
 import { FigureDataList } from "./figure_data_list";
 import { Figure } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_figures";
 import { GiCurlyWing } from "react-icons/gi";
+import { removeAndRefocus } from "@/app/utils/keyboard_select";
 import EditFigureButton from "./edit_figure_button";
 
 export function SelectableFigureCardBody(props: {
@@ -61,7 +62,9 @@ export function SelectableFigureCardBody(props: {
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  onFigureDelete(figure, true);
+                  removeAndRefocus(e.currentTarget, () =>
+                    onFigureDelete(figure, true),
+                  );
                 }}
                 _hover={{
                   color: "red",

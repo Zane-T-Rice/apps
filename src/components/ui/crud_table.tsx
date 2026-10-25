@@ -70,7 +70,7 @@ export default function CRUDTable<
           confirmDelete
           renderCreateDrawer={renderCreateDrawer}
         />
-        <Box overflowX="auto" overflowY="auto" maxHeight="32rem">
+        <Box overflowX="auto" overflowY="auto" maxHeight="32rem" tabIndex={-1}>
           <DataTable
             records={records}
             style={{}}

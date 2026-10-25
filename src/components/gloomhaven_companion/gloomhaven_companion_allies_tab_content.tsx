@@ -1,3 +1,4 @@
+import { keyboardSelectProps } from "@/app/utils/keyboard_select";
 import { Card, Grid, GridItem, Skeleton, Stack, Text } from "@chakra-ui/react";
 import { Figure } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_figures";
 import { FigureCard } from "../ui/figure_card";
@@ -157,6 +158,13 @@ export function GloomhavenCompanionAllyTabContent(props: {
                           key={`figure-card-${figureIndex}`}
                           justifyItems="center"
                           onClick={() => onFigureSelect(figure, "ally")}
+                          {...keyboardSelectProps(() =>
+                            onFigureSelect(figure, "ally"),
+                          )}
+                          _focusVisible={{
+                            outline: "2px solid",
+                            outlineColor: "blue.500",
+                          }}
                         >
                           <FigureCard
                             figure={figure}

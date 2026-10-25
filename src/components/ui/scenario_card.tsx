@@ -1,3 +1,4 @@
+import { removeAndRefocus } from "@/app/utils/keyboard_select";
 import { SelectableCardRoot } from "./selectable_card_root";
 import { useMemo } from "react";
 import { Scenario } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_scenarios";
@@ -27,7 +28,11 @@ export function ScenarioCard(props: {
               <Card.Title>{`${scenario.name}`}</Card.Title>
               <Button
                 marginLeft="auto"
-                onClick={() => onScenarioDelete(scenario, true)}
+                onClick={(e) =>
+                  removeAndRefocus(e.currentTarget, () =>
+                    onScenarioDelete(scenario, true),
+                  )
+                }
                 _hover={{
                   color: "red",
                 }}

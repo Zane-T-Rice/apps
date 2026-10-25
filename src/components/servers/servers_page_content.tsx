@@ -29,31 +29,40 @@ export default function ServersPageContent() {
 
   const tabTriggers = (
     <>
-      <Tabs.Trigger value="hosts">
+      <Tabs.Trigger tabIndex={0} value="hosts">
         <Box hideBelow="sm">
           <FaGhost />
         </Box>
         Hosts
       </Tabs.Trigger>
-      <Tabs.Trigger value="servers" disabled={!selectedHost}>
+      <Tabs.Trigger tabIndex={0} value="servers" disabled={!selectedHost}>
         <Box hideBelow="sm">
           <FaServer />
         </Box>
         Servers
       </Tabs.Trigger>
-      <Tabs.Trigger value="ports" disabled={!selectedHost || !selectedServer}>
+      <Tabs.Trigger
+        tabIndex={0}
+        value="ports"
+        disabled={!selectedHost || !selectedServer}
+      >
         <Box hideBelow="sm">
           <CiEdit />
         </Box>
         Ports
       </Tabs.Trigger>
-      <Tabs.Trigger value="volumes" disabled={!selectedHost || !selectedServer}>
+      <Tabs.Trigger
+        tabIndex={0}
+        value="volumes"
+        disabled={!selectedHost || !selectedServer}
+      >
         <Box hideBelow="sm">
           <CiEdit />
         </Box>
         Volumes
       </Tabs.Trigger>
       <Tabs.Trigger
+        tabIndex={0}
         value="environment_variables"
         disabled={!selectedHost || !selectedServer}
       >
@@ -62,13 +71,21 @@ export default function ServersPageContent() {
         </Box>
         Env Variables
       </Tabs.Trigger>
-      <Tabs.Trigger value="files" disabled={!selectedHost || !selectedServer}>
+      <Tabs.Trigger
+        tabIndex={0}
+        value="files"
+        disabled={!selectedHost || !selectedServer}
+      >
         <Box hideBelow="sm">
           <CiEdit />
         </Box>
         Files
       </Tabs.Trigger>
-      <Tabs.Trigger value="users" disabled={!selectedHost || !selectedServer}>
+      <Tabs.Trigger
+        tabIndex={0}
+        value="users"
+        disabled={!selectedHost || !selectedServer}
+      >
         <Box hideBelow="sm">
           <CiEdit />
         </Box>
@@ -79,14 +96,14 @@ export default function ServersPageContent() {
 
   const tabContents = (
     <>
-      <Tabs.Content value="hosts">
+      <Tabs.Content tabIndex={-1} value="hosts">
         <HostsTabContent
           selectedHost={selectedHost}
           setSelectedHost={setSelectedHost}
           onSelectHost={onSelectHost}
         />
       </Tabs.Content>
-      <Tabs.Content value="servers">
+      <Tabs.Content tabIndex={-1} value="servers">
         {selectedHost ? (
           <ServersTabContent
             selectedHost={selectedHost}
@@ -95,7 +112,7 @@ export default function ServersPageContent() {
           />
         ) : null}
       </Tabs.Content>
-      <Tabs.Content value="ports">
+      <Tabs.Content tabIndex={-1} value="ports">
         {selectedHost && selectedServer ? (
           <PortsTabContent
             selectedHost={selectedHost}
@@ -103,7 +120,7 @@ export default function ServersPageContent() {
           />
         ) : null}
       </Tabs.Content>
-      <Tabs.Content value="volumes">
+      <Tabs.Content tabIndex={-1} value="volumes">
         {selectedHost && selectedServer ? (
           <VolumesTabContent
             selectedHost={selectedHost}
@@ -111,7 +128,7 @@ export default function ServersPageContent() {
           />
         ) : null}
       </Tabs.Content>
-      <Tabs.Content value="environment_variables">
+      <Tabs.Content tabIndex={-1} value="environment_variables">
         {selectedHost && selectedServer ? (
           <EnvironmentVariablesTabContent
             selectedHost={selectedHost}
@@ -119,7 +136,7 @@ export default function ServersPageContent() {
           />
         ) : null}
       </Tabs.Content>
-      <Tabs.Content value="files">
+      <Tabs.Content tabIndex={-1} value="files">
         {selectedHost && selectedServer ? (
           <FilesTabContent
             selectedHost={selectedHost}
@@ -127,7 +144,7 @@ export default function ServersPageContent() {
           />
         ) : null}
       </Tabs.Content>
-      <Tabs.Content value="users">
+      <Tabs.Content tabIndex={-1} value="users">
         {selectedHost && selectedServer ? (
           <UserServerLinksTabContent
             selectedHost={selectedHost}

@@ -180,7 +180,7 @@ export function GloomhavenCompanionAllyEnemyTabSharedContent(props: {
 
   return (
     <>
-      <Tabs.Content value="enemies">
+      <Tabs.Content tabIndex={-1} value="enemies">
         <GloomhavenCompanionAllyEnemyTabContent
           selectedCampaign={selectedCampaign}
           selectedScenario={selectedScenario}
@@ -201,7 +201,7 @@ export function GloomhavenCompanionAllyEnemyTabSharedContent(props: {
           isLoading={figuresLoading}
         />
       </Tabs.Content>
-      <Tabs.Content value="allies">
+      <Tabs.Content tabIndex={-1} value="allies">
         <GloomhavenCompanionAllyEnemyTabContent
           selectedCampaign={selectedCampaign}
           selectedScenario={selectedScenario}

@@ -1,5 +1,6 @@
 "use client";
 
+import { useRestoreFocus } from "@/app/utils/use_restore_focus";
 import {
   CloseButton,
   Drawer,
@@ -203,9 +204,12 @@ export function AutoFormDrawer<T extends object, S extends Schema>(props: {
     })();
   };
 
+  const finalFocusEl = useRestoreFocus(isOpen);
+
   return (
     <Drawer.Root
       open={isOpen}
+      finalFocusEl={finalFocusEl}
       onOpenChange={(details: DrawerOpenChangeDetails) =>
         setIsOpen(details.open)
       }

@@ -71,7 +71,7 @@ export function FigureDataList(props: {
                       : status
                   }
                 >
-                  <Text tabIndex={index}>{textStatuses[lowerCaseStatus]}</Text>
+                  <Text tabIndex={0}>{textStatuses[lowerCaseStatus]}</Text>
                 </Tooltip>
               )}
             </Stack>

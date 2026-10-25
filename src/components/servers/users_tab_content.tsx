@@ -35,7 +35,7 @@ export function UserServerLinksTabContent(props: {
     createREST: createUserServerLink,
     deleteREST: deleteUserServerLink,
   } = useUserServerLinks(selectedHost, selectedServer);
-  const { getAllREST: searchAuth0Users } = useAuth0Users();
+  const searchAuth0Users = useAuth0Users();
 
   useEffect(() => {
     if (!selectedServer) return;

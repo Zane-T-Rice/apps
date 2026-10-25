@@ -3,6 +3,38 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import { useCallback } from "react";
 
+// GET all of a resource. Optionally pass query params (i.e. { search: "a", page: "0" }) to filter or
+// page the results. Split out of useREST for resources that are only listed and have no id.
+export function useGetAllREST<R>(
+  baseUrl: string,
+  responseTransformer?: (response: R | R[]) => R | R[],
+) {
+  const { getAccessTokenSilently } = useAuth0();
+
+  return useCallback(
+    async (query?: Record<string, string>): Promise<R[] | null> => {
+      const accessToken = await getAccessTokenSilently();
+
+      const queryString = query ? `?${new URLSearchParams(query)}` : "";
+      const response = await fetch(`${baseUrl}${queryString}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (response.status !== 200) {
+        return null;
+      }
+
+      const parsedResponse = await response.json();
+      return responseTransformer?.(parsedResponse) || parsedResponse;
+    },
+    [baseUrl, getAccessTokenSilently, responseTransformer],
+  );
+}
+
 export function useREST<
   T extends { id: string }, // The main resource type
   // Any keys to exclude from create and edit.
@@ -12,29 +44,7 @@ export function useREST<
 >(baseUrl: string, responseTransformer?: (response: R | R[]) => R | R[]) {
   const { getAccessTokenSilently } = useAuth0();
 
-  const getAllREST: (query?: Record<string, string>) => Promise<R[] | null> =
-    useCallback(
-      async (query?: Record<string, string>) => {
-        const accessToken = await getAccessTokenSilently();
-
-        const queryString = query ? `?${new URLSearchParams(query)}` : "";
-        const response = await fetch(`${baseUrl}${queryString}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            authorization: `Bearer ${accessToken}`,
-          },
-        });
-
-        if (response.status !== 200) {
-          return null;
-        }
-
-        const parsedResponse = await response.json();
-        return responseTransformer?.(parsedResponse) || parsedResponse;
-      },
-      [baseUrl, getAccessTokenSilently, responseTransformer],
-    );
+  const getAllREST = useGetAllREST<R>(baseUrl, responseTransformer);
 
   const createREST: (resource: Omit<T, K>) => Promise<R | null> = useCallback(
     async (resource: Omit<T, K>) => {

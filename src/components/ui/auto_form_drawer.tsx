@@ -59,7 +59,10 @@ export function AutoFormDrawer<T extends object, S extends Schema>(props: {
 
     const getFieldValue = (record: T, fieldName: keyof T) => {
       let result;
-      if (typeof record[fieldName] === "number") {
+      if (record[fieldName] === undefined || record[fieldName] === null) {
+        // Optional/nullable fields the service omits are simply empty inputs.
+        result = "";
+      } else if (typeof record[fieldName] === "number") {
         result = record[fieldName];
       } else if (
         typeof record[fieldName] === "string" ||

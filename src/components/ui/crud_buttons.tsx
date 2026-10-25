@@ -104,8 +104,6 @@ export default function CRUDButtons<
           base: "repeat(6, 1fr)",
         }}
         gap="3"
-        marginLeft={3}
-        marginRight={3}
       >
         {createPermission !== undefined ? (
           <GridItem colSpan={createEditDeleteWidth}>

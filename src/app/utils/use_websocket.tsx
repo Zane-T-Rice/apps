@@ -122,7 +122,8 @@ export function useWebSocket<
 
   const connect = useCallback(async () => {
     if (!ws || ws.readyState !== WebSocket.OPEN) {
-      wsHooks(await getAccessTokenSilently());
+      const accessToken = await getAccessTokenSilently();
+      if (accessToken) wsHooks(accessToken);
     }
   }, [ws, wsHooks, getAccessTokenSilently]);
 

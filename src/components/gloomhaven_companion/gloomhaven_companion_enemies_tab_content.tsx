@@ -203,11 +203,7 @@ export function GloomhavenCompanionEnemyTabContent(props: {
                   </Card.Title>
                   <Grid
                     key={`group-grid-${groupIndex}`}
-                    templateColumns={{
-                      base: "repeat(1, 1fr)",
-                      md: "repeat(2, 1fr)",
-                      lg: "repeat(3, 1fr)",
-                    }}
+                    templateColumns="repeat(auto-fill, minmax(min(26.5rem, 100%), 1fr))"
                     gap="3"
                     marginLeft={3}
                     marginRight={3}
@@ -219,7 +215,6 @@ export function GloomhavenCompanionEnemyTabContent(props: {
                           key={`figure-card-${figureIndex}`}
                           justifyItems="center"
                           onClick={() => onFigureSelect(figure, "enemy")}
-                          minWidth={365}
                         >
                           <FigureCard
                             figure={figure}

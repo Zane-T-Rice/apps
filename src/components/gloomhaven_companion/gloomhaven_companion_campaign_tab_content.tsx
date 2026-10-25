@@ -181,7 +181,7 @@ export function GloomhavenCompanionCampaignTabContent(props: {
         </Stack>
       ) : (
         <>
-          <Stack gap={3}>
+          <Stack gap={3} marginLeft={3} marginRight={3}>
             <CRUDButtons
               omitKeys={["id", "parent", "entity", "updatedAt"]}
               selectedRecord={selectedCampaign}
@@ -196,12 +196,7 @@ export function GloomhavenCompanionCampaignTabContent(props: {
               onDelete={onCampaignDelete}
               confirmDelete
             />
-            <Button
-              onClick={openJoinCampaignDrawer}
-              variant="safe"
-              marginLeft={3}
-              marginRight={3}
-            >
+            <Button onClick={openJoinCampaignDrawer} variant="safe">
               Use Join Code
             </Button>
             <Grid
@@ -209,10 +204,10 @@ export function GloomhavenCompanionCampaignTabContent(props: {
                 base: "repeat(1, 1fr)",
                 md: "repeat(2, 1fr)",
                 lg: "repeat(3, 1fr)",
+                xl: "repeat(4, 1fr)",
+                "2xl": "repeat(5, 1fr)",
               }}
               gap="3"
-              marginLeft={3}
-              marginRight={3}
             >
               {campaigns.map((campaign, index) => {
                 return (

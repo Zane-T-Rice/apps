@@ -2,6 +2,7 @@ import { Box, Stack, StackProps } from "@chakra-ui/react";
 import DataTable from "./data_table";
 import CRUDButtons from "./crud_buttons";
 import { Schema } from "yup";
+import { ReactNode } from "react";
 
 export default function CRUDTable<
   T extends object,
@@ -22,6 +23,10 @@ export default function CRUDTable<
     editResourceSchema?: E;
     deletePermission?: string;
     onDelete?: (record: T) => Promise<boolean>;
+    renderCreateDrawer?: (drawer: {
+      isOpen: boolean;
+      setIsOpen: (value: boolean) => void;
+    }) => ReactNode;
   } & StackProps,
 ) {
   const {
@@ -38,6 +43,7 @@ export default function CRUDTable<
     editResourceSchema,
     deletePermission,
     onDelete,
+    renderCreateDrawer,
     ...stackProps
   } = props;
 
@@ -62,6 +68,7 @@ export default function CRUDTable<
           deletePermission={deletePermission}
           onDelete={onDelete}
           confirmDelete
+          renderCreateDrawer={renderCreateDrawer}
         />
         <Box overflowX="auto" overflowY="auto" maxHeight="32rem">
           <DataTable

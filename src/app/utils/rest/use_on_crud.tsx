@@ -59,9 +59,14 @@ export function useOnCRUD<
       });
       if (!resource) return false;
 
-      // Update resources with new record
+      // Update resources with new record. A create can return a resource that
+      // already exists, so replace it rather than add a duplicate row.
       setResources((prev) => {
-        return [...prev, resource];
+        return prev.some((current) => current.id === resource.id)
+          ? prev.map((current) =>
+              current.id === resource.id ? resource : current,
+            )
+          : [...prev, resource];
       });
 
       sendMessage?.(resource, "POST");

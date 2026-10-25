@@ -1,7 +1,7 @@
 import { Box, Grid, GridItem, Stack, Text } from "@chakra-ui/react";
 import { AlertDialog } from "./alert_dialog";
 import { AutoDataList } from "./auto_data_list";
-import { useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { usePermissions } from "@/app/utils/use_permissions";
 import { AutoFormDrawer } from "./auto_form_drawer";
 import { Button } from "../recipes/button";
@@ -25,6 +25,11 @@ export default function CRUDButtons<
   onDelete?: (record: T) => Promise<boolean>;
   desiredFieldOrder?: { [Property in keyof T]?: number };
   confirmDelete?: boolean;
+  // Replaces the generic create form with a custom create drawer.
+  renderCreateDrawer?: (drawer: {
+    isOpen: boolean;
+    setIsOpen: (value: boolean) => void;
+  }) => ReactNode;
 }) {
   const {
     omitKeys,
@@ -40,6 +45,7 @@ export default function CRUDButtons<
     onDelete,
     desiredFieldOrder,
     confirmDelete,
+    renderCreateDrawer,
   } = props;
 
   const [isEditOpen, setIsEditOpen] = useState<boolean>(false);
@@ -165,7 +171,12 @@ export default function CRUDButtons<
           </GridItem>
         ) : null}
       </Grid>
-      {creationRecord &&
+      {renderCreateDrawer?.({
+        isOpen: isCreateOpen,
+        setIsOpen: setIsCreateOpen,
+      })}
+      {!renderCreateDrawer &&
+      creationRecord &&
       onCreate &&
       createResourceSchema &&
       createPermission !== undefined ? (

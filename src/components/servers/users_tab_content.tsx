@@ -6,12 +6,14 @@ import {
 } from "@/app/utils/server-manager-service/server_manager_service_user_server_links";
 import { useEffect, useState } from "react";
 import { string, object } from "yup";
+import { useAuth0Users } from "@/app/utils/server-manager-service/server_manager_service_auth0_users";
+import { UserSearchDrawer } from "./user_search_drawer";
 import { Server } from "@/app/utils/server-manager-service/server_manager_service_servers";
 import { Host } from "@/app/utils/server-manager-service/server_manager_service_hosts";
 import { useOnCRUD } from "@/app/utils/rest/use_on_crud";
 
 const createUserServerLinkSchema = object({
-  username: string().required(),
+  userId: string().required(),
 }).stripUnknown();
 
 const deleteUserServerLinkSchema = object({
@@ -28,16 +30,12 @@ export function UserServerLinksTabContent(props: {
   const [selectedUserServerLink, setSelectedUserServerLink] =
     useState<UserServerLink>();
 
-  const [createUserServerLinkRecord] = useState<UserServerLink>({
-    id: "",
-    username: "",
-  });
-
   const {
     getAllREST: getUserServerLinks,
     createREST: createUserServerLink,
     deleteREST: deleteUserServerLink,
   } = useUserServerLinks(selectedHost, selectedServer);
+  const { getAllREST: searchAuth0Users } = useAuth0Users();
 
   useEffect(() => {
     if (!selectedServer) return;
@@ -62,7 +60,7 @@ export function UserServerLinksTabContent(props: {
     typeof createUserServerLinkSchema,
     typeof deleteUserServerLinkSchema
   >({
-    resourceNameKey: "username",
+    resourceNameKey: "userId",
     createResourceSchema: createUserServerLinkSchema,
     deleteResourceSchema: deleteUserServerLinkSchema,
     createResource: createUserServerLink,
@@ -84,9 +82,21 @@ export function UserServerLinksTabContent(props: {
       onRowSelect={onUserServerLinkSelect}
       selectedRecordId={selectedUserServerLink?.id}
       createPermission="server-manager:admin"
-      creationRecord={createUserServerLinkRecord}
-      onCreate={onUserServerLinkCreate}
-      createResourceSchema={createUserServerLinkSchema}
+      renderCreateDrawer={({ isOpen, setIsOpen }) => (
+        <UserSearchDrawer
+          isOpen={isOpen}
+          setIsOpen={setIsOpen}
+          search={searchAuth0Users}
+          onSelect={(user) =>
+            onUserServerLinkCreate({
+              id: "",
+              userId: user.userId,
+              email: user.email ?? null,
+              applicationName: user.applicationName ?? null,
+            })
+          }
+        />
+      )}
       deletePermission="server-manager:admin"
       onDelete={onUserServerLinkDelete}
       marginLeft={3}

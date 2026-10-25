@@ -12,24 +12,29 @@ export function useREST<
 >(baseUrl: string, responseTransformer?: (response: R | R[]) => R | R[]) {
   const { getAccessTokenSilently } = useAuth0();
 
-  const getAllREST: () => Promise<R[] | null> = useCallback(async () => {
-    const accessToken = await getAccessTokenSilently();
+  const getAllREST: (query?: Record<string, string>) => Promise<R[] | null> =
+    useCallback(
+      async (query?: Record<string, string>) => {
+        const accessToken = await getAccessTokenSilently();
 
-    const response = await fetch(baseUrl, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        authorization: `Bearer ${accessToken}`,
+        const queryString = query ? `?${new URLSearchParams(query)}` : "";
+        const response = await fetch(`${baseUrl}${queryString}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            authorization: `Bearer ${accessToken}`,
+          },
+        });
+
+        if (response.status !== 200) {
+          return null;
+        }
+
+        const parsedResponse = await response.json();
+        return responseTransformer?.(parsedResponse) || parsedResponse;
       },
-    });
-
-    if (response.status !== 200) {
-      return null;
-    }
-
-    const parsedResponse = await response.json();
-    return responseTransformer?.(parsedResponse) || parsedResponse;
-  }, [baseUrl, getAccessTokenSilently, responseTransformer]);
+      [baseUrl, getAccessTokenSilently, responseTransformer],
+    );
 
   const createREST: (resource: Omit<T, K>) => Promise<R | null> = useCallback(
     async (resource: Omit<T, K>) => {

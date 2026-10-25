@@ -9,7 +9,9 @@ export type Server = {
 
 export type UserServerLink = {
   id: string;
-  username: string; // auth0 user id
+  userId: string; // auth0 user id (or <client_id>@clients for machines)
+  email: string | null; // auth0 email
+  applicationName: string | null; // name of the auth0 machine-to-machine application
 };
 
 export function useUserServerLinks(host: Host, server: Server | null) {

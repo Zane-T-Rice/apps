@@ -46,6 +46,28 @@ export function useREST<
 
   const getAllREST = useGetAllREST<R>(baseUrl, responseTransformer);
 
+  const getREST: (resource: Pick<T, "id">) => Promise<R | null> = useCallback(
+    async (resource: Pick<T, "id">) => {
+      const accessToken = await getAccessTokenSilently();
+
+      const response = await fetch(`${baseUrl}/${resource.id}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (response.status !== 200) {
+        return null;
+      }
+
+      const parsedResponse = await response.json();
+      return responseTransformer?.(parsedResponse) || parsedResponse;
+    },
+    [baseUrl, getAccessTokenSilently, responseTransformer],
+  );
+
   const createREST: (resource: Omit<T, K>) => Promise<R | null> = useCallback(
     async (resource: Omit<T, K>) => {
       const accessToken = await getAccessTokenSilently();
@@ -169,6 +191,7 @@ export function useREST<
 
   return {
     getAllREST,
+    getREST,
     createREST,
     editREST,
     deleteREST,

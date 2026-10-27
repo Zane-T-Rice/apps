@@ -1,4 +1,5 @@
-import { Skeleton, Stack } from "@chakra-ui/react";
+import { Box, Skeleton, Stack } from "@chakra-ui/react";
+import { Button } from "../recipes/button";
 import CRUDTable from "../ui/crud_table";
 import {
   Server,
@@ -9,6 +10,8 @@ import { string, boolean, object } from "yup";
 import { fetchWithValidateAndToast } from "@/app/utils/fetch/fetch_with_validate_and_toast";
 import { Host } from "@/app/utils/server-manager-service/server_manager_service_hosts";
 import { ServerActionsButtons } from "./server_actions_buttons";
+import { useServerStatusRefresh } from "@/app/utils/use_server_status_refresh";
+import { StatusLight } from "../ui/status_light";
 import { useOnCRUD } from "@/app/utils/rest/use_on_crud";
 
 const createServerSchema = object({
@@ -47,10 +50,12 @@ export function ServersTabContent(props: {
     containerName: "",
     isInResponseChain: false,
     isUpdatable: true,
+    status: "",
   });
 
   const {
     getAllREST: getServers,
+    getREST: getServer,
     createREST: createServer,
     editREST: editServer,
     deleteREST: deleteServer,
@@ -67,6 +72,14 @@ export function ServersTabContent(props: {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedHost]);
+
+  const {
+    refreshingIds,
+    isRefreshingAll,
+    refreshServer,
+    refreshAllServers,
+    refreshServerAfterAction,
+  } = useServerStatusRefresh({ servers, setServers, getServer, getServers });
 
   const onServerSelect = (server: Server) => {
     setSelectedServer(server);
@@ -108,6 +121,7 @@ export function ServersTabContent(props: {
     });
     if (!server) return false;
 
+    refreshServerAfterAction(serverToUpdate.id);
     return true;
   };
 
@@ -126,6 +140,7 @@ export function ServersTabContent(props: {
     });
     if (!server) return false;
 
+    refreshServerAfterAction(serverToStop.id);
     return true;
   };
 
@@ -141,6 +156,16 @@ export function ServersTabContent(props: {
         records={servers}
         style={{}}
         idKey="id"
+        omitKeys={["status"]}
+        cellRenderers={{
+          status: (status, server) => (
+            <StatusLight
+              status={status}
+              onRefresh={() => refreshServer(server.id)}
+              isRefreshing={refreshingIds.has(server.id)}
+            />
+          ),
+        }}
         onRowSelect={onServerSelect}
         selectedRecordId={selectedServer?.id}
         createPermission="server-manager:admin"
@@ -160,6 +185,19 @@ export function ServersTabContent(props: {
         onServerUpdate={onServerUpdate}
         onServerStop={onServerStop}
       />
+      <Box marginLeft={3} marginRight={3}>
+        <Button
+          variant="outline"
+          width="100%"
+          // Not disabled while refreshing: a disabled button loses the keyboard focus.
+          aria-disabled={isRefreshingAll}
+          onClick={() => {
+            if (!isRefreshingAll) refreshAllServers();
+          }}
+        >
+          Refresh statuses
+        </Button>
+      </Box>
     </Stack>
   );
 }

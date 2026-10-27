@@ -1,4 +1,5 @@
-import { Table, Text } from "@chakra-ui/react";
+import { Flex, Table, Text } from "@chakra-ui/react";
+import { ReactNode } from "react";
 import { keyboardSelectProps } from "@/app/utils/keyboard_select";
 
 export default function DataTable<T extends object>(props: {
@@ -7,8 +8,17 @@ export default function DataTable<T extends object>(props: {
   onRowSelect?: (record: T) => void;
   idKey?: keyof T;
   selectedRecordId?: string;
+  // Show a column's cells as something other than text, i.e. { status: (value) => <StatusLight ... /> }.
+  cellRenderers?: { [K in keyof T]?: (value: T[K], record: T) => ReactNode };
 }) {
-  const { records, style, onRowSelect, idKey, selectedRecordId } = props;
+  const {
+    records,
+    style,
+    onRowSelect,
+    idKey,
+    selectedRecordId,
+    cellRenderers,
+  } = props;
 
   return records.length > 0 ? (
     <Table.Root variant="outline" style={style}>
@@ -55,16 +65,28 @@ export default function DataTable<T extends object>(props: {
                   : undefined,
             }}
           >
-            {Object.values(record).map((data, cellIndex) => (
-              <Table.Cell
-                key={`data-row-${index}-cell-${cellIndex}`}
-                justifyItems="center"
-              >
-                <Text maxWidth={300} truncate>
-                  {data !== null && data !== undefined ? data.toString() : ""}
-                </Text>
-              </Table.Cell>
-            ))}
+            {(Object.keys(record) as (keyof T)[]).map((column, cellIndex) => {
+              const data = record[column];
+              const renderCell = cellRenderers?.[column];
+              return (
+                <Table.Cell
+                  key={`data-row-${index}-cell-${cellIndex}`}
+                  justifyItems="center"
+                >
+                  {renderCell ? (
+                    <Flex justifyContent="center">
+                      {renderCell(data, record)}
+                    </Flex>
+                  ) : (
+                    <Text maxWidth={300} truncate>
+                      {data !== null && data !== undefined
+                        ? data.toString()
+                        : ""}
+                    </Text>
+                  )}
+                </Table.Cell>
+              );
+            })}
           </Table.Row>
         ))}
       </Table.Body>

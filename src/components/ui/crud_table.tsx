@@ -2,7 +2,7 @@ import { Box, Stack, StackProps } from "@chakra-ui/react";
 import DataTable from "./data_table";
 import CRUDButtons from "./crud_buttons";
 import { Schema } from "yup";
-import { ReactNode } from "react";
+import { ComponentProps, ReactNode } from "react";
 
 export default function CRUDTable<
   T extends object,
@@ -12,6 +12,10 @@ export default function CRUDTable<
   props: {
     records: T[];
     idKey: keyof T;
+    // Keys that are shown in the table but are not part of the create and edit forms (idKey is always omitted).
+    omitKeys?: (keyof T)[];
+    // Show a column's cells as something other than text. See DataTable.
+    cellRenderers?: ComponentProps<typeof DataTable<T>>["cellRenderers"];
     selectedRecordId?: string; // Should this just be selectedRecord: T (and update DataTable also)
     onRowSelect: (record: T) => void;
     createPermission?: string;
@@ -32,6 +36,8 @@ export default function CRUDTable<
   const {
     records,
     idKey,
+    omitKeys = [],
+    cellRenderers,
     selectedRecordId,
     onRowSelect,
     createPermission,
@@ -56,7 +62,7 @@ export default function CRUDTable<
     <>
       <Stack direction="column" {...stackProps}>
         <CRUDButtons
-          omitKeys={[idKey]}
+          omitKeys={[idKey, ...omitKeys]}
           selectedRecord={selectedRecord}
           createPermission={createPermission}
           creationRecord={creationRecord}
@@ -77,6 +83,7 @@ export default function CRUDTable<
             onRowSelect={onRowSelect}
             idKey={idKey}
             selectedRecordId={selectedRecordId}
+            cellRenderers={cellRenderers}
           />
         </Box>
       </Stack>

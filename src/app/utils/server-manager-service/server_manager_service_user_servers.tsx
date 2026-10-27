@@ -9,6 +9,7 @@ export type Server = {
   isUpdatable: boolean;
   host: { url: string };
   ports: { number: number }[];
+  status: string;
 };
 
 export function useUserServers() {

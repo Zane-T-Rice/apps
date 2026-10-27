@@ -1,16 +1,14 @@
 import { Box, chakra } from "@chakra-ui/react";
 import { Tooltip } from "./tooltip";
 
-// Docker container states, plus "stopped" (no container exists) and "unknown" (the host could not be asked).
+// The statuses of servers in the cluster, and of the apps on the home page. "unknown" means we could not tell.
 const STATUS_COLORS: Record<string, string> = {
   running: "green.500",
-  paused: "yellow.500",
-  restarting: "yellow.500",
-  created: "yellow.500",
-  removing: "yellow.500",
-  exited: "red.500",
-  dead: "red.500",
+  starting: "yellow.500",
   stopped: "gray.500",
+  available: "green.500",
+  checking: "yellow.500",
+  unavailable: "red.500",
   unknown: "gray.500",
 };
 

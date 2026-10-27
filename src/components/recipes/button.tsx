@@ -11,7 +11,6 @@ type ButtonVariantProps = RecipeVariantProps<typeof buttonRecipe> &
   ChakraButtonProps;
 
 // eslint-disable-next-line
-export interface ButtonProps
-  extends React.PropsWithChildren<ButtonVariantProps> {}
+export interface ButtonProps extends React.PropsWithChildren<ButtonVariantProps> {}
 
 export const Button = chakra("button", buttonRecipe);

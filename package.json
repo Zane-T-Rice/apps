@@ -9,7 +9,9 @@
     "build": "next build && mkdir apps && mv out apps/apps && mv apps out",
     "build-prod": "cp .env.prod .env.local && npm run build",
     "deploy": "terraform -chdir=deployments/terraform init && terraform -chdir=deployments/terraform apply",
-    "destroy": "terraform -chdir=deployments/terraform init && terraform -chdir=deployments/terraform destroy"
+    "destroy": "terraform -chdir=deployments/terraform init && terraform -chdir=deployments/terraform destroy",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "@auth0/auth0-react": "^2.3.0",

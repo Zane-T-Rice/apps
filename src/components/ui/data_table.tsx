@@ -1,6 +1,7 @@
 import { Flex, Table, Text } from "@chakra-ui/react";
 import { ReactNode } from "react";
 import { keyboardSelectProps } from "@/app/utils/keyboard_select";
+import { CopyIdButton } from "./copy_id_button";
 
 export default function DataTable<T extends object>(props: {
   records: T[];
@@ -20,13 +21,18 @@ export default function DataTable<T extends object>(props: {
     cellRenderers,
   } = props;
 
+  // The id column goes last: nobody scans these tables for ids, they only copy one now and then.
+  const columns = (
+    records.length > 0 ? (Object.keys(records[0]) as (keyof T)[]) : []
+  ).sort((a, b) => Number(a === idKey) - Number(b === idKey));
+
   return records.length > 0 ? (
     <Table.Root variant="outline" style={style}>
       <Table.Header>
         <Table.Row key="column-row">
-          {Object.keys(records[0]).map((columnName, index) => (
+          {columns.map((columnName, index) => (
             <Table.ColumnHeader key={`column-${index}`} justifyItems="center">
-              <Text>{columnName}</Text>
+              <Text>{String(columnName)}</Text>
             </Table.ColumnHeader>
           ))}
         </Table.Row>
@@ -65,9 +71,14 @@ export default function DataTable<T extends object>(props: {
                   : undefined,
             }}
           >
-            {(Object.keys(record) as (keyof T)[]).map((column, cellIndex) => {
+            {columns.map((column, cellIndex) => {
               const data = record[column];
-              const renderCell = cellRenderers?.[column];
+              // The id is an icon that copies it, unless the caller chose how to show it.
+              const renderCell =
+                cellRenderers?.[column] ??
+                (column === idKey
+                  ? () => <CopyIdButton id={String(data)} />
+                  : undefined);
               return (
                 <Table.Cell
                   key={`data-row-${index}-cell-${cellIndex}`}

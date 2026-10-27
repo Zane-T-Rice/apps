@@ -14,6 +14,7 @@ env:
   NEXT_PUBLIC_GLOOMHAVEN_COMPANION_WEBSOCKETS_URL: "wss://ws.zanesworld.click/gloomhaven-companion-service"
   NEXT_PUBLIC_SERVER_MANAGER_SERVICE_DOMAIN: "https://server-manager-service.zanesworld.click"
   NEXT_PUBLIC_WEBSITE_DOMAIN: "https://apps.zanesworld.click"
+  NEXT_PUBLIC_GAME_SERVER_HOST: "zanesworld.click"
 
 jobs:
   build:

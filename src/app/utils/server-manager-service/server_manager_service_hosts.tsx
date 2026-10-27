@@ -5,7 +5,6 @@ import { useREST } from "../rest/use_rest";
 export type Host = {
   id: string;
   name: string;
-  url: string;
 };
 
 export function useHosts() {

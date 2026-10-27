@@ -10,7 +10,6 @@ import { useOnCRUD } from "@/app/utils/rest/use_on_crud";
 
 const createHostSchema = object({
   name: string().required(),
-  url: string().required(),
 }).stripUnknown();
 
 const editHostSchema = createHostSchema
@@ -37,7 +36,6 @@ export function HostsTabContent(props: {
   const [createHostRecord] = useState<Host>({
     id: "",
     name: "",
-    url: "",
   });
 
   const {

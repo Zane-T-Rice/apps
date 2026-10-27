@@ -107,7 +107,8 @@ export function MyServersTabContent() {
   }, [servers, filterText]);
 
   const serverToServerInfo = (server: Server) => ({
-    Host: `${new URL(server.host.url).hostname}`,
+    // The address to connect to, with one of the ports below, e.g. zanesworld.click:2456.
+    Host: process.env.NEXT_PUBLIC_GAME_SERVER_HOST,
     Ports: `${Object.keys(
       server.ports
         .map((port) => port.number)

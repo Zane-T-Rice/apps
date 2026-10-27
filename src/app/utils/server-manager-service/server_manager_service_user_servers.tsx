@@ -7,7 +7,7 @@ export type Server = {
   applicationName: string;
   containerName: string;
   isUpdatable: boolean;
-  host: { url: string };
+  host: { name: string };
   ports: { number: number }[];
   status: string;
 };

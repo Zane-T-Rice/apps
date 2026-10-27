@@ -52,6 +52,8 @@ export function useAppHealth(healthUrl: string) {
     let result: AppHealth;
     try {
       const accessToken = await latestGetAccessToken.current();
+      // Some versions of the Auth0 library can answer with nothing instead of throwing.
+      if (!accessToken) throw new Error("There is no access token.");
       let pending = inFlight.get(healthUrl);
       if (!pending) {
         pending = askHealth(healthUrl, accessToken).finally(() =>

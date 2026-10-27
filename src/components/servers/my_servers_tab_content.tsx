@@ -1,5 +1,6 @@
 import {
   Card,
+  Flex,
   Grid,
   GridItem,
   HStack,
@@ -174,13 +175,19 @@ export function MyServersTabContent() {
             >
               <Card.Body>
                 <Stack gap={6}>
-                  <HStack justifyContent="space-between" alignItems="center">
+                  <HStack
+                    justifyContent="space-between"
+                    alignItems="flex-start"
+                  >
                     <Card.Title>{`${server.applicationName}/${server.containerName}`}</Card.Title>
-                    <StatusLight
-                      status={server.status}
-                      onRefresh={() => refreshServer(server.id)}
-                      isRefreshing={refreshingIds.has(server.id)}
-                    />
+                    {/* As tall as one line of the title, so the light stays beside its first line. */}
+                    <Flex alignItems="center" height="1lh" textStyle="lg">
+                      <StatusLight
+                        status={server.status}
+                        onRefresh={() => refreshServer(server.id)}
+                        isRefreshing={refreshingIds.has(server.id)}
+                      />
+                    </Flex>
                   </HStack>
                   <AutoDataList record={serverToServerInfo(server)} />
                   <ServerActionsButtons

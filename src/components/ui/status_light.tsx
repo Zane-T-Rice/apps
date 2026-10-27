@@ -34,10 +34,7 @@ export function StatusLight(props: {
   } as const;
 
   return (
-    <Tooltip
-      content={onRefresh ? `${status} (click to refresh)` : status}
-      positioning={{ placement: "top" }}
-    >
+    <Tooltip content={status} positioning={{ placement: "top" }}>
       {onRefresh ? (
         <chakra.button
           type="button"

@@ -19,11 +19,9 @@ export function useServerStatusRefresh<
   servers: T[];
   setServers: Dispatch<SetStateAction<T[]>>;
   getServer: (server: Pick<T, "id">) => Promise<T | null>;
-  getServers: () => Promise<T[] | null>;
 }) {
   const { setServers } = props;
   const [refreshingIds, setRefreshingIds] = useState<Set<string>>(new Set());
-  const [isRefreshingAll, setIsRefreshingAll] = useState<boolean>(false);
 
   const latest = useRef(props);
   useEffect(() => {
@@ -62,16 +60,6 @@ export function useServerStatusRefresh<
     [setServers],
   );
 
-  const refreshAllServers = useCallback(async () => {
-    setIsRefreshingAll(true);
-    try {
-      const responseServers = await latest.current.getServers();
-      if (responseServers && isMounted.current) setServers(responseServers);
-    } finally {
-      if (isMounted.current) setIsRefreshingAll(false);
-    }
-  }, [setServers]);
-
   const refreshServerAfterAction = useCallback(
     async (id: string) => {
       const before = latest.current.servers.find(
@@ -88,9 +76,7 @@ export function useServerStatusRefresh<
 
   return {
     refreshingIds,
-    isRefreshingAll,
     refreshServer,
-    refreshAllServers,
     refreshServerAfterAction,
   };
 }

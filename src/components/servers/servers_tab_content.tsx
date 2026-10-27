@@ -1,5 +1,4 @@
-import { Box, Skeleton, Stack } from "@chakra-ui/react";
-import { Button } from "../recipes/button";
+import { Skeleton, Stack } from "@chakra-ui/react";
 import CRUDTable from "../ui/crud_table";
 import {
   Server,
@@ -73,13 +72,8 @@ export function ServersTabContent(props: {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedHost]);
 
-  const {
-    refreshingIds,
-    isRefreshingAll,
-    refreshServer,
-    refreshAllServers,
-    refreshServerAfterAction,
-  } = useServerStatusRefresh({ servers, setServers, getServer, getServers });
+  const { refreshingIds, refreshServer, refreshServerAfterAction } =
+    useServerStatusRefresh({ servers, setServers, getServer });
 
   const onServerSelect = (server: Server) => {
     setSelectedServer(server);
@@ -185,19 +179,6 @@ export function ServersTabContent(props: {
         onServerUpdate={onServerUpdate}
         onServerStop={onServerStop}
       />
-      <Box marginLeft={3} marginRight={3}>
-        <Button
-          variant="outline"
-          width="100%"
-          // Not disabled while refreshing: a disabled button loses the keyboard focus.
-          aria-disabled={isRefreshingAll}
-          onClick={() => {
-            if (!isRefreshingAll) refreshAllServers();
-          }}
-        >
-          Refresh statuses
-        </Button>
-      </Box>
     </Stack>
   );
 }

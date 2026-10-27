@@ -16,7 +16,6 @@ import { fetchWithValidateAndToast } from "@/app/utils/fetch/fetch_with_validate
 import { useUserServers } from "@/app/utils/server-manager-service/server_manager_service_user_servers";
 import { ServerActionsButtons } from "./server_actions_buttons";
 import { AutoDataList } from "../ui/auto_data_list";
-import { Button } from "../recipes/button";
 import { useServerStatusRefresh } from "@/app/utils/use_server_status_refresh";
 import { StatusLight } from "../ui/status_light";
 
@@ -46,13 +45,8 @@ export function MyServersTabContent() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const {
-    refreshingIds,
-    isRefreshingAll,
-    refreshServer,
-    refreshAllServers,
-    refreshServerAfterAction,
-  } = useServerStatusRefresh({ servers, setServers, getServer, getServers });
+  const { refreshingIds, refreshServer, refreshServerAfterAction } =
+    useServerStatusRefresh({ servers, setServers, getServer });
 
   const onServerUpdate = async (serverToUpdate: Server): Promise<boolean> => {
     const title = `Updating server ${serverToUpdate.applicationName}/${serverToUpdate.containerName}`;
@@ -136,17 +130,6 @@ export function MyServersTabContent() {
           onChange={(e) => setFilterText(e.target.value)}
           maxWidth="md"
         />
-        <Button
-          variant="outline"
-          flexShrink={0}
-          // Not disabled while refreshing: a disabled button loses the keyboard focus.
-          aria-disabled={isRefreshingAll}
-          onClick={() => {
-            if (!isRefreshingAll) refreshAllServers();
-          }}
-        >
-          Refresh statuses
-        </Button>
       </HStack>
       {visibleServers.length === 0 && filterText.trim() ? (
         <Text marginLeft={2} opacity={0.7}>

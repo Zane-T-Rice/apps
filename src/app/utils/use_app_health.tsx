@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth0 } from "@auth0/auth0-react";
+import { useGetAccessToken } from "./use_access_token";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 // What the status light shows for an app.
@@ -32,12 +32,12 @@ async function askHealth(url: string, accessToken: string): Promise<AppHealth> {
 // Asks a service's /health on load and whenever refresh is called. The service needs a valid token
 // like any other route, which the signed in user already has.
 export function useAppHealth(healthUrl: string) {
-  const { getAccessTokenSilently } = useAuth0();
+  const getAccessToken = useGetAccessToken();
   const [health, setHealth] = useState<AppHealth>("checking");
   // Keep the latest token function without making refresh change when it does, which would ask again.
-  const latestGetAccessToken = useRef(getAccessTokenSilently);
+  const latestGetAccessToken = useRef(getAccessToken);
   useEffect(() => {
-    latestGetAccessToken.current = getAccessTokenSilently;
+    latestGetAccessToken.current = getAccessToken;
   });
   const isMounted = useRef<boolean>(true);
   useEffect(() => {

@@ -1,7 +1,7 @@
 "use client";
 
 import { tabbableWithin } from "@/app/utils/keyboard_select";
-import { KeyboardEvent, ReactNode, useRef } from "react";
+import { KeyboardEvent, ReactNode, useEffect, useRef } from "react";
 import { Stack, Tabs } from "@chakra-ui/react";
 import { NavigationDrawer } from "./navigation_drawer";
 
@@ -23,6 +23,24 @@ export function NavigationBar(props: {
   } = props;
 
   const rootRef = useRef<HTMLDivElement>(null);
+  const barRef = useRef<HTMLDivElement>(null);
+
+  // Anything else that sticks to the top sits just below the bar. Its height differs between the
+  // phone and desktop layouts, so it is measured and shared as a CSS variable.
+  useEffect(() => {
+    const root = rootRef.current;
+    const bar = barRef.current;
+    if (!root || !bar) return;
+    const update = () =>
+      root.style.setProperty(
+        "--navigation-bar-height",
+        `${bar.offsetHeight}px`,
+      );
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(bar);
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <>
@@ -39,6 +57,7 @@ export function NavigationBar(props: {
         fitted
       >
         <Stack
+          ref={barRef}
           direction={{ base: "column", md: "row" }}
           gapY={0}
           position="sticky"

@@ -43,6 +43,10 @@ export function GloomhavenCompanionAllyEnemyTabContent(props: {
   getFigures: () => Promise<Figure[] | null>;
   onFigureSelect: (figure: Figure, type: string) => void;
   isLoading: boolean;
+  state: Record<string, string>;
+  onInitiativeChange: (groupKey: string, value: string) => void;
+  onSpawn?: (figure: Figure) => void;
+  onFigureRemoved?: (figure: Figure) => void;
 }) {
   const {
     selectedCampaign,
@@ -62,6 +66,10 @@ export function GloomhavenCompanionAllyEnemyTabContent(props: {
     getFigures,
     onFigureSelect,
     isLoading,
+    state,
+    onInitiativeChange,
+    onSpawn,
+    onFigureRemoved,
   } = props;
   const { getQueryString } = useQueryString();
 
@@ -111,7 +119,7 @@ export function GloomhavenCompanionAllyEnemyTabContent(props: {
   const {
     onResourceCreate: onFigureCreate,
     onResourceEdit: _onFigureEdit,
-    onResourceDelete: onFigureDelete,
+    onResourceDelete: _onFigureDelete,
   } = useOnCRUD<
     Figure,
     typeof createFigureSchemaState,
@@ -129,6 +137,15 @@ export function GloomhavenCompanionAllyEnemyTabContent(props: {
     setSelectedResource: setSelectedFigure,
     sendMessage,
   });
+
+  const onFigureDelete = useCallback(
+    async (figure: Figure, silent?: boolean): Promise<boolean> => {
+      const result = await _onFigureDelete(figure, silent);
+      if (result) onFigureRemoved?.(figure);
+      return result;
+    },
+    [_onFigureDelete, onFigureRemoved],
+  );
 
   const onFigureEdit = useCallback(
     async (newResource: Figure, silent?: boolean): Promise<boolean> => {
@@ -173,6 +190,9 @@ export function GloomhavenCompanionAllyEnemyTabContent(props: {
           figures={figures}
           templates={templates}
           isLoading={isLoading}
+          state={state}
+          onInitiativeChange={onInitiativeChange}
+          onSpawn={onSpawn}
           selectedFigure={selectedFigure}
           onFigureCreate={onFigureCreate}
           onFigureDelete={onFigureDelete}
@@ -186,6 +206,8 @@ export function GloomhavenCompanionAllyEnemyTabContent(props: {
           figures={figures}
           templates={templates}
           isLoading={isLoading}
+          state={state}
+          onInitiativeChange={onInitiativeChange}
           selectedFigure={selectedFigure}
           onFigureCreate={onFigureCreate}
           onFigureDelete={onFigureDelete}

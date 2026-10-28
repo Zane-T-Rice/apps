@@ -1,4 +1,8 @@
-import { useAuth0 } from "@auth0/auth0-react";
+import { useGetAccessToken } from "./use_access_token";
+import {
+  State,
+  STATE_ENTITY_PREFIX,
+} from "./gloomhaven_companion_service/gloomhaven_companion_service_state";
 import {
   Dispatch,
   SetStateAction,
@@ -21,8 +25,10 @@ export function useWebSocket<
   scenarioId: string;
   websocketId: string;
   setResources: Dispatch<SetStateAction<T[]>>;
+  // Table state shares the websocket but is not one of the resources.
+  onStateMessage?: (resource: State) => void;
 }): {
-  sendMessage: (resource: T, action: string) => void;
+  sendMessage: (resource: T | State, action: string) => void;
   refresh: boolean;
   setRefresh: Dispatch<SetStateAction<boolean>>;
 } {
@@ -32,6 +38,7 @@ export function useWebSocket<
     // Used to identify messages sent by self (and ignore them).
     websocketId,
     setResources,
+    onStateMessage,
   } = props;
   const [refresh, setRefresh] = useState<boolean>(false);
   // Counts how many times a connection has been made, so each (re)connection can be announced.
@@ -40,7 +47,7 @@ export function useWebSocket<
   // websocket that is closing can not clobber a newer one.
   const wsRef = useRef<WebSocket | null>(null);
   const isConnectingRef = useRef<boolean>(false);
-  const { getAccessTokenSilently } = useAuth0();
+  const getAccessToken = useGetAccessToken();
 
   const onMessage = useCallback(
     (event: MessageEvent) => {
@@ -50,6 +57,10 @@ export function useWebSocket<
       // This only really happens in "next dev" mode
       // because the React hooks are invoked multiple times.
       if (websocketId === data.messageId) return;
+      if (resource.entity?.startsWith(STATE_ENTITY_PREFIX)) {
+        onStateMessage?.(data.resource as State);
+        return;
+      }
       setResources((prev) => {
         const existingResourceIndex = prev.findIndex((prevResource) => {
           return (
@@ -96,7 +107,7 @@ export function useWebSocket<
         }
       });
     },
-    [websocketId, setResources],
+    [websocketId, setResources, onStateMessage],
   );
 
   // Make a websocket for the campaign and scenario if there is not one (or one being made).
@@ -112,7 +123,7 @@ export function useWebSocket<
 
     isConnectingRef.current = true;
     try {
-      const accessToken = await getAccessTokenSilently();
+      const accessToken = await getAccessToken();
       if (!accessToken) return;
 
       const websocket = new WebSocket(
@@ -144,7 +155,7 @@ export function useWebSocket<
     } finally {
       isConnectingRef.current = false;
     }
-  }, [campaignId, scenarioId, getAccessTokenSilently, onMessage]);
+  }, [campaignId, scenarioId, getAccessToken, onMessage]);
 
   // The websocket belongs to one scenario, so replace it when the scenario changes (and close it
   // when done). Declared before the effect that connects so the old one is closed first.
@@ -222,7 +233,7 @@ export function useWebSocket<
   }, [connect]);
 
   const sendMessage = useCallback(
-    async (resource: T, action: string) => {
+    async (resource: T | State, action: string) => {
       const websocket = wsRef.current;
       if (websocket && websocket.readyState === WebSocket.OPEN) {
         websocket.send(

@@ -26,6 +26,17 @@ export default function DashboardLayout({
             domain={`${process.env.NEXT_PUBLIC_AUTH0_DOMAIN}`}
             clientId={`${process.env.NEXT_PUBLIC_AUTH0_CLIENT_ID}`}
             cacheLocation={cacheLocation}
+            onRedirectCallback={(appState) => {
+              // Back to where a re-login was needed. Without one, stay on the page the login returned to.
+              if (appState?.returnTo)
+                window.location.replace(appState.returnTo);
+              else
+                window.history.replaceState(
+                  {},
+                  document.title,
+                  window.location.pathname,
+                );
+            }}
             authorizationParams={{
               redirect_uri: `${process.env.NEXT_PUBLIC_WEBSITE_DOMAIN}/apps`,
               audience: process.env.NEXT_PUBLIC_AUTH0_AUDIENCE,

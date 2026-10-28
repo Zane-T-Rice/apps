@@ -1,4 +1,11 @@
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import {
   Figure,
   useFigures,
@@ -12,6 +19,15 @@ import { Template } from "@/app/utils/gloomhaven_companion_service/gloomhaven_co
 import { useWebSocket } from "@/app/utils/use_websocket";
 import { v4 as uuid } from "uuid";
 import { useQueryString } from "@/app/utils/use_query_string";
+import { useTableState } from "@/app/utils/gloomhaven_companion_ui/use_table_state";
+import {
+  collectTurnGroups,
+  planFigureRemoved,
+  planInitiative,
+  SECOND_INITIATIVE_PREFIX,
+  planSpawn,
+} from "@/app/utils/gloomhaven_companion_ui/table_state";
+import { TableStatus } from "../ui/table_status";
 
 export function GloomhavenCompanionAllyEnemyTabSharedContent(props: {
   selectedCampaign: Campaign;
@@ -128,12 +144,58 @@ export function GloomhavenCompanionAllyEnemyTabSharedContent(props: {
     }
   };
 
+  const { state, reloadState, onStateMessage, saveState } = useTableState(
+    selectedCampaign.id,
+    selectedScenario.id,
+  );
+
   const { sendMessage, refresh, setRefresh } = useWebSocket<Figure>({
     campaignId: selectedCampaign.id,
     scenarioId: selectedScenario.id,
     websocketId: websocketID,
     setResources: setFigures,
+    onStateMessage,
   });
+
+  const onSaveState = useCallback(
+    (entries: [string, string][]) => saveState(entries, sendMessage),
+    [saveState, sendMessage],
+  );
+  // An enemy that appears once the round has started takes a turn right after the current one.
+  const onSpawn = useCallback(
+    (figure: Figure) => {
+      const spawn = planSpawn(collectTurnGroups(figures), state, figure);
+      if (spawn) onSaveState([spawn]);
+    },
+    [figures, state, onSaveState],
+  );
+  // A group's initiative is entered after the round has started, so it may need to go after the
+  // current turn.
+  const onInitiativeChange = useCallback(
+    (key: string, value: string) =>
+      onSaveState(
+        // The second card only breaks ties, so it never changes where a group goes late.
+        key.startsWith(SECOND_INITIATIVE_PREFIX)
+          ? [[key, value]]
+          : planInitiative(collectTurnGroups(figures), state, key, value),
+      ),
+    [figures, state, onSaveState],
+  );
+  // A removed figure leaves the turn order, and a group with none left is out of the round.
+  const onFigureRemoved = useCallback(
+    (figure: Figure) => {
+      const entries = planFigureRemoved(figures, state, figure);
+      if (entries.length > 0) onSaveState(entries);
+    },
+    [figures, state, onSaveState],
+  );
+  const tableStatus = (
+    <TableStatus
+      state={state}
+      turnGroups={collectTurnGroups(figures)}
+      saveState={onSaveState}
+    />
+  );
 
   // Sometimes the websocket will tell the listener to refresh all data
   // whenever it (re)connects.
@@ -141,6 +203,7 @@ export function GloomhavenCompanionAllyEnemyTabSharedContent(props: {
     if (!refresh) return;
     const getAllFigures = async () => {
       setRefresh(false);
+      reloadState();
       getFigures().then((responseFigures) => {
         if (responseFigures) {
           setFigures((prev) => {
@@ -158,7 +221,15 @@ export function GloomhavenCompanionAllyEnemyTabSharedContent(props: {
       });
     };
     getAllFigures();
-  }, [refresh, figures, setRefresh, setFiguresLoading, setFigures, getFigures]);
+  }, [
+    refresh,
+    figures,
+    setRefresh,
+    setFiguresLoading,
+    setFigures,
+    getFigures,
+    reloadState,
+  ]);
 
   useEffect(() => {
     const reset = async () => {
@@ -181,6 +252,7 @@ export function GloomhavenCompanionAllyEnemyTabSharedContent(props: {
   return (
     <>
       <Tabs.Content tabIndex={-1} value="enemies">
+        {tableStatus}
         <GloomhavenCompanionAllyEnemyTabContent
           selectedCampaign={selectedCampaign}
           selectedScenario={selectedScenario}
@@ -199,9 +271,14 @@ export function GloomhavenCompanionAllyEnemyTabSharedContent(props: {
           getFigures={getFigures}
           onFigureSelect={onFigureSelect}
           isLoading={figuresLoading}
+          state={state}
+          onInitiativeChange={onInitiativeChange}
+          onSpawn={onSpawn}
+          onFigureRemoved={onFigureRemoved}
         />
       </Tabs.Content>
       <Tabs.Content tabIndex={-1} value="allies">
+        {tableStatus}
         <GloomhavenCompanionAllyEnemyTabContent
           selectedCampaign={selectedCampaign}
           selectedScenario={selectedScenario}
@@ -220,6 +297,10 @@ export function GloomhavenCompanionAllyEnemyTabSharedContent(props: {
           getFigures={getFigures}
           onFigureSelect={onFigureSelect}
           isLoading={figuresLoading}
+          state={state}
+          onInitiativeChange={onInitiativeChange}
+          onSpawn={onSpawn}
+          onFigureRemoved={onFigureRemoved}
         />
       </Tabs.Content>
     </>

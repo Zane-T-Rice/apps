@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth0 } from "@auth0/auth0-react";
+import { useGetAccessToken } from "../use_access_token";
 import { useCallback } from "react";
 
 // GET all of a resource. Optionally pass query params (i.e. { search: "a", page: "0" }) to filter or
@@ -9,11 +9,11 @@ export function useGetAllREST<R>(
   baseUrl: string,
   responseTransformer?: (response: R | R[]) => R | R[],
 ) {
-  const { getAccessTokenSilently } = useAuth0();
+  const getAccessToken = useGetAccessToken();
 
   return useCallback(
     async (query?: Record<string, string>): Promise<R[] | null> => {
-      const accessToken = await getAccessTokenSilently();
+      const accessToken = await getAccessToken();
 
       const queryString = query ? `?${new URLSearchParams(query)}` : "";
       const response = await fetch(`${baseUrl}${queryString}`, {
@@ -31,7 +31,7 @@ export function useGetAllREST<R>(
       const parsedResponse = await response.json();
       return responseTransformer?.(parsedResponse) || parsedResponse;
     },
-    [baseUrl, getAccessTokenSilently, responseTransformer],
+    [baseUrl, getAccessToken, responseTransformer],
   );
 }
 
@@ -42,13 +42,13 @@ export function useREST<
   K extends keyof T = "id",
   R = T, // Useful if the input resource type differs from the response type.
 >(baseUrl: string, responseTransformer?: (response: R | R[]) => R | R[]) {
-  const { getAccessTokenSilently } = useAuth0();
+  const getAccessToken = useGetAccessToken();
 
   const getAllREST = useGetAllREST<R>(baseUrl, responseTransformer);
 
   const getREST: (resource: Pick<T, "id">) => Promise<R | null> = useCallback(
     async (resource: Pick<T, "id">) => {
-      const accessToken = await getAccessTokenSilently();
+      const accessToken = await getAccessToken();
 
       const response = await fetch(`${baseUrl}/${resource.id}`, {
         method: "GET",
@@ -65,12 +65,12 @@ export function useREST<
       const parsedResponse = await response.json();
       return responseTransformer?.(parsedResponse) || parsedResponse;
     },
-    [baseUrl, getAccessTokenSilently, responseTransformer],
+    [baseUrl, getAccessToken, responseTransformer],
   );
 
   const createREST: (resource: Omit<T, K>) => Promise<R | null> = useCallback(
     async (resource: Omit<T, K>) => {
-      const accessToken = await getAccessTokenSilently();
+      const accessToken = await getAccessToken();
 
       const response = await fetch(baseUrl, {
         method: "POST",
@@ -88,13 +88,13 @@ export function useREST<
       const parsedResponse = await response.json();
       return responseTransformer?.(parsedResponse) || parsedResponse;
     },
-    [baseUrl, getAccessTokenSilently, responseTransformer],
+    [baseUrl, getAccessToken, responseTransformer],
   );
 
   const editREST: (resource: Omit<T, K> & { id: string }) => Promise<R | null> =
     useCallback(
       async (resource: Omit<T, K> & { id: string }) => {
-        const accessToken = await getAccessTokenSilently();
+        const accessToken = await getAccessToken();
 
         const response = await fetch(`${baseUrl}/${resource.id}`, {
           method: "PATCH",
@@ -112,13 +112,13 @@ export function useREST<
         const parsedResponse = await response.json();
         return responseTransformer?.(parsedResponse) || parsedResponse;
       },
-      [baseUrl, getAccessTokenSilently, responseTransformer],
+      [baseUrl, getAccessToken, responseTransformer],
     );
 
   const deleteREST: (resource: Pick<T, "id">) => Promise<R | null> =
     useCallback(
       async (resource: Pick<T, "id">) => {
-        const accessToken = await getAccessTokenSilently();
+        const accessToken = await getAccessToken();
 
         const response = await fetch(`${baseUrl}/${resource.id}`, {
           method: "DELETE",
@@ -135,7 +135,7 @@ export function useREST<
         const parsedResponse = await response.json();
         return responseTransformer?.(parsedResponse) || parsedResponse;
       },
-      [baseUrl, getAccessTokenSilently, responseTransformer],
+      [baseUrl, getAccessToken, responseTransformer],
     );
 
   // Special function to do actions on a resource (i.e. "create-join-code", "reboot").
@@ -144,7 +144,7 @@ export function useREST<
     action: string,
   ) => Promise<R | null> = useCallback(
     async (resource: Pick<T, "id">, action: string) => {
-      const accessToken = await getAccessTokenSilently();
+      const accessToken = await getAccessToken();
 
       const response = await fetch(`${baseUrl}/${resource.id}/${action}`, {
         method: "POST",
@@ -161,14 +161,14 @@ export function useREST<
       const parsedResponse = await response.json();
       return responseTransformer?.(parsedResponse) || parsedResponse;
     },
-    [baseUrl, getAccessTokenSilently, responseTransformer],
+    [baseUrl, getAccessToken, responseTransformer],
   );
 
   // A catchall POST function that gives more control over the path and response values.
   const customREST: (resource: T, path: string) => Promise<R | null> =
     useCallback(
       async (resource: T, path: string) => {
-        const accessToken = await getAccessTokenSilently();
+        const accessToken = await getAccessToken();
 
         const response = await fetch(`${baseUrl}/${path}`, {
           method: "POST",
@@ -186,7 +186,7 @@ export function useREST<
         const parsedResponse = await response.json();
         return responseTransformer?.(parsedResponse) || parsedResponse;
       },
-      [baseUrl, getAccessTokenSilently, responseTransformer],
+      [baseUrl, getAccessToken, responseTransformer],
     );
 
   return {

@@ -9,12 +9,21 @@ import { Template } from "@/app/utils/gloomhaven_companion_service/gloomhaven_co
 import AddSummonButton from "../ui/add_summon_button";
 import AddMonsterButton from "../ui/add_monster_button";
 import AddNPCButton from "../ui/add_npc_button";
+import { InitiativeStepper } from "../ui/initiative_stepper";
+import {
+  collectTurnGroups,
+  initiativeKey,
+  secondInitiativeKey,
+} from "@/app/utils/gloomhaven_companion_ui/table_state";
+import { toaster } from "../ui/toaster";
 import { getStandeeNumber } from "@/app/utils/gloomhaven_companion_ui/get_standee_number";
 
 export function GloomhavenCompanionAllyTabContent(props: {
   figures: Figure[];
   templates: Template[];
   isLoading: boolean;
+  state: Record<string, string>;
+  onInitiativeChange: (groupKey: string, value: string) => void;
   selectedFigure?: Figure;
   onFigureCreate: (figure: Figure, silent?: boolean) => Promise<boolean>;
   onFigureDelete: (figure: Figure, silent?: boolean) => Promise<boolean>;
@@ -26,6 +35,8 @@ export function GloomhavenCompanionAllyTabContent(props: {
     figures,
     templates,
     isLoading,
+    state,
+    onInitiativeChange,
     selectedFigure,
     onFigureCreate: _onFigureCreate,
     onFigureDelete,
@@ -75,7 +86,14 @@ export function GloomhavenCompanionAllyTabContent(props: {
   const onFigureCreate = useCallback(
     async (figure: Figure, silent?: boolean): Promise<boolean> => {
       const standeeNumber = getStandeeNumber(figure, groups, templates);
-      if (standeeNumber === -1) return false;
+      if (standeeNumber === -1) {
+        toaster.create({
+          title: `No more ${figure.class} standees`,
+          description: "They are all on the board already.",
+          type: "warning",
+        });
+        return false;
+      }
       if (standeeNumber !== null) figure.number = standeeNumber;
       return _onFigureCreate(figure, silent);
     },
@@ -144,6 +162,44 @@ export function GloomhavenCompanionAllyTabContent(props: {
                       <Text>{group.class}</Text>
                     </Stack>
                   </Card.Title>
+                  {collectTurnGroups(group.figures).length > 0 && (
+                    <Stack
+                      gap={2}
+                      marginBottom={3}
+                      marginLeft={3}
+                      marginRight={3}
+                    >
+                      <InitiativeStepper
+                        label={group.class}
+                        value={state[initiativeKey("ally", group.class)] ?? ""}
+                        onSave={(value) =>
+                          onInitiativeChange(
+                            initiativeKey("ally", group.class),
+                            value,
+                          )
+                        }
+                      />
+                      <InitiativeStepper
+                        title="Second card"
+                        label={group.class}
+                        value={
+                          state[
+                            secondInitiativeKey(
+                              initiativeKey("ally", group.class),
+                            )
+                          ] ?? ""
+                        }
+                        onSave={(value) =>
+                          onInitiativeChange(
+                            secondInitiativeKey(
+                              initiativeKey("ally", group.class),
+                            ),
+                            value,
+                          )
+                        }
+                      />
+                    </Stack>
+                  )}
                   <Grid
                     key={`group-grid-${groupIndex}`}
                     templateColumns="repeat(auto-fill, minmax(min(26.5rem, 100%), 1fr))"

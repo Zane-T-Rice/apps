@@ -10,6 +10,12 @@ import { RefObject, useCallback } from "react";
 import AddMonsterButton from "../ui/add_monster_button";
 import AddNPCButton from "../ui/add_npc_button";
 import AddBossButton from "../ui/add_boss_button";
+import { toaster } from "../ui/toaster";
+import { InitiativeStepper } from "../ui/initiative_stepper";
+import {
+  collectTurnGroups,
+  initiativeKey,
+} from "@/app/utils/gloomhaven_companion_ui/table_state";
 import { getStandeeNumber } from "@/app/utils/gloomhaven_companion_ui/get_standee_number";
 
 export function GloomhavenCompanionEnemyTabContent(props: {
@@ -17,6 +23,9 @@ export function GloomhavenCompanionEnemyTabContent(props: {
   figures: Figure[];
   templates: Template[];
   isLoading: boolean;
+  state: Record<string, string>;
+  onInitiativeChange: (groupKey: string, value: string) => void;
+  onSpawn?: (figure: Figure) => void;
   selectedFigure?: Figure;
   onFigureCreate: (figure: Figure, silent?: boolean) => Promise<boolean>;
   onFigureDelete: (figure: Figure, silent?: boolean) => Promise<boolean>;
@@ -29,6 +38,9 @@ export function GloomhavenCompanionEnemyTabContent(props: {
     figures,
     templates,
     isLoading,
+    state,
+    onInitiativeChange,
+    onSpawn,
     selectedFigure,
     onFigureCreate: _onFigureCreate,
     onFigureDelete,
@@ -96,11 +108,21 @@ export function GloomhavenCompanionEnemyTabContent(props: {
   const onFigureCreate = useCallback(
     async (figure: Figure, silent?: boolean): Promise<boolean> => {
       const standeeNumber = getStandeeNumber(figure, groups, templates);
-      if (standeeNumber === -1) return false;
+      if (standeeNumber === -1) {
+        toaster.create({
+          title: `No more ${figure.class} standees`,
+          description: "They are all on the board already.",
+          type: "warning",
+        });
+        return false;
+      }
       if (standeeNumber !== null) figure.number = standeeNumber;
-      return _onFigureCreate(figure, silent);
+      const created = await _onFigureCreate(figure, silent);
+      // An enemy added during a round takes a turn of its own right after the current one.
+      if (created) onSpawn?.(figure);
+      return created;
     },
-    [_onFigureCreate, groups, templates],
+    [_onFigureCreate, groups, templates, onSpawn],
   );
 
   const addEnemy = useCallback(
@@ -202,6 +224,20 @@ export function GloomhavenCompanionEnemyTabContent(props: {
                       )}
                     </Stack>
                   </Card.Title>
+                  {collectTurnGroups(group.figures).length > 0 && (
+                    <Stack marginBottom={3} marginLeft={3} marginRight={3}>
+                      <InitiativeStepper
+                        label={group.class}
+                        value={state[initiativeKey("enemy", group.class)] ?? ""}
+                        onSave={(value) =>
+                          onInitiativeChange(
+                            initiativeKey("enemy", group.class),
+                            value,
+                          )
+                        }
+                      />
+                    </Stack>
+                  )}
                   <Grid
                     key={`group-grid-${groupIndex}`}
                     templateColumns="repeat(auto-fill, minmax(min(26.5rem, 100%), 1fr))"

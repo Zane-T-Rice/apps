@@ -34,7 +34,7 @@ export const tabbableWithin = (container: ParentNode) =>
 // next in the tab order, as if tabbing on from the end of the removed item: the next item, the
 // next group's first control or, when nothing follows, the next tab. The removed item takes the
 // focus with it and the list may be rendered again after the removal, so the target is found by
-// its position in the tab order instead of by keeping the element.
+// its position in the tab order, counted from the end, instead of by keeping the element.
 export async function removeAndRefocus(
   button: HTMLElement,
   remove: () => Promise<unknown>,
@@ -43,23 +43,23 @@ export async function removeAndRefocus(
   if (!item) return;
 
   const before = tabbableWithin(document);
-  const removedCount = before.filter((element) =>
-    item.contains(element),
-  ).length;
   const firstAfter = before.findIndex(
     (element) =>
       !item.contains(element) &&
       item.compareDocumentPosition(element) & Node.DOCUMENT_POSITION_FOLLOWING,
   );
-  const targetIndex =
-    (firstAfter === -1 ? before.length : firstAfter) - removedCount;
+  // How many tabbable elements there are from the target to the end of the page. Counting from the
+  // end holds when more than the item goes away or appears before the target, i.e. the whole
+  // group's header and controls when the item was the last one in its group.
+  const fromEnd = firstAfter === -1 ? 0 : before.length - firstAfter;
   const nextTab = nextTabOf(item);
 
   if ((await remove()) === false) return;
 
   const focusNext = () => {
     const after = tabbableWithin(document);
-    (after[targetIndex] ?? nextTab ?? after.at(-1))?.focus();
+    const target = fromEnd > 0 ? after[after.length - fromEnd] : undefined;
+    (target ?? nextTab ?? after.at(-1))?.focus();
   };
   // Wait for the removal to render, and check again in case it was rendered again afterwards.
   requestAnimationFrame(() =>

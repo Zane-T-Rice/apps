@@ -30,7 +30,7 @@ function recentlySentToLogin(): boolean {
 export function useGetAccessToken() {
   const { getAccessTokenSilently, loginWithRedirect } = useAuth0();
 
-  return useCallback(async (): Promise<string> => {
+  return useCallback(async (): Promise<string | undefined> => {
     try {
       return await getAccessTokenSilently();
     } catch (error) {
@@ -46,7 +46,7 @@ export function useGetAccessToken() {
         },
       });
       // The page is leaving. Never answer, so nothing carries on without a token.
-      return new Promise<string>(() => {});
+      return new Promise<string | undefined>(() => {});
     }
   }, [getAccessTokenSilently, loginWithRedirect]);
 }

@@ -47,6 +47,8 @@ export type TurnGroup = {
   key: string;
   label: string;
   alignment: "ally" | "enemy";
+  // The standee numbers of the figures in the group that take part, so it is plain which ones go.
+  numbers?: number[];
   summons?: SummonTurn[];
 };
 
@@ -88,6 +90,12 @@ export const collectTurnGroups = (
   Object.keys(groups).forEach((key) => {
     // A group of one is that figure, so its name goes with its class. A group of several is just
     // its class, since the name of one of them would not be the name of the group.
+    groups[key].numbers = members[key]
+      .map((figure) => figure.number)
+      .filter(
+        (number): number is number => number !== null && number !== undefined,
+      )
+      .sort((a, b) => a - b);
     if (members[key].length === 1)
       groups[key].label = figureTitle(members[key][0]);
     // Summons go in the order they were summoned, which is the order of their standee numbers.
@@ -240,10 +248,17 @@ export const buildTurnList = (
   // only if its initiative puts it before that turn. Otherwise it is in its place by initiative,
   // and moving its initiative around moves it between the two.
   const orderedIndex = new Map(ordered.map((turn, i) => [turn.key, i]));
+  // A player's summons sit just before the player, so for judging where a group falls, a turn
+  // that follows one of them is at the player's place in the order.
+  const summonOwner = new Map<string, string>();
+  groups.forEach((group) =>
+    group.summons?.forEach((summon) => summonOwner.set(summon.id, group.key)),
+  );
+  const anchorOf = (id: string) => summonOwner.get(id) ?? id;
   const isLate = (turn: { key: string }) => {
     const placement = parsePlacement(state[deferKey(turn.key)]);
     if (!placement) return false;
-    const anchor = orderedIndex.get(placement.after);
+    const anchor = orderedIndex.get(anchorOf(placement.after));
     // A turn that is not one of the groups is a spawn, which is always where it was put.
     if (anchor === undefined)
       return parseSpawn(state[placement.after]) !== null;
@@ -279,7 +294,7 @@ export const buildTurnList = (
     alignment: turn.alignment,
     initiative: turn.initiative,
     second: turn.second,
-    numbers: [],
+    numbers: turn.numbers ?? [],
     spawned: false,
     summon: false,
     afterId: parsePlacement(state[deferKey(turn.key)])?.after ?? null,
@@ -337,13 +352,18 @@ export const buildTurnList = (
 
   const placed = new Set<string>();
   const list: TurnListEntry[] = [];
+  // Puts whatever follows the turn with this id right after it.
+  const placeAfter = (turnId: string) =>
+    later
+      .filter((l) => l.placement.after === turnId && !placed.has(l.id))
+      .forEach((l) => place(l.id, l.entry));
   const place = (id: string, entry: TurnListEntry) => {
     placed.add(id);
     // A player's summons act right before them.
     if (!entry.spawned)
       groups
         .find((group) => group.key === entry.groupKey)
-        ?.summons?.forEach((summon) =>
+        ?.summons?.forEach((summon) => {
           list.push({
             id: summon.id,
             groupKey: entry.groupKey,
@@ -360,12 +380,12 @@ export const buildTurnList = (
             tieChosen: false,
             tieRank: null,
             done: state[doneKey(summon.id)] === "1",
-          }),
-        );
+          });
+          // A turn can go right after a summon, before the player.
+          placeAfter(summon.id);
+        });
     list.push(entry);
-    later
-      .filter((l) => l.placement.after === entry.id && !placed.has(l.id))
-      .forEach((l) => place(l.id, l.entry));
+    placeAfter(entry.id);
   };
   ordered
     .filter((turn) => !isLate(turn))

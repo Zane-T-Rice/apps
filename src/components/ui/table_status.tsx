@@ -1,5 +1,5 @@
-import { Box, Stack, Text } from "@chakra-ui/react";
-import { ComponentType, useEffect, useRef } from "react";
+import { Box, Popover, Portal, Stack, Text } from "@chakra-ui/react";
+import { ComponentType, ReactNode, useEffect, useRef } from "react";
 import {
   GiFlame,
   GiMoon,
@@ -11,7 +11,6 @@ import {
 import { Button } from "../recipes/button";
 import { useLongPress } from "@/app/utils/use_long_press";
 import { AlertDialog } from "./alert_dialog";
-import { toaster } from "./toaster";
 import {
   Element,
   ELEMENTS,
@@ -78,11 +77,20 @@ function ElementButton(props: {
       paddingX={0}
       height={12}
       fontSize="2xl"
-      bg={elementState === "strong" ? `${color}.solid` : undefined}
+      // Strong is solid. Waning is the same color, lighter, with a dashed edge in the full color, so it
+      // reads as on but fading. Inert has no fill and is dimmed.
+      bg={
+        elementState === "strong"
+          ? `${color}.solid`
+          : elementState === "waning"
+            ? `${color}.muted`
+            : undefined
+      }
       color={elementState === "strong" ? `${color}.contrast` : undefined}
       opacity={elementState === "inert" ? 0.4 : 1}
       borderStyle={elementState === "waning" ? "dashed" : "solid"}
       borderWidth={elementState === "waning" ? "3px" : "1px"}
+      borderColor={elementState === "waning" ? `${color}.solid` : undefined}
     >
       <Icon />
     </Button>
@@ -107,8 +115,28 @@ export function TableStatus(props: {
   // ones that are still to come, so it is picked up here without anyone stepping through the order.
   const activeIndex = turns.findIndex((turn) => !turn.done);
   const lastDoneIndex = turns.map((turn) => turn.done).lastIndexOf(true);
+  // Each set of figures tied with each other, split into those that still need putting in order and
+  // those that have been.
+  const allTieGroups = Object.values(
+    turns
+      .filter((turn) => turn.tied)
+      .reduce<Record<string, typeof turns>>((groups, turn) => {
+        const key = `${turn.alignment}|${turn.initiative}|${turn.second}`;
+        (groups[key] ??= []).push(turn);
+        return groups;
+      }, {}),
+  );
+  const tieGroups = allTieGroups.filter((group) => !group[0].tieChosen);
+  // For the menu, in an order that does not change as the choices are made.
+  const tieMembers = allTieGroups
+    .map((group) => [...group].sort((a, b) => a.id.localeCompare(b.id)))
+    .sort((a, b) => a[0].id.localeCompare(b[0].id));
+  // A spawned turn or a late group says which standees go, since it is easy to lose track of which
+  // ones in the group still have a turn to take.
   const turnName = (turn: (typeof turns)[number]) =>
-    turn.spawned ? `${turn.label} ${turn.numbers.join(", ")}` : turn.label;
+    (turn.spawned || turn.late) && turn.numbers.length > 0
+      ? `${turn.label} ${turn.numbers.join(", ")}`
+      : turn.label;
   // Why a turn is where it is, when that is not just its initiative.
   const turnTag = (turn: (typeof turns)[number], index: number) => {
     const after = turns.find((other) => other.id === turn.afterId);
@@ -154,6 +182,8 @@ export function TableStatus(props: {
   };
 
   const onDone = () => {
+    // Not while a tie still needs its order chosen.
+    if (tieGroups.length > 0) return;
     if (activeIndex !== -1) saveState([[doneKey(turns[activeIndex].id), "1"]]);
   };
 
@@ -173,15 +203,12 @@ export function TableStatus(props: {
 
   const onEndRound = () => {
     const entries: [string, string][] = [[ROUND_KEY, `${round + 1}`]];
-    const changes: string[] = [];
     ELEMENTS.forEach((element) => {
       const elementState = getElementState(state, element);
       if (elementState === "strong") {
         entries.push([elementKey(element), "waning"]);
-        changes.push(`${element} is waning`);
       } else if (elementState === "waning") {
         entries.push([elementKey(element), "inert"]);
-        changes.push(`${element} is inert`);
       }
     });
     // Start the next round with no initiatives, no turns taken and no spawns. Initiatives go even
@@ -202,14 +229,82 @@ export function TableStatus(props: {
         entries.push([key, ""]);
     });
     saveState(entries);
-    toaster.create({
-      title: `Round ${round + 1}`,
-      description: changes.length
-        ? `${changes.join(", ")}.`
-        : "No elements to age.",
-      type: "info",
-    });
   };
+
+  // Choosing the order of a tie, or changing it. It opens over the page, so it takes no room of its
+  // own, and it is shared by the button next to the round and the one that stands in for Done.
+  const tieMenu = (
+    trigger: ReactNode,
+    placement: "bottom-start" | "bottom-end",
+  ) => (
+    <Popover.Root positioning={{ placement }}>
+      <Popover.Trigger asChild>{trigger}</Popover.Trigger>
+      <Portal>
+        <Popover.Positioner>
+          <Popover.Content>
+            <Popover.Body>
+              <Stack gap={4} minWidth="15rem">
+                {tieMembers.map((members) => {
+                  const placed = members.filter(
+                    (turn) => turn.tieRank !== null,
+                  );
+                  return (
+                    <Stack key={members[0].id} gap={2}>
+                      <Text fontWeight="semibold">
+                        {placed.length === members.length
+                          ? "Tied. In this order"
+                          : placed.length === 0
+                            ? "Tied. Who goes first?"
+                            : "Tied. Who goes next?"}
+                      </Text>
+                      {/* Everyone stays where they are and only changes look, so nothing moves
+                                as the choices are made. */}
+                      <Stack direction="row" gap={2} wrap="wrap">
+                        {members.map((turn) => (
+                          <Button
+                            key={turn.id}
+                            variant={turn.tieRank === null ? "outline" : "safe"}
+                            disabled={turn.tieRank !== null}
+                            onClick={() => {
+                              const placement = planTieTap(
+                                turns,
+                                state,
+                                turn.id,
+                              );
+                              if (placement.length > 0) saveState(placement);
+                            }}
+                          >
+                            {turn.tieRank !== null && `${turn.tieRank} `}
+                            {turnName(turn)}
+                          </Button>
+                        ))}
+                      </Stack>
+                      <Button
+                        variant="outline"
+                        alignSelf="start"
+                        disabled={placed.length === 0}
+                        onClick={() => {
+                          // Pressing one that has a place starts the whole tie over.
+                          const placement = planTieTap(
+                            turns,
+                            state,
+                            placed[0].id,
+                          );
+                          if (placement.length > 0) saveState(placement);
+                        }}
+                      >
+                        Start over
+                      </Button>
+                    </Stack>
+                  );
+                })}
+              </Stack>
+            </Popover.Body>
+          </Popover.Content>
+        </Popover.Positioner>
+      </Portal>
+    </Popover.Root>
+  );
 
   return (
     <Stack
@@ -229,6 +324,16 @@ export function TableStatus(props: {
         <Text fontSize="xl" fontWeight="bold">
           Round {round}
         </Text>
+        {allTieGroups.length > 0 &&
+          tieMenu(
+            <Button
+              variant={tieGroups.length > 0 ? "caution" : "outline"}
+              height={8}
+            >
+              Tied
+            </Button>,
+            "bottom-start",
+          )}
         <AlertDialog
           trigger={
             <Button variant="safe" marginLeft="auto">
@@ -268,6 +373,9 @@ export function TableStatus(props: {
             gap={2}
             alignItems="center"
             overflowX="auto"
+            // Room above and below, since a scrolling strip clips whatever sticks out of it, such as
+            // the outline of a focused chip.
+            paddingY={1}
             // So the chips measure their position from the strip.
             position="relative"
           >
@@ -282,36 +390,29 @@ export function TableStatus(props: {
                     }
                     colorPalette={turn.alignment === "ally" ? "blue" : "red"}
                     opacity={turn.done ? 0.4 : 1}
-                    // A turn that is over can be tapped to bring it back, and so can groups tied,
-                    // to put them in the order they go.
-                    pointerEvents={turn.done || turn.tied ? "auto" : "none"}
-                    tabIndex={turn.done || turn.tied ? 0 : -1}
+                    // Why it is where it is, for when it needs checking.
+                    title={tag ?? undefined}
+                    // Groups tied that still need putting in order are dashed. Once they are in order they
+                    // look like any other, and tapping one still starts the tie over.
+                    borderStyle={
+                      turn.tied && !turn.tieChosen ? "dashed" : undefined
+                    }
+                    borderWidth={
+                      turn.tied && !turn.tieChosen ? "2px" : undefined
+                    }
+                    // Only a turn that is over can be tapped, to bring it back. Ties are chosen and
+                    // changed from the line above, where a tap can not happen by accident.
+                    pointerEvents={turn.done ? "auto" : "none"}
+                    tabIndex={turn.done ? 0 : -1}
                     aria-label={
-                      turn.done
-                        ? `Bring back ${turn.label}'s turn`
-                        : turn.tied
-                          ? turn.tieRank
-                            ? `Tied, place ${turn.tieRank}. Tap to start the tie over`
-                            : `Tied. Tap in the order they go, ${turn.label} next`
-                          : undefined
+                      turn.done ? `Bring back ${turn.label}'s turn` : undefined
                     }
                     onClick={() => {
                       if (turn.done) saveState([[doneKey(turn.id), ""]]);
-                      else {
-                        const placed = planTieTap(turns, state, turn.id);
-                        if (placed.length > 0) saveState(placed);
-                      }
                     }}
                   >
                     {turn.done && "✓ "}
-                    {turn.initiative === null
-                      ? turnName(turn)
-                      : `${turn.initiative} ${turn.label}`}
-                    {tag && (
-                      <Text as="span" fontSize="xs" marginLeft={1}>
-                        {tag}
-                      </Text>
-                    )}
+                    {turnName(turn)}
                   </Button>
                   {turn.spawned && !turn.done && (
                     <Button
@@ -328,13 +429,6 @@ export function TableStatus(props: {
                 </Stack>
               );
             })}
-            {turns.some((turn) => turn.tied && !turn.tieChosen) && (
-              <Box flexShrink={0}>
-                <Text color="fg.muted">
-                  Tied. Tap them in the order they go.
-                </Text>
-              </Box>
-            )}
             {waitingOn.length > 0 && (
               <Box flexShrink={0}>
                 <Text color="fg.muted">
@@ -342,6 +436,9 @@ export function TableStatus(props: {
                 </Text>
               </Box>
             )}
+            {/* Room at the end, so the last chip is not flush with the edge when scrolled all the way
+                there, where a pixel of rounding can cut it. */}
+            <Box flexShrink={0} width={2} aria-hidden="true" />
           </Stack>
           {started && turns.length > 0 && (
             <>
@@ -350,12 +447,24 @@ export function TableStatus(props: {
                   Back
                 </Button>
               )}
-              {activeIndex !== -1 ? (
-                <Button variant="caution" flexShrink={0} onClick={onDone}>
+              {tieGroups.length > 0 ? (
+                // Until the tie is chosen there is no going on, so this stands where Done is.
+                tieMenu(
+                  <Button variant="caution" flexShrink={0}>
+                    Tied
+                  </Button>,
+                  "bottom-end",
+                )
+              ) : (
+                // Nothing left to do this round once everyone has gone, so there is nothing to mark.
+                <Button
+                  variant="caution"
+                  flexShrink={0}
+                  disabled={activeIndex === -1}
+                  onClick={onDone}
+                >
                   Done
                 </Button>
-              ) : (
-                <Text flexShrink={0}>All done. End the round!</Text>
               )}
             </>
           )}

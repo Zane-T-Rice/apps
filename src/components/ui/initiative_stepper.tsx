@@ -1,4 +1,4 @@
-import { Input, Stack, Text } from "@chakra-ui/react";
+import { Grid, Input, Text } from "@chakra-ui/react";
 import { useState } from "react";
 import { Button } from "../recipes/button";
 
@@ -17,10 +17,18 @@ export function InitiativeStepper(props: {
   label: string;
   // What it is for, when it is not the initiative (the second card).
   title?: string;
+  // The same on a narrow screen, where there is no room for the whole word.
+  shortTitle?: string;
   value: string;
   onSave: (value: string) => void;
 }) {
-  const { label, title = "Initiative", value, onSave } = props;
+  const {
+    label,
+    title = "Initiative",
+    shortTitle = "Init",
+    value,
+    onSave,
+  } = props;
   // What is being typed. Null whenever nothing is, so the saved value shows (including changes
   // other players make).
   const [draft, setDraft] = useState<string | null>(null);
@@ -45,10 +53,12 @@ export function InitiativeStepper(props: {
     <Button
       key={by}
       aria-label={`${by < 0 ? "Lower" : "Raise"} ${label} ${title.toLowerCase()} by ${Math.abs(by)}`}
-      variant="outline"
+      variant="safe"
       height={10}
       paddingX={0}
-      minWidth="2.75rem"
+      width="100%"
+      minWidth={0}
+      fontSize={{ base: "sm", sm: "md" }}
       disabled={
         initiative !== null &&
         (by < 0
@@ -62,9 +72,30 @@ export function InitiativeStepper(props: {
   );
 
   return (
-    <Stack direction="row" alignItems="center" gap={1} wrap="wrap">
-      <Text fontWeight="semibold" marginRight={1} minWidth="6.5rem">
-        {title}
+    // Every part takes a share of the width and shrinks with it, so the row never wraps. The input
+    // gets the most, since it holds the number.
+    <Grid
+      templateColumns="minmax(0, 2.4fr) repeat(2, minmax(0, 1fr)) minmax(0, 1.8fr) repeat(3, minmax(0, 1fr))"
+      alignItems="center"
+      gap={1}
+      // As wide as it needs to be and no more, so a wide screen does not stretch it into big buttons
+      // far apart. On a narrow one it is the width available.
+      width="100%"
+      maxWidth="24rem"
+    >
+      <Text
+        fontWeight="semibold"
+        overflow="hidden"
+        textOverflow="ellipsis"
+        whiteSpace="nowrap"
+        title={title}
+      >
+        <Text as="span" hideBelow="sm">
+          {title}
+        </Text>
+        <Text as="span" hideFrom="sm">
+          {shortTitle}
+        </Text>
       </Text>
       {stepButton(-10)}
       {stepButton(-1)}
@@ -72,10 +103,12 @@ export function InitiativeStepper(props: {
         aria-label={`${label} ${title.toLowerCase()}`}
         placeholder="--"
         inputMode="numeric"
-        width="4.5rem"
+        width="100%"
+        minWidth={0}
+        paddingX={1}
         height={10}
         textAlign="center"
-        fontSize="xl"
+        fontSize={{ base: "lg", sm: "xl" }}
         fontWeight="bold"
         value={draft ?? value}
         onFocus={(e) => e.target.select()}
@@ -91,10 +124,11 @@ export function InitiativeStepper(props: {
       {stepButton(10)}
       <Button
         aria-label={`Clear ${label} ${title.toLowerCase()}`}
-        variant="outline"
+        variant="caution"
         height={10}
         paddingX={0}
-        minWidth="2.75rem"
+        width="100%"
+        minWidth={0}
         visibility={initiative === null ? "hidden" : "visible"}
         onClick={() => {
           setDraft(null);
@@ -103,6 +137,6 @@ export function InitiativeStepper(props: {
       >
         ×
       </Button>
-    </Stack>
+    </Grid>
   );
 }

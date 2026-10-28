@@ -184,6 +184,7 @@ export function GloomhavenCompanionAllyTabContent(props: {
                       />
                       <InitiativeStepper
                         title="Second card"
+                        shortTitle="2nd"
                         label={group.class}
                         value={
                           state[

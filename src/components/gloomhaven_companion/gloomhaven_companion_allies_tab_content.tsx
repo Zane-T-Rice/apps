@@ -13,6 +13,7 @@ import { InitiativeStepper } from "../ui/initiative_stepper";
 import {
   collectTurnGroups,
   initiativeKey,
+  restKey,
   secondInitiativeKey,
 } from "@/app/utils/gloomhaven_companion_ui/table_state";
 import { toaster } from "../ui/toaster";
@@ -24,6 +25,7 @@ export function GloomhavenCompanionAllyTabContent(props: {
   isLoading: boolean;
   state: Record<string, string>;
   onInitiativeChange: (groupKey: string, value: string) => void;
+  onRestChange?: (figure: Figure, resting: boolean) => void;
   selectedFigure?: Figure;
   onFigureCreate: (figure: Figure, silent?: boolean) => Promise<boolean>;
   onFigureDelete: (figure: Figure, silent?: boolean) => Promise<boolean>;
@@ -37,6 +39,7 @@ export function GloomhavenCompanionAllyTabContent(props: {
     isLoading,
     state,
     onInitiativeChange,
+    onRestChange,
     selectedFigure,
     onFigureCreate: _onFigureCreate,
     onFigureDelete,
@@ -227,6 +230,14 @@ export function GloomhavenCompanionAllyTabContent(props: {
                             selected={selectedFigure?.id === figure.id}
                             onFigureDelete={onFigureDelete}
                             onFigureEdit={onFigureEdit}
+                            // A summon can sit out the round, which is how it is kept from acting
+                            // in the round it was summoned.
+                            resting={state[restKey(figure.id)] === "1"}
+                            onRestChange={
+                              figure.rank?.toLowerCase() === "summon"
+                                ? onRestChange
+                                : undefined
+                            }
                             ref={ref}
                           />
                         </GridItem>

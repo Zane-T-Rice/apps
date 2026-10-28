@@ -48,6 +48,7 @@ export function GloomhavenCompanionAllyEnemyTabContent(props: {
   onSpawn?: (figure: Figure) => void;
   onFigureRemoved?: (figure: Figure) => void;
   onRestChange?: (figure: Figure, resting: boolean) => void;
+  onFigureCreated?: (figure: Figure) => void;
 }) {
   const {
     selectedCampaign,
@@ -72,6 +73,7 @@ export function GloomhavenCompanionAllyEnemyTabContent(props: {
     onSpawn,
     onFigureRemoved,
     onRestChange,
+    onFigureCreated,
   } = props;
   const { getQueryString } = useQueryString();
 
@@ -84,6 +86,7 @@ export function GloomhavenCompanionAllyEnemyTabContent(props: {
     maximumHP: numberSchema.required(),
     damage: numberSchema.required(),
     name: stringSchema.optional(),
+    nickname: stringSchema.optional(),
     number: numberSchema.optional(),
     shield: numberSchema.optional(),
     retaliate: numberSchema.optional(),
@@ -118,6 +121,16 @@ export function GloomhavenCompanionAllyEnemyTabContent(props: {
   const [deleteFigureSchemaState] =
     useState<typeof deleteFigureSchema>(deleteFigureSchema);
 
+  // Lets the page know about the figure the service made, which has its id.
+  const createAndAnnounce = useCallback(
+    async (figure: Figure) => {
+      const created = (await createFigure?.(figure)) ?? null;
+      if (created) onFigureCreated?.(created);
+      return created;
+    },
+    [createFigure, onFigureCreated],
+  );
+
   const {
     onResourceCreate: onFigureCreate,
     onResourceEdit: _onFigureEdit,
@@ -132,7 +145,7 @@ export function GloomhavenCompanionAllyEnemyTabContent(props: {
     createResourceSchema: createFigureSchemaState,
     editResourceSchema: editFigureSchemaState,
     deleteResourceSchema: deleteFigureSchemaState,
-    createResource: createFigure,
+    createResource: createAndAnnounce,
     editResource: editFigure,
     deleteResource: deleteFigure,
     setResources: setFigures,
@@ -211,6 +224,7 @@ export function GloomhavenCompanionAllyEnemyTabContent(props: {
           isLoading={isLoading}
           state={state}
           onInitiativeChange={onInitiativeChange}
+          onRestChange={onRestChange}
           selectedFigure={selectedFigure}
           onFigureCreate={onFigureCreate}
           onFigureDelete={onFigureDelete}

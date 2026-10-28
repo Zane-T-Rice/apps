@@ -112,6 +112,7 @@ export function TableStatus(props: {
   // Why a turn is where it is, when that is not just its initiative.
   const turnTag = (turn: (typeof turns)[number], index: number) => {
     const after = turns.find((other) => other.id === turn.afterId);
+    if (turn.summon) return "Summon";
     if (turn.spawned || turn.late)
       return `${turn.spawned ? "Spawned" : "Late"}${after ? ` after ${turnName(after)}` : ""}`;
     if (turn.tied) return turn.tieRank ? `Tie ${turn.tieRank}` : "Tie";
@@ -303,7 +304,7 @@ export function TableStatus(props: {
                     }}
                   >
                     {turn.done && "✓ "}
-                    {turn.spawned
+                    {turn.initiative === null
                       ? turnName(turn)
                       : `${turn.initiative} ${turn.label}`}
                     {tag && (

@@ -21,10 +21,13 @@ import { v4 as uuid } from "uuid";
 import { useQueryString } from "@/app/utils/use_query_string";
 import { useTableState } from "@/app/utils/gloomhaven_companion_ui/use_table_state";
 import {
+  buildTurnList,
   collectTurnGroups,
+  hasRoundStarted,
   planFigureRemoved,
   planInitiative,
   planRest,
+  restKey,
   SECOND_INITIATIVE_PREFIX,
   planSpawn,
 } from "@/app/utils/gloomhaven_companion_ui/table_state";
@@ -208,6 +211,22 @@ export function GloomhavenCompanionAllyEnemyTabSharedContent(props: {
       ),
     [onSaveState],
   );
+  // A summon of a player that shows up once the round has started does not act in that round, so
+  // it must not jump in as the current turn. It can be set to act from its card.
+  const onFigureCreated = useCallback(
+    (figure: Figure) => {
+      if (
+        figure.alignment !== "ally" ||
+        figure.rank?.toLowerCase() !== "summon"
+      )
+        return;
+      const { figures, state } = latest.current;
+      const groups = collectTurnGroups(figures, state);
+      if (hasRoundStarted(groups, buildTurnList(groups, state), state))
+        onSaveState([[restKey(figure.id), "1"]]);
+    },
+    [onSaveState],
+  );
   const tableStatus = (
     <TableStatus
       state={state}
@@ -295,6 +314,7 @@ export function GloomhavenCompanionAllyEnemyTabSharedContent(props: {
           onSpawn={onSpawn}
           onFigureRemoved={onFigureRemoved}
           onRestChange={onRestChange}
+          onFigureCreated={onFigureCreated}
         />
       </Tabs.Content>
       <Tabs.Content tabIndex={-1} value="allies">
@@ -322,6 +342,7 @@ export function GloomhavenCompanionAllyEnemyTabSharedContent(props: {
           onSpawn={onSpawn}
           onFigureRemoved={onFigureRemoved}
           onRestChange={onRestChange}
+          onFigureCreated={onFigureCreated}
         />
       </Tabs.Content>
     </>

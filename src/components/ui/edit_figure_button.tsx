@@ -3,14 +3,21 @@ import { Figure } from "@/app/utils/gloomhaven_companion_service/gloomhaven_comp
 import { useDrawer } from "@/app/utils/use_drawer";
 import { CiEdit } from "react-icons/ci";
 import { AutoFormDrawer } from "./auto_form_drawer";
-import { number, object } from "yup";
+import { number, object, string } from "yup";
 
 const transformInt = (value: number): number | null => {
   return isNaN(value) ? null : value;
 };
 const numberSchema = number().transform(transformInt).integer();
 
+// Emptying the field takes the nickname away, so the name shows again.
+const nicknameSchema = string()
+  .nullable()
+  .optional()
+  .transform((value) => (value === "" ? null : value));
+
 const editMonsterFigureSchema = object({
+  nickname: nicknameSchema,
   maximumHP: numberSchema.required(),
   move: numberSchema.nullable().optional(),
   attack: numberSchema.nullable().optional(),
@@ -24,11 +31,17 @@ const editSummonFigureSchema = editMonsterFigureSchema
   )
   .stripUnknown();
 
+// Characters, NPCs and the like have nothing to change but their nickname.
+const editOtherFigureSchema = object({
+  nickname: nicknameSchema,
+}).stripUnknown();
+
 const desiredFieldOrder = {
-  maximumHP: 1,
-  move: 2,
-  attack: 3,
-  range: 4,
+  nickname: 1,
+  maximumHP: 2,
+  move: 3,
+  attack: 4,
+  range: 5,
 };
 
 export default function EditFigureButton(
@@ -57,7 +70,6 @@ export default function EditFigureButton(
       <Button
         onClick={() => onCreateButton()}
         disabled={!hasCreatePermission}
-        hidden={!isSummon && !isMonster}
         {...buttonProps}
       >
         <CiEdit />
@@ -69,7 +81,11 @@ export default function EditFigureButton(
         setIsOpen={setIsCreateOpen}
         onSubmit={onEdit}
         resourceSchema={
-          isSummon ? editSummonFigureSchema : editMonsterFigureSchema
+          isSummon
+            ? editSummonFigureSchema
+            : isMonster
+              ? editMonsterFigureSchema
+              : editOtherFigureSchema
         }
         desiredFieldOrder={desiredFieldOrder}
       />

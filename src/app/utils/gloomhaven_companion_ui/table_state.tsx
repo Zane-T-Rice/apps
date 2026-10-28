@@ -1,4 +1,7 @@
-import { Figure } from "../gloomhaven_companion_service/gloomhaven_companion_service_figures";
+import {
+  Figure,
+  getFigureName,
+} from "../gloomhaven_companion_service/gloomhaven_companion_service_figures";
 
 export const ELEMENTS = [
   "fire",
@@ -37,16 +40,25 @@ export const initiativeKey = (alignment: string, groupClass: string) =>
   `${INITIATIVE_PREFIX}${alignment}:${groupClass}`;
 
 // A group that takes a turn of its own. Summons and NPCs act on someone else's initiative.
+// A summon of a player. It acts right before the player, in the order it was summoned.
+export type SummonTurn = { id: string; label: string };
+
 export type TurnGroup = {
   key: string;
   label: string;
   alignment: "ally" | "enemy";
+  summons?: SummonTurn[];
 };
 
 const takesOwnTurn = (figure: Figure) =>
   figure.rank?.toLowerCase() !== "summon" &&
   figure.class?.toLowerCase() !== "wildfury bear" &&
   figure.class?.toLowerCase() !== "npc / obstacle";
+
+// What a figure is called: its class and its nickname, or its name when it has no nickname,
+// leaving out whichever is empty.
+const figureTitle = (figure: Figure) =>
+  [figure.class, getFigureName(figure)].filter((part) => !!part).join(" ");
 
 // The groups that take a turn. Given the state, a group whose standees are all set to not act this
 // round is left out, since it needs no initiative and has no turn.
@@ -55,12 +67,36 @@ export const collectTurnGroups = (
   state?: Record<string, string>,
 ): TurnGroup[] => {
   const groups: { [key: string]: TurnGroup } = {};
+  const members: { [key: string]: Figure[] } = {};
+  const summons: { [key: string]: Figure[] } = {};
   figures.forEach((figure) => {
+    if (state?.[restKey(figure.id)] === "1") return;
+    // A player's summon belongs to the player, whose class it carries.
+    if (
+      figure.alignment === "ally" &&
+      figure.rank?.toLowerCase() === "summon"
+    ) {
+      (summons[initiativeKey("ally", figure.class)] ??= []).push(figure);
+      return;
+    }
     if (figure.alignment !== "ally" && figure.alignment !== "enemy") return;
     if (!takesOwnTurn(figure)) return;
-    if (state?.[restKey(figure.id)] === "1") return;
     const key = initiativeKey(figure.alignment, figure.class);
     groups[key] = { key, label: figure.class, alignment: figure.alignment };
+    (members[key] ??= []).push(figure);
+  });
+  Object.keys(groups).forEach((key) => {
+    // A group of one is that figure, so its name goes with its class. A group of several is just
+    // its class, since the name of one of them would not be the name of the group.
+    if (members[key].length === 1)
+      groups[key].label = figureTitle(members[key][0]);
+    // Summons go in the order they were summoned, which is the order of their standee numbers.
+    groups[key].summons = (summons[key] ?? [])
+      .sort((a, b) => (a.number ?? Infinity) - (b.number ?? Infinity))
+      .map((figure) => ({
+        id: `summon:${figure.id}`,
+        label: figureTitle(figure) || "Summon",
+      }));
   });
   return Object.values(groups);
 };
@@ -112,7 +148,8 @@ export const orderTurns = (
       const choiceA = a.choice || Infinity;
       const choiceB = b.choice || Infinity;
       if (choiceA !== choiceB) return choiceA < choiceB ? -1 : 1;
-      return a.label.localeCompare(b.label);
+      // Not the label, which can change when a figure is given a name.
+      return a.key.localeCompare(b.key);
     });
 
 export const getRound = (state: Record<string, string>) =>
@@ -177,6 +214,8 @@ export type TurnListEntry = {
   second: number | null;
   numbers: number[];
   spawned: boolean;
+  // A summon of a player, which acts right before them.
+  summon: boolean;
   // A group that got its initiative after its place in the order had passed.
   late: boolean;
   // The turn this one goes right after, for spawns and late groups.
@@ -242,6 +281,7 @@ export const buildTurnList = (
     second: turn.second,
     numbers: [],
     spawned: false,
+    summon: false,
     afterId: parsePlacement(state[deferKey(turn.key)])?.after ?? null,
     late: isLate(turn),
     tied: state[doneKey(turn.key)] !== "1" && tiedWith(turn).length > 1,
@@ -269,6 +309,7 @@ export const buildTurnList = (
           second: null,
           numbers: spawn.numbers,
           spawned: true,
+          summon: false,
           afterId: spawn.after,
           late: false,
           tied: false,
@@ -298,6 +339,29 @@ export const buildTurnList = (
   const list: TurnListEntry[] = [];
   const place = (id: string, entry: TurnListEntry) => {
     placed.add(id);
+    // A player's summons act right before them.
+    if (!entry.spawned)
+      groups
+        .find((group) => group.key === entry.groupKey)
+        ?.summons?.forEach((summon) =>
+          list.push({
+            id: summon.id,
+            groupKey: entry.groupKey,
+            label: summon.label,
+            alignment: "ally",
+            initiative: null,
+            second: null,
+            numbers: [],
+            spawned: false,
+            summon: true,
+            afterId: null,
+            late: false,
+            tied: false,
+            tieChosen: false,
+            tieRank: null,
+            done: state[doneKey(summon.id)] === "1",
+          }),
+        );
     list.push(entry);
     later
       .filter((l) => l.placement.after === entry.id && !placed.has(l.id))
@@ -518,6 +582,9 @@ export const planFigureRemoved = (
   // Later writes to a key replace earlier ones.
   const entries = new Map<string, string>();
   if (state[restKey(removed.id)]) entries.set(restKey(removed.id), "");
+  // A summon of a player has a turn of its own that goes with it.
+  if (state[doneKey(`summon:${removed.id}`)])
+    entries.set(doneKey(`summon:${removed.id}`), "");
 
   if (
     (removed.alignment === "ally" || removed.alignment === "enemy") &&

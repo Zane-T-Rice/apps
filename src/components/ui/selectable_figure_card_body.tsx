@@ -2,7 +2,10 @@ import { Box, Card, Grid, GridItem, Stack, Text } from "@chakra-ui/react";
 import { Button } from "../recipes/button";
 import { IoCloseSharp } from "react-icons/io5";
 import { FigureDataList } from "./figure_data_list";
-import { Figure } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_figures";
+import {
+  Figure,
+  getFigureName,
+} from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_figures";
 import { GiCurlyWing, GiNightSleep } from "react-icons/gi";
 import { removeAndRefocus } from "@/app/utils/keyboard_select";
 import EditFigureButton from "./edit_figure_button";
@@ -31,14 +34,15 @@ export function SelectableFigureCardBody(props: {
 
   const buildTitleText = (figure: Figure) => {
     let title = "";
+    const name = getFigureName(figure);
     if (figure.rank?.toLowerCase() === "character") {
-      title = [figure.class, figure.name].filter((e) => !!e).join(" ");
+      title = [figure.class, name].filter((e) => !!e).join(" ");
     } else if (figure.rank?.toLowerCase() === "summon") {
-      title = [figure.name].filter((e) => !!e).join(" ");
+      title = [name].filter((e) => !!e).join(" ");
     } else if (figure.class?.toLowerCase() === "npc / obstacle") {
-      title = [figure.name].filter((e) => !!e).join(" ");
+      title = [name].filter((e) => !!e).join(" ");
     } else {
-      title = [figure.rank, figure.class, figure.name, figure.number]
+      title = [figure.rank, figure.class, name, figure.number]
         .filter((e) => !!e)
         .join(" ");
     }

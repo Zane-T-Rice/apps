@@ -11,6 +11,9 @@ export type Figure = {
   rank: string | null;
   class: string;
   name: string | null;
+  // What this figure is called in this scenario, shown instead of its name. The name itself is
+  // left alone, since it also says which figure this is.
+  nickname: string | null;
   number: number | null;
   maximumHP: number;
   damage: number;
@@ -30,6 +33,10 @@ export type Figure = {
   attackPlusC: boolean | null;
   flying: boolean | null;
 };
+
+// What to call a figure: the nickname it was given, or else its name.
+export const getFigureName = (figure: Pick<Figure, "name" | "nickname">) =>
+  figure.nickname || figure.name;
 
 export function useFigures(
   campaignId: string,

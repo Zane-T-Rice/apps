@@ -8,9 +8,20 @@ export function FigureCard(props: {
   selected: boolean;
   onFigureDelete: (figure: Figure, silent?: boolean) => Promise<boolean>;
   onFigureEdit: (figure: Figure, silent?: boolean) => Promise<boolean>;
+  // Whether the figure does not act this round, and how to change that.
+  resting?: boolean;
+  onRestChange?: (figure: Figure, resting: boolean) => void;
   ref: RefObject<HTMLDivElement | null>;
 }) {
-  const { figure, selected, onFigureDelete, onFigureEdit, ref } = props;
+  const {
+    figure,
+    selected,
+    onFigureDelete,
+    onFigureEdit,
+    resting,
+    onRestChange,
+    ref,
+  } = props;
 
   const figureCard = useMemo(() => {
     return (
@@ -19,10 +30,20 @@ export function FigureCard(props: {
           figure={figure}
           onFigureDelete={onFigureDelete}
           onFigureEdit={onFigureEdit}
+          resting={resting}
+          onRestChange={onRestChange}
         />
       </SelectableCardRoot>
     );
-  }, [figure, selected, ref, onFigureDelete, onFigureEdit]);
+  }, [
+    figure,
+    selected,
+    ref,
+    onFigureDelete,
+    onFigureEdit,
+    resting,
+    onRestChange,
+  ]);
 
   return figureCard;
 }

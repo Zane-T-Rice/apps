@@ -28,6 +28,10 @@ export const secondInitiativeKey = (groupKey: string) =>
 // What the table chose when players tie on both cards. Lower goes first.
 export const ORDER_PREFIX = "order:";
 export const orderKey = (groupKey: string) => `${ORDER_PREFIX}${groupKey}`;
+// A standee that does not act this round, such as one that was just summoned. It lasts until the
+// round ends, and is saved per figure so it never touches anyone else's.
+export const REST_PREFIX = "rest:";
+export const restKey = (figureId: string) => `${REST_PREFIX}${figureId}`;
 export const INITIATIVE_PREFIX = "initiative:";
 export const initiativeKey = (alignment: string, groupClass: string) =>
   `${INITIATIVE_PREFIX}${alignment}:${groupClass}`;
@@ -44,11 +48,17 @@ const takesOwnTurn = (figure: Figure) =>
   figure.class?.toLowerCase() !== "wildfury bear" &&
   figure.class?.toLowerCase() !== "npc / obstacle";
 
-export const collectTurnGroups = (figures: Figure[]): TurnGroup[] => {
+// The groups that take a turn. Given the state, a group whose standees are all set to not act this
+// round is left out, since it needs no initiative and has no turn.
+export const collectTurnGroups = (
+  figures: Figure[],
+  state?: Record<string, string>,
+): TurnGroup[] => {
   const groups: { [key: string]: TurnGroup } = {};
   figures.forEach((figure) => {
     if (figure.alignment !== "ally" && figure.alignment !== "enemy") return;
     if (!takesOwnTurn(figure)) return;
+    if (state?.[restKey(figure.id)] === "1") return;
     const key = initiativeKey(figure.alignment, figure.class);
     groups[key] = { key, label: figure.class, alignment: figure.alignment };
   });
@@ -442,6 +452,60 @@ export const planTieTap = (
   return entries;
 };
 
+// What to save so a standee no longer takes part in the spawned turns that have yet to go for its
+// group. A spawned turn left with no standees goes away.
+const planDropFromSpawns = (
+  state: Record<string, string>,
+  groupKey: string,
+  number: number | null,
+): [string, string][] => {
+  const entries: [string, string][] = [];
+  if (number === null) return entries;
+  Object.keys(state).forEach((key) => {
+    if (!key.startsWith(EXTRA_PREFIX) || state[doneKey(key)] === "1") return;
+    const spawn = parseSpawn(state[key]);
+    if (spawn?.group !== groupKey || !spawn.numbers.includes(number)) return;
+    const numbers = spawn.numbers.filter((other) => other !== number);
+    if (numbers.length > 0) {
+      entries.push([key, JSON.stringify({ ...spawn, numbers })]);
+    } else {
+      entries.push([key, ""]);
+      if (state[doneKey(key)]) entries.push([doneKey(key), ""]);
+    }
+  });
+  return entries;
+};
+
+// What to save when a standee is set to not act this round, or to act again. One that does not act
+// gives up its place in a spawned turn. One that acts again is treated as if it had just spawned,
+// so it gets a turn of its own if its group has gone already.
+export const planRest = (
+  figures: Figure[],
+  state: Record<string, string>,
+  figure: Figure,
+  resting: boolean,
+): [string, string][] => {
+  const entries: [string, string][] = [
+    [restKey(figure.id), resting ? "1" : ""],
+  ];
+  if (figure.alignment !== "enemy") return entries;
+  if (resting) {
+    entries.push(
+      ...planDropFromSpawns(
+        state,
+        initiativeKey("enemy", figure.class),
+        figure.number,
+      ),
+    );
+  } else {
+    // Looked at as it will be, with this standee acting again.
+    const next = { ...state, [restKey(figure.id)]: "" };
+    const spawn = planSpawn(collectTurnGroups(figures, next), next, figure);
+    if (spawn) entries.push(spawn);
+  }
+  return entries;
+};
+
 // What to save when a figure was just removed. A turn spawned for it no longer lists it, and goes
 // when it was the last one. Once a group has no figures left it is no longer in the round: its
 // initiative, whether it went, and any turns spawned for it are wiped, so enemies of that type that
@@ -451,46 +515,41 @@ export const planFigureRemoved = (
   state: Record<string, string>,
   removed: Figure,
 ): [string, string][] => {
-  if (
-    (removed.alignment !== "ally" && removed.alignment !== "enemy") ||
-    !takesOwnTurn(removed)
-  )
-    return [];
-  const groupKey = initiativeKey(removed.alignment, removed.class);
-  const spawnKeys = Object.keys(state).filter(
-    (key) =>
-      key.startsWith(EXTRA_PREFIX) &&
-      parseSpawn(state[key])?.group === groupKey,
-  );
   // Later writes to a key replace earlier ones.
   const entries = new Map<string, string>();
-  const removeSpawn = (key: string) => {
-    entries.set(key, "");
-    if (state[doneKey(key)]) entries.set(doneKey(key), "");
-  };
+  if (state[restKey(removed.id)]) entries.set(restKey(removed.id), "");
 
-  // A spawned turn that has not gone yet stops listing this enemy.
-  spawnKeys.forEach((key) => {
-    const spawn = parseSpawn(state[key]) as Spawn;
-    if (state[doneKey(key)] === "1" || removed.number === null) return;
-    if (!spawn.numbers.includes(removed.number)) return;
-    const numbers = spawn.numbers.filter((number) => number !== removed.number);
-    if (numbers.length === 0) removeSpawn(key);
-    else entries.set(key, JSON.stringify({ ...spawn, numbers }));
-  });
+  if (
+    (removed.alignment === "ally" || removed.alignment === "enemy") &&
+    takesOwnTurn(removed)
+  ) {
+    const groupKey = initiativeKey(removed.alignment, removed.class);
+    planDropFromSpawns(state, groupKey, removed.number).forEach(
+      ([key, value]) => entries.set(key, value),
+    );
 
-  const remaining = figures.filter((figure) => figure.id !== removed.id);
-  if (!collectTurnGroups(remaining).some((group) => group.key === groupKey)) {
-    [
-      groupKey,
-      secondInitiativeKey(groupKey),
-      doneKey(groupKey),
-      deferKey(groupKey),
-      orderKey(groupKey),
-    ].forEach((key) => {
-      if (state[key]) entries.set(key, "");
-    });
-    spawnKeys.forEach(removeSpawn);
+    const remaining = figures.filter((figure) => figure.id !== removed.id);
+    if (!collectTurnGroups(remaining).some((group) => group.key === groupKey)) {
+      [
+        groupKey,
+        secondInitiativeKey(groupKey),
+        doneKey(groupKey),
+        deferKey(groupKey),
+        orderKey(groupKey),
+      ].forEach((key) => {
+        if (state[key]) entries.set(key, "");
+      });
+      Object.keys(state)
+        .filter(
+          (key) =>
+            key.startsWith(EXTRA_PREFIX) &&
+            parseSpawn(state[key])?.group === groupKey,
+        )
+        .forEach((key) => {
+          entries.set(key, "");
+          if (state[doneKey(key)]) entries.set(doneKey(key), "");
+        });
+    }
   }
   return [...entries.entries()];
 };

@@ -22,6 +22,7 @@ import {
   DEFER_PREFIX,
   INITIATIVE_PREFIX,
   ORDER_PREFIX,
+  REST_PREFIX,
   planTieTap,
   SECOND_INITIATIVE_PREFIX,
   doneKey,
@@ -194,6 +195,7 @@ export function TableStatus(props: {
           key.startsWith(EXTRA_PREFIX) ||
           key.startsWith(DEFER_PREFIX) ||
           key.startsWith(ORDER_PREFIX) ||
+          key.startsWith(REST_PREFIX) ||
           key.startsWith(SECOND_INITIATIVE_PREFIX))
       )
         entries.push([key, ""]);

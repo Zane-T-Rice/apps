@@ -47,6 +47,7 @@ export function GloomhavenCompanionAllyEnemyTabContent(props: {
   onInitiativeChange: (groupKey: string, value: string) => void;
   onSpawn?: (figure: Figure) => void;
   onFigureRemoved?: (figure: Figure) => void;
+  onRestChange?: (figure: Figure, resting: boolean) => void;
 }) {
   const {
     selectedCampaign,
@@ -70,6 +71,7 @@ export function GloomhavenCompanionAllyEnemyTabContent(props: {
     onInitiativeChange,
     onSpawn,
     onFigureRemoved,
+    onRestChange,
   } = props;
   const { getQueryString } = useQueryString();
 
@@ -193,6 +195,7 @@ export function GloomhavenCompanionAllyEnemyTabContent(props: {
           state={state}
           onInitiativeChange={onInitiativeChange}
           onSpawn={onSpawn}
+          onRestChange={onRestChange}
           selectedFigure={selectedFigure}
           onFigureCreate={onFigureCreate}
           onFigureDelete={onFigureDelete}

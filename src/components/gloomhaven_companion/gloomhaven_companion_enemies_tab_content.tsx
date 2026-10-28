@@ -15,6 +15,7 @@ import { InitiativeStepper } from "../ui/initiative_stepper";
 import {
   collectTurnGroups,
   initiativeKey,
+  restKey,
 } from "@/app/utils/gloomhaven_companion_ui/table_state";
 import { getStandeeNumber } from "@/app/utils/gloomhaven_companion_ui/get_standee_number";
 
@@ -26,6 +27,7 @@ export function GloomhavenCompanionEnemyTabContent(props: {
   state: Record<string, string>;
   onInitiativeChange: (groupKey: string, value: string) => void;
   onSpawn?: (figure: Figure) => void;
+  onRestChange?: (figure: Figure, resting: boolean) => void;
   selectedFigure?: Figure;
   onFigureCreate: (figure: Figure, silent?: boolean) => Promise<boolean>;
   onFigureDelete: (figure: Figure, silent?: boolean) => Promise<boolean>;
@@ -41,6 +43,7 @@ export function GloomhavenCompanionEnemyTabContent(props: {
     state,
     onInitiativeChange,
     onSpawn,
+    onRestChange,
     selectedFigure,
     onFigureCreate: _onFigureCreate,
     onFigureDelete,
@@ -265,6 +268,8 @@ export function GloomhavenCompanionEnemyTabContent(props: {
                             selected={selectedFigure?.id === figure.id}
                             onFigureDelete={onFigureDelete}
                             onFigureEdit={onFigureEdit}
+                            resting={state[restKey(figure.id)] === "1"}
+                            onRestChange={onRestChange}
                             ref={ref}
                           />
                         </GridItem>

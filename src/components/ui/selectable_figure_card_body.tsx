@@ -3,7 +3,7 @@ import { Button } from "../recipes/button";
 import { IoCloseSharp } from "react-icons/io5";
 import { FigureDataList } from "./figure_data_list";
 import { Figure } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_figures";
-import { GiCurlyWing } from "react-icons/gi";
+import { GiCurlyWing, GiNightSleep } from "react-icons/gi";
 import { removeAndRefocus } from "@/app/utils/keyboard_select";
 import EditFigureButton from "./edit_figure_button";
 import { useLongPress } from "@/app/utils/use_long_press";
@@ -15,8 +15,12 @@ export function SelectableFigureCardBody(props: {
   figure: Figure;
   onFigureDelete: (figure: Figure, silent?: boolean) => Promise<boolean>;
   onFigureEdit: (figure: Figure, silent?: boolean) => Promise<boolean>;
+  // Whether the figure does not act this round, and how to change that. Without a way to change
+  // it, the card has no button for it.
+  resting?: boolean;
+  onRestChange?: (figure: Figure, resting: boolean) => void;
 }) {
-  const { figure, onFigureDelete, onFigureEdit } = props;
+  const { figure, onFigureDelete, onFigureEdit, resting, onRestChange } = props;
   const isDead = figure.maximumHP <= figure.damage;
   // Holding the X removes any figure, which is how one added by accident goes away. From the
   // keyboard that is holding enter or space. A figure that is dead is taken off with a plain press.
@@ -51,7 +55,7 @@ export function SelectableFigureCardBody(props: {
       <Stack gap={0}>
         <Card.Title>
           <Grid templateColumns="repeat(10, 1fr)" alignItems="center">
-            <GridItem colSpan={8}>
+            <GridItem colSpan={onRestChange ? 7 : 8}>
               <Stack direction="row" alignItems="center" gap={1}>
                 <Text>{buildTitleText(figure)}</Text>
                 {figure.flying && (
@@ -59,8 +63,37 @@ export function SelectableFigureCardBody(props: {
                     <GiCurlyWing />
                   </Box>
                 )}
+                {resting && (
+                  <Text fontSize="xs" color="fg.muted">
+                    No action this round
+                  </Text>
+                )}
               </Stack>
             </GridItem>
+            {onRestChange && (
+              <GridItem colSpan={1}>
+                <Button
+                  aria-label={
+                    resting
+                      ? "Acts this round again"
+                      : "Does not act this round, such as a summoned monster"
+                  }
+                  aria-pressed={!!resting}
+                  title={
+                    resting ? "No action this round" : "No action this round?"
+                  }
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    onRestChange(figure, !resting);
+                  }}
+                  color={resting ? "blue.500" : undefined}
+                  padding={0}
+                >
+                  <GiNightSleep />
+                </Button>
+              </GridItem>
+            )}
             <GridItem colSpan={1}>
               <EditFigureButton
                 onFigureEdit={onFigureEdit}

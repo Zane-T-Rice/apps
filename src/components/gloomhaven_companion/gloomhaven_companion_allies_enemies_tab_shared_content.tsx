@@ -24,6 +24,7 @@ import {
   collectTurnGroups,
   planFigureRemoved,
   planInitiative,
+  planRest,
   SECOND_INITIATIVE_PREFIX,
   planSpawn,
 } from "@/app/utils/gloomhaven_companion_ui/table_state";
@@ -164,7 +165,7 @@ export function GloomhavenCompanionAllyEnemyTabSharedContent(props: {
   // An enemy that appears once the round has started takes a turn right after the current one.
   const onSpawn = useCallback(
     (figure: Figure) => {
-      const spawn = planSpawn(collectTurnGroups(figures), state, figure);
+      const spawn = planSpawn(collectTurnGroups(figures, state), state, figure);
       if (spawn) onSaveState([spawn]);
     },
     [figures, state, onSaveState],
@@ -177,7 +178,12 @@ export function GloomhavenCompanionAllyEnemyTabSharedContent(props: {
         // The second card only breaks ties, so it never changes where a group goes late.
         key.startsWith(SECOND_INITIATIVE_PREFIX)
           ? [[key, value]]
-          : planInitiative(collectTurnGroups(figures), state, key, value),
+          : planInitiative(
+              collectTurnGroups(figures, state),
+              state,
+              key,
+              value,
+            ),
       ),
     [figures, state, onSaveState],
   );
@@ -189,10 +195,23 @@ export function GloomhavenCompanionAllyEnemyTabSharedContent(props: {
     },
     [figures, state, onSaveState],
   );
+  // A standee that does not act this round, such as a summoned monster. This reads the latest figures
+  // and state when it runs, so the cards are not all drawn again whenever those change.
+  const latest = useRef({ figures, state });
+  useEffect(() => {
+    latest.current = { figures, state };
+  });
+  const onRestChange = useCallback(
+    (figure: Figure, resting: boolean) =>
+      onSaveState(
+        planRest(latest.current.figures, latest.current.state, figure, resting),
+      ),
+    [onSaveState],
+  );
   const tableStatus = (
     <TableStatus
       state={state}
-      turnGroups={collectTurnGroups(figures)}
+      turnGroups={collectTurnGroups(figures, state)}
       saveState={onSaveState}
     />
   );
@@ -275,6 +294,7 @@ export function GloomhavenCompanionAllyEnemyTabSharedContent(props: {
           onInitiativeChange={onInitiativeChange}
           onSpawn={onSpawn}
           onFigureRemoved={onFigureRemoved}
+          onRestChange={onRestChange}
         />
       </Tabs.Content>
       <Tabs.Content tabIndex={-1} value="allies">
@@ -301,6 +321,7 @@ export function GloomhavenCompanionAllyEnemyTabSharedContent(props: {
           onInitiativeChange={onInitiativeChange}
           onSpawn={onSpawn}
           onFigureRemoved={onFigureRemoved}
+          onRestChange={onRestChange}
         />
       </Tabs.Content>
     </>

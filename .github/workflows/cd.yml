@@ -6,15 +6,18 @@ on:
     branches:
       - main
 env:
-  NEXT_PUBLIC_AUTH0_AUDIENCE: "https://zanesworld.click"
-  NEXT_PUBLIC_AUTH0_CLIENT_ID: "9gbYkOK0QacEul9QHfidMwhRurXbnPS1"
-  NEXT_PUBLIC_AUTH0_DOMAIN: "dev-7n448ak2gn3oqctx.us.auth0.com"
-  NEXT_PUBLIC_AUTH0_SCOPES: "server-manager:admin gloomhaven-companion:admin server-manager:public gloomhaven-companion:public"
-  NEXT_PUBLIC_GLOOMHAVEN_COMPANION_SERVICE_DOMAIN: "https://api.zanesworld.click/gloomhaven-companion-service"
-  NEXT_PUBLIC_GLOOMHAVEN_COMPANION_WEBSOCKETS_URL: "wss://ws.zanesworld.click/gloomhaven-companion-service"
-  NEXT_PUBLIC_SERVER_MANAGER_SERVICE_DOMAIN: "https://server-manager-service.zanesworld.click"
-  NEXT_PUBLIC_WEBSITE_DOMAIN: "https://apps.zanesworld.click"
-  NEXT_PUBLIC_GAME_SERVER_HOST: "zanesworld.click"
+  NEXT_PUBLIC_AUTH0_AUDIENCE: ${{ vars.NEXT_PUBLIC_AUTH0_AUDIENCE }}
+  NEXT_PUBLIC_AUTH0_CLIENT_ID: ${{ vars.NEXT_PUBLIC_AUTH0_CLIENT_ID }}
+  NEXT_PUBLIC_AUTH0_DOMAIN: ${{ vars.NEXT_PUBLIC_AUTH0_DOMAIN }}
+  NEXT_PUBLIC_AUTH0_SCOPES: ${{ vars.NEXT_PUBLIC_AUTH0_SCOPES }}
+  NEXT_PUBLIC_GLOOMHAVEN_COMPANION_SERVICE_DOMAIN: ${{ vars.NEXT_PUBLIC_GLOOMHAVEN_COMPANION_SERVICE_DOMAIN }}
+  NEXT_PUBLIC_GLOOMHAVEN_COMPANION_WEBSOCKETS_URL: ${{ vars.NEXT_PUBLIC_GLOOMHAVEN_COMPANION_WEBSOCKETS_URL }}
+  NEXT_PUBLIC_SERVER_MANAGER_SERVICE_DOMAIN: ${{ vars.NEXT_PUBLIC_SERVER_MANAGER_SERVICE_DOMAIN }}
+  NEXT_PUBLIC_WEBSITE_DOMAIN: ${{ vars.NEXT_PUBLIC_WEBSITE_DOMAIN }}
+  NEXT_PUBLIC_GAME_SERVER_HOST: ${{ vars.NEXT_PUBLIC_GAME_SERVER_HOST }}
+  # Where terraform keeps its state, and the name of the S3 bucket the site is uploaded to. S3 names are global.
+  TF_STATE_BUCKET: ${{ vars.TF_STATE_BUCKET }}
+  TF_VAR_site_bucket_name: ${{ vars.SITE_BUCKET_NAME }}
 
 jobs:
   build:
@@ -43,6 +46,6 @@ jobs:
         with:
           terraform_version: latest
       - name: Terraform Init
-        run: terraform -chdir=deployments/terraform init
+        run: terraform -chdir=deployments/terraform init -backend-config="bucket=$TF_STATE_BUCKET"
       - name: Terraform Apply
         run: terraform -chdir=deployments/terraform apply --auto-approve=true

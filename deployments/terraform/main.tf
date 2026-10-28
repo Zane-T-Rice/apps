@@ -1,10 +1,7 @@
 // NOTE:
 //
-// There are a few resources that need to be created
-// or updated manually.
-// 
-// There is more information about these in
-// custom-domains.tf, data.tf, secrets.tf, and terraform.tf.
+// The S3 bucket that stores the terraform state has to be created
+// manually before the first apply. See terraform.tf.
 
 provider "aws" {
   region = var.aws_region

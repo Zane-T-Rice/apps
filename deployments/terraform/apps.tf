@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "zanesworld_apps_bucket" {
-  bucket = "zanesworld-apps"
+  bucket = var.site_bucket_name
 }
 
 resource "aws_s3_bucket_ownership_controls" "bucket_ownership_controls" {

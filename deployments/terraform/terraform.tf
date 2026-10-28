@@ -5,7 +5,8 @@ terraform {
   // versioning on the s3 bucket to be able to rollback your
   // terraform .tfstate file.
   backend "s3" {
-    // You can use any name for the bucket that you like.
+    // You can use any name for the bucket that you like. Pass your own with
+    // terraform init -backend-config="bucket=YOUR_BUCKET" (npm run deploy does so from TF_STATE_BUCKET).
     bucket       = "zanesworld-terraform-state-files"
     key          = "apps/terraform.tfstate"
     region       = "us-east-1"

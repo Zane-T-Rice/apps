@@ -8,8 +8,8 @@
     "start-dev": "npx serve out -p 3100",
     "build": "next build && mkdir apps && mv out apps/apps && mv apps out",
     "build-prod": "cp .env.prod .env.local && npm run build",
-    "deploy": "terraform -chdir=deployments/terraform init && terraform -chdir=deployments/terraform apply",
-    "destroy": "terraform -chdir=deployments/terraform init && terraform -chdir=deployments/terraform destroy",
+    "deploy": "terraform -chdir=deployments/terraform init ${TF_STATE_BUCKET:+-backend-config=bucket=$TF_STATE_BUCKET} && terraform -chdir=deployments/terraform apply",
+    "destroy": "terraform -chdir=deployments/terraform init ${TF_STATE_BUCKET:+-backend-config=bucket=$TF_STATE_BUCKET} && terraform -chdir=deployments/terraform destroy",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },

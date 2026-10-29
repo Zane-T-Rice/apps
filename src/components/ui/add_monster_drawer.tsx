@@ -40,8 +40,8 @@ export function AddMonsterDrawer(props: {
     const selectOptions = enemyTemplates
       .map((template) => {
         return {
-          label: templateLabel(template, editions),
-          value: template.type,
+          label: templateLabel(template, editions, filteredTemplates),
+          value: template.id,
         };
       })
       .sort((a, b) => {
@@ -82,19 +82,22 @@ export function AddMonsterDrawer(props: {
   const submit = async () => {
     let figure: Figure | undefined;
 
-    const figureStats = templates.find(
-      (template) => template.type == selectedClass[0],
-    )?.stats[parseInt(selectedLevel[0])];
+    const template = templates.find(
+      (template) => template.id === selectedClass[0],
+    );
+    const figureStats = template?.stats[parseInt(selectedLevel[0])];
 
     if (selectedRank[0] === "Normal")
       figure = {
         ...figureStats?.normal,
         alignment,
+        editionId: template?.editionId,
       } as Figure;
     else if (selectedRank[0] === "Elite")
       figure = {
         ...figureStats?.elite,
         alignment,
+        editionId: template?.editionId,
       } as Figure;
 
     if (figure === undefined) return false;

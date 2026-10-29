@@ -23,7 +23,6 @@ import {
   useState,
 } from "react";
 import {
-  DEFAULT_EDITION_ID,
   Scope,
   Template,
   useSystemTemplates,
@@ -69,6 +68,21 @@ const SCOPE_HEADINGS: Record<Scope, string> = {
   mine: "Your templates",
   shared: "Shared with you by players in your campaigns",
 };
+
+// Whether a template can be made in an edition: it is a system one or the person's own.
+const usableEdition = (edition?: Edition) =>
+  !!edition && (edition.scope === "system" || edition.scope === "mine");
+
+// The edition to put a new template in when nothing better is known: a system one, before the
+// person's own.
+const firstUsableEdition = (editions: Edition[]) =>
+  [...editions]
+    .filter(usableEdition)
+    .sort(
+      (a, b) =>
+        SCOPE_ORDER.indexOf(a.scope) - SCOPE_ORDER.indexOf(b.scope) ||
+        a.name.localeCompare(b.name),
+    )[0];
 
 // Says who can change the templates in a section, where that is not obvious.
 const SECTION_NOTES = (scope: Scope, isAdmin: boolean) =>
@@ -146,12 +160,10 @@ export function GloomhavenCompanionTemplatesTabContent(props: {
   );
 
   const sortedEditions = useMemo(() => {
-    const rank = (edition: Edition) =>
-      edition.id === DEFAULT_EDITION_ID
-        ? -1
-        : SCOPE_ORDER.indexOf(edition.scope);
     return [...editions].sort(
-      (a, b) => rank(a) - rank(b) || a.name.localeCompare(b.name),
+      (a, b) =>
+        SCOPE_ORDER.indexOf(a.scope) - SCOPE_ORDER.indexOf(b.scope) ||
+        a.name.localeCompare(b.name),
     );
   }, [editions]);
 
@@ -191,20 +203,19 @@ export function GloomhavenCompanionTemplatesTabContent(props: {
   const countInEdition = (editionId: string) =>
     templates.filter((template) => template.editionId === editionId).length;
 
-  // Whether a template can be made in an edition: the edition is a system one or the person's own.
-  const usableEdition = (edition?: Edition) =>
-    edition && (edition.scope === "system" || edition.scope === "mine");
-
   const open = useCallback((state: Omit<EditorState, "key">) => {
     editorCounter.current += 1;
     setEditor({ ...state, key: editorCounter.current });
   }, []);
 
   const onNew = () => {
-    const editionId = usableEdition(selectedEdition)
-      ? selectedEdition!.id
-      : DEFAULT_EDITION_ID;
-    open({ mode: "new", draft: emptyDraft("enemy", editionId, false) });
+    const edition = usableEdition(selectedEdition)
+      ? selectedEdition
+      : firstUsableEdition(editions);
+    open({
+      mode: "new",
+      draft: emptyDraft("enemy", edition?.id ?? "", false),
+    });
   };
 
   const onClone = useCallback(
@@ -217,7 +228,8 @@ export function GloomhavenCompanionTemplatesTabContent(props: {
         draft.type = `${template.type} copy`;
       }
       const edition = editions.find((e) => e.id === template.editionId);
-      if (!usableEdition(edition)) draft.editionId = DEFAULT_EDITION_ID;
+      if (!usableEdition(edition))
+        draft.editionId = firstUsableEdition(editions)?.id ?? "";
       open({ mode: "clone", template, draft });
     },
     [editions, open],
@@ -314,10 +326,7 @@ export function GloomhavenCompanionTemplatesTabContent(props: {
     setSelectedEditionId(ALL_EDITIONS);
   };
 
-  const editionCanChange =
-    !!selectedEdition &&
-    selectedEdition.id !== DEFAULT_EDITION_ID &&
-    canChange(selectedEdition);
+  const editionCanChange = !!selectedEdition && canChange(selectedEdition);
   const editionHasTemplates =
     !!selectedEdition && countInEdition(selectedEdition.id) > 0;
 

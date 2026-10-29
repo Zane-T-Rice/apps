@@ -29,9 +29,6 @@ export type Template = {
   };
 };
 
-// The edition of the templates that came before editions did.
-export const DEFAULT_EDITION_ID = "gloomhaven-2e";
-
 export function useTemplates(
   responseTransformer?: (
     response: Template | Template[],

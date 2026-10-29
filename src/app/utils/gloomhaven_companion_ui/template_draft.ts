@@ -158,6 +158,8 @@ export function validateDraft(
   if (type) {
     const conflict = templates.some((other) => {
       if (other.id === editingId) return false;
+      // The same name is fine in another edition.
+      if (other.editionId !== draft.editionId) return false;
       if (other.type.trim().toLowerCase() !== type.toLowerCase()) return false;
       const otherKind = getTemplateKind(other);
       if ((draft.kind === "summon") !== (otherKind === "summon")) return false;
@@ -170,8 +172,8 @@ export function validateDraft(
     if (conflict)
       problems.push(
         draft.kind === "summon"
-          ? `There is already a summon with that name for ${type}.`
-          : `There is already a template named ${type}. Figures in a scenario are found by name, so each name can only be used once.`,
+          ? `There is already a summon with that name for ${type} in this edition.`
+          : `There is already a template named ${type} in this edition. Figures in a scenario are found by name, so each name can only be used once in an edition.`,
       );
   }
 

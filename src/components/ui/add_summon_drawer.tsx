@@ -9,6 +9,14 @@ import { SharedDrawer } from "./shared_drawer";
 import { useEditionFilter } from "@/app/utils/gloomhaven_companion_ui/editions_context";
 import { templateLabel } from "@/app/utils/gloomhaven_companion_ui/template_kind";
 
+// A source card is told apart from the same card in another edition by the edition in its key.
+const sourceKey = (template: Template) =>
+  `${template.editionId}|${template.type}`;
+const splitSourceKey = (key: string = "") => {
+  const at = key.indexOf("|");
+  return { editionId: key.slice(0, at), type: key.slice(at + 1) };
+};
+
 export function AddSummonDrawer(props: {
   isOpen: boolean;
   setIsOpen: (value: boolean) => void;
@@ -35,24 +43,24 @@ export function AddSummonDrawer(props: {
       .filter((template) => {
         return template.stats[0]?.summon?.rank === "Summon";
       })
-      .forEach((template) => (dedupeMap[template.type] = template));
+      .forEach((template) => (dedupeMap[sourceKey(template)] = template));
     return createListCollection({
       items: Object.keys(dedupeMap)
-        .sort()
-        .map((type) => {
-          return {
-            label: templateLabel(dedupeMap[type], editions),
-            value: type,
-          };
-        }),
+        .map((key) => ({
+          label: templateLabel(dedupeMap[key], editions, filteredTemplates),
+          value: key,
+        }))
+        .sort((a, b) => a.label.localeCompare(b.label)),
     });
   }, [filteredTemplates, editions]);
 
   const getSummonSelectOptions = useMemo(() => {
     const summonTemplates = templates
       .filter((template) => {
+        const source = splitSourceKey(selectedType[0]);
         return (
-          template.type === selectedType[0] &&
+          template.type === source.type &&
+          template.editionId === source.editionId &&
           template.stats[0]?.summon?.rank === "Summon"
         );
       })
@@ -103,11 +111,9 @@ export function AddSummonDrawer(props: {
     const matchSummonerWithType = async () => {
       setSelectedSummon([]);
       setSelectedSummoner([]);
-      if (
-        selectedType.length !== 0 &&
-        selectedType[0].toLowerCase() !== "item"
-      ) {
-        setSelectedSummoner(selectedType);
+      const source = splitSourceKey(selectedType[0]);
+      if (selectedType.length !== 0 && source.type.toLowerCase() !== "item") {
+        setSelectedSummoner([source.type]);
       }
     };
 
@@ -115,14 +121,18 @@ export function AddSummonDrawer(props: {
   }, [selectedType]);
 
   const submit = async () => {
-    const figureStats = templates.find(
+    const source = splitSourceKey(selectedType[0]);
+    const template = templates.find(
       (template) =>
-        template.type === selectedType[0] &&
+        template.type === source.type &&
+        template.editionId === source.editionId &&
         template.stats[0]?.summon?.name === selectedSummon[0],
-    )?.stats[0].summon;
+    );
+    const figureStats = template?.stats[0].summon;
     const figure: Figure = {
       ...figureStats,
       alignment: "ally",
+      editionId: template?.editionId,
       class: selectedSummoner[0],
     } as Figure;
     return await onSubmit(figure);

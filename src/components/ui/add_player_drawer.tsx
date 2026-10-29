@@ -35,8 +35,8 @@ export function AddPlayerDrawer(props: {
     const selectOptions = playerTemplates
       .map((template) => {
         return {
-          label: templateLabel(template, editions),
-          value: template.type,
+          label: templateLabel(template, editions, filteredTemplates),
+          value: template.id,
         };
       })
       .sort((a, b) => {
@@ -64,13 +64,14 @@ export function AddPlayerDrawer(props: {
   }, [resetEdition]);
 
   const submit = async () => {
-    const figureStats = templates.find(
-      (template) =>
-        template.type == selectedClass[0] && template.stats[1]?.character,
-    )?.stats[parseInt(selectedLevel[0])].character;
+    const template = templates.find(
+      (template) => template.id === selectedClass[0],
+    );
+    const figureStats = template?.stats[parseInt(selectedLevel[0])].character;
     const figure: Figure = {
       ...figureStats,
       alignment: "ally",
+      editionId: template?.editionId,
     } as Figure;
     return await onSubmit(figure);
   };

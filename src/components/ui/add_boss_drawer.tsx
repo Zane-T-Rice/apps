@@ -32,21 +32,16 @@ export function AddBossDrawer(props: {
   } = useEditionFilter(templates);
 
   const getTypeSelectOptions = useMemo(() => {
-    const dedupeMap: { [key: string]: Template } = {};
-    filteredTemplates
-      .filter((template) => {
-        return template.stats[0]?.boss?.rank?.toLowerCase() === "boss";
-      })
-      .forEach((template) => (dedupeMap[template.type] = template));
     return createListCollection({
-      items: Object.keys(dedupeMap)
-        .sort()
-        .map((type) => {
-          return {
-            label: templateLabel(dedupeMap[type], editions),
-            value: type,
-          };
-        }),
+      items: filteredTemplates
+        .filter((template) => {
+          return template.stats[0]?.boss?.rank?.toLowerCase() === "boss";
+        })
+        .map((template) => ({
+          label: templateLabel(template, editions, filteredTemplates),
+          value: template.id,
+        }))
+        .sort((a, b) => a.label.localeCompare(b.label)),
     });
   }, [filteredTemplates, editions]);
 
@@ -78,9 +73,10 @@ export function AddBossDrawer(props: {
   }, [resetEdition]);
 
   const submit = async () => {
-    const figureStats = templates.find(
-      (template) => template.type === selectedType[0],
-    )?.stats[parseInt(selectedLevel[0])].boss;
+    const template = templates.find(
+      (template) => template.id === selectedType[0],
+    );
+    const figureStats = template?.stats[parseInt(selectedLevel[0])].boss;
 
     if (!figureStats) return false;
 
@@ -89,6 +85,7 @@ export function AddBossDrawer(props: {
       maximumHP:
         figureStats.maximumHP * parseInt(selectedNumberOfCharacters[0]),
       alignment: "enemy",
+      editionId: template?.editionId,
     } as Figure;
 
     if (figureStats.attackPlusC) {

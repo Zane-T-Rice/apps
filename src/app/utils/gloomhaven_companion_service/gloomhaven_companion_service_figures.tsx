@@ -32,6 +32,8 @@ export type Figure = {
   alignment: string | null;
   attackPlusC: boolean | null;
   flying: boolean | null;
+  // The edition of the template the figure was made from. Left out for the default edition.
+  editionId?: string | null;
 };
 
 // What to call a figure: the nickname it was given, or else its name.

@@ -11,6 +11,8 @@ export type Scenario = {
   name: string;
   scenarioLevel: number;
   groups: string;
+  // The edition of the scenario's enemies. Left out for the default edition.
+  editionId?: string | null;
 };
 
 export function useScenarios(

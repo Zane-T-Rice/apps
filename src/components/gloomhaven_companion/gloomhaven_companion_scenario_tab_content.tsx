@@ -19,6 +19,7 @@ const createScenarioSchema = object({
   name: string().required(),
   scenarioLevel: number().integer().required(),
   groups: string().required(),
+  editionId: string().nullable().optional(),
 }).stripUnknown();
 
 const editScenarioSchema = createScenarioSchema

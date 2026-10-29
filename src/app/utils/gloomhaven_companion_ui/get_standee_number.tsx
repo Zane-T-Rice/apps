@@ -1,5 +1,6 @@
 import { Group } from "@/components/gloomhaven_companion/gloomhaven_companion_allies_enemies_tab_content";
 import { Figure } from "../gloomhaven_companion_service/gloomhaven_companion_service_figures";
+import { findTemplate } from "./find_template";
 import { Template } from "../gloomhaven_companion_service/gloomhaven_companion_service_templates";
 
 // Return -1 if no more standees are available.
@@ -34,8 +35,10 @@ export const getStandeeNumber = (
     figure.rank?.toLowerCase() === "elite"
   ) {
     // Enemies get a random available standee number.
-    const template: Template | undefined = templates.find(
-      (template) => template.type === figure.class,
+    const template: Template | undefined = findTemplate(
+      templates,
+      figure.class,
+      figure.editionId,
     );
     if (template) {
       const group = groups.find((group) => group.class === figure.class);

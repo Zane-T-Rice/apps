@@ -3,6 +3,7 @@ import { Card, Grid, GridItem, Skeleton, Stack, Text } from "@chakra-ui/react";
 import { Figure } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_figures";
 import { Scenario } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_scenarios";
 import { FigureCard } from "../ui/figure_card";
+import { findTemplate } from "@/app/utils/gloomhaven_companion_ui/find_template";
 import { Template } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_templates";
 import { Button } from "../recipes/button";
 import { Group } from "./gloomhaven_companion_allies_enemies_tab_content";
@@ -130,15 +131,21 @@ export function GloomhavenCompanionEnemyTabContent(props: {
 
   const addEnemy = useCallback(
     (enemyClass: string, rank: "normal" | "elite") => {
-      const template: Template | undefined = templates.find(
-        (template) => template.type.toLowerCase() === enemyClass.toLowerCase(),
-      );
+      const template: Template | undefined =
+        findTemplate(templates, enemyClass, selectedScenario.editionId) ??
+        templates.find(
+          (template) =>
+            template.type.toLowerCase() === enemyClass.toLowerCase(),
+        );
       if (template) {
-        const figure: Figure | undefined =
+        const stats: Figure | undefined =
           template.stats[selectedScenario.scenarioLevel][rank];
-        if (figure) {
-          figure.alignment = "enemy";
-          onFigureCreate(figure, true);
+        if (stats) {
+          // A copy, so that the template itself is left as it was.
+          onFigureCreate(
+            { ...stats, alignment: "enemy", editionId: template.editionId },
+            true,
+          );
         }
       }
     },
@@ -196,11 +203,15 @@ export function GloomhavenCompanionEnemyTabContent(props: {
                   <Card.Title marginBottom={3} marginLeft={3}>
                     <Stack direction="row" alignItems="center">
                       <Text>{group.class}</Text>
-                      {templates.find(
+                      {findTemplate(
+                        templates,
+                        group.class,
+                        selectedScenario.editionId,
                         (template) =>
-                          template.type === group.class &&
-                          (template.stats?.[0].normal?.class ||
-                            template.stats?.[0].elite?.class),
+                          !!(
+                            template.stats?.[0].normal?.class ||
+                            template.stats?.[0].elite?.class
+                          ),
                       ) && (
                         <>
                           <Button

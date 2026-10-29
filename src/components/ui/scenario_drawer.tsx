@@ -8,7 +8,6 @@ import { SharedDrawer } from "./shared_drawer";
 import { Scenario } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_scenarios";
 import { SharedStringInput } from "./shared_string_input";
 import { useEditionList } from "@/app/utils/gloomhaven_companion_ui/editions_context";
-import { templateLabel } from "@/app/utils/gloomhaven_companion_ui/template_kind";
 
 export function ScenarioDrawer(props: {
   isOpen: boolean;
@@ -22,11 +21,17 @@ export function ScenarioDrawer(props: {
   const [selectedClass, setSelectedClass] = useState<string[]>([]);
   const [selectedLevel, setSelectedLevel] = useState<string[]>([]);
   const editions = useEditionList();
+  // The enemies of a scenario are all from one edition, which is what tells apart enemies that
+  // have the same name in different editions.
+  const [selectedEdition, setSelectedEdition] = useState<string[]>(
+    scenario?.editionId ? [scenario.editionId] : [],
+  );
 
   useEffect(() => {
     const setFields = async () => {
       setName(scenario?.name || null);
       setSelectedClass(scenario?.groups.split(",") || []);
+      setSelectedEdition(scenario?.editionId ? [scenario.editionId] : []);
       setSelectedLevel(
         scenario?.scenarioLevel !== undefined
           ? [scenario.scenarioLevel.toString()]
@@ -36,17 +41,41 @@ export function ScenarioDrawer(props: {
     setFields();
   }, [scenario]);
 
-  const getClassSelectOptions = useMemo(() => {
-    const enemyTemplates = templates.filter((template) => {
-      return (
-        template.stats[0]?.normal?.rank?.toLowerCase() === "normal" ||
-        template.stats[0]?.elite?.rank?.toLowerCase() === "elite"
-      );
+  const enemyTemplates = useMemo(
+    () =>
+      templates.filter((template) => {
+        return (
+          template.stats[0]?.normal?.rank?.toLowerCase() === "normal" ||
+          template.stats[0]?.elite?.rank?.toLowerCase() === "elite"
+        );
+      }),
+    [templates],
+  );
+
+  // The editions that have enemies, and the scenario's own.
+  const getEditionSelectOptions = useMemo(() => {
+    const used = new Set(enemyTemplates.map((template) => template.editionId));
+    if (scenario?.editionId) used.add(scenario.editionId);
+    return createListCollection({
+      items: editions
+        .filter((edition) => used.has(edition.id))
+        .map((edition) => ({ label: edition.name, value: edition.id })),
     });
+  }, [enemyTemplates, editions, scenario]);
+
+  // Nothing is chosen until it is picked, and then it is the first edition.
+  const editionId =
+    selectedEdition[0] || getEditionSelectOptions.items[0]?.value;
+
+  const getClassSelectOptions = useMemo(() => {
     const selectOptions = enemyTemplates
+      .filter((template) => template.editionId === editionId)
       .map((template) => {
         return {
-          label: templateLabel(template, editions),
+          label:
+            template.scope === "system"
+              ? template.type
+              : `${template.type} (custom)`,
           value: template.type,
         };
       })
@@ -56,7 +85,7 @@ export function ScenarioDrawer(props: {
         else return 0;
       });
     return createListCollection({ items: selectOptions });
-  }, [templates, editions]);
+  }, [enemyTemplates, editionId]);
 
   const getLevelSelectOptions = useMemo(() => {
     const selectOptions = [0, 1, 2, 3, 4, 5, 6, 7].map((level) => {
@@ -71,6 +100,7 @@ export function ScenarioDrawer(props: {
   const resetFields = useCallback(() => {
     setName(scenario?.name || null);
     setSelectedClass(scenario?.groups.split(",") || []);
+    setSelectedEdition(scenario?.editionId ? [scenario.editionId] : []);
     setSelectedLevel(
       scenario?.scenarioLevel ? [scenario.scenarioLevel.toString()] : [],
     );
@@ -85,6 +115,7 @@ export function ScenarioDrawer(props: {
       name,
       scenarioLevel: scenarioLevel,
       groups: selectedClass.join(","),
+      editionId,
       updatedAt: scenario?.updatedAt,
     } as Scenario;
     const response = await onSubmit(newScenario);
@@ -104,6 +135,20 @@ export function ScenarioDrawer(props: {
           setValue={setSelectedLevel}
           label={"Scenario Level"}
         />
+        {getEditionSelectOptions.items.length > 1 && (
+          <DrawerSelect
+            collection={getEditionSelectOptions}
+            value={editionId ? [editionId] : []}
+            setValue={(value) => {
+              // Enemies are of one edition, so those picked from the other do not carry over.
+              if (value[0] && value[0] !== editionId) {
+                setSelectedEdition(value);
+                setSelectedClass([]);
+              }
+            }}
+            label="Edition"
+          />
+        )}
         <DrawerSelect
           collection={getClassSelectOptions}
           value={selectedClass}
@@ -115,7 +160,9 @@ export function ScenarioDrawer(props: {
     );
   }, [
     getClassSelectOptions,
+    getEditionSelectOptions,
     getLevelSelectOptions,
+    editionId,
     name,
     selectedClass,
     selectedLevel,

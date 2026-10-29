@@ -1,5 +1,6 @@
 import { Figure } from "../gloomhaven_companion_service/gloomhaven_companion_service_figures";
 import { Template } from "../gloomhaven_companion_service/gloomhaven_companion_service_templates";
+import { joinStatuses } from "./status_options";
 import { getKindInfo, getTemplateKind, TemplateKind } from "./template_kind";
 
 type Rank = "normal" | "elite" | "boss" | "character" | "summon";
@@ -120,18 +121,6 @@ export function changeKind(draft: TemplateDraft, kind: TemplateKind) {
   };
 }
 
-// Copies the figures of one level over those of another.
-export function copyLevel(
-  draft: TemplateDraft,
-  from: number,
-  to: number,
-): TemplateDraft {
-  const figures = { ...draft.figures };
-  for (const rank of getKindInfo(draft.kind).ranks)
-    figures[figureKey(to, rank)] = { ...draft.figures[figureKey(from, rank)] };
-  return { ...draft, figures };
-}
-
 const isWholeNumber = (value: string) => /^\d+$/.test(value.trim());
 
 // The classes a summon's source card can have: a player character, or Item for a card that comes from an item. A summon that is already there
@@ -239,6 +228,11 @@ export function draftToInput(draft: TemplateDraft) {
         if (!value) continue;
         if (column.input === "number") figure[column.key] = parseInt(value);
         else if (column.input === "check") figure[column.key] = true;
+        else if (
+          column.key === "innateOffenses" ||
+          column.key === "innateDefenses"
+        )
+          figure[column.key] = joinStatuses([value]);
         else figure[column.key] = value;
       }
       if (draft.kind === "character" && figure.xp === undefined) figure.xp = 0;

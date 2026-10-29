@@ -113,19 +113,6 @@ export default function GloomhavenCompanionPageContent() {
       </Tabs.Trigger>
       <Tabs.Trigger
         tabIndex={0}
-        value="templates"
-        onClick={() => {
-          if (activeTab !== "templates")
-            setQueryString("activeTab", "templates");
-        }}
-      >
-        <Box hideBelow="sm">
-          <FaClone />
-        </Box>
-        Templates
-      </Tabs.Trigger>
-      <Tabs.Trigger
-        tabIndex={0}
         value="enemies"
         onClick={() => {
           setScroll(true);
@@ -151,6 +138,19 @@ export default function GloomhavenCompanionPageContent() {
           <GiMeepleGroup />
         </Box>
         Allies
+      </Tabs.Trigger>
+      <Tabs.Trigger
+        tabIndex={0}
+        value="templates"
+        onClick={() => {
+          if (activeTab !== "templates")
+            setQueryString("activeTab", "templates");
+        }}
+      >
+        <Box hideBelow="sm">
+          <FaClone />
+        </Box>
+        Templates
       </Tabs.Trigger>
     </>
   );

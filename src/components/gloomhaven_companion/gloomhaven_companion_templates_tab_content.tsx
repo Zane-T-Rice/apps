@@ -1,6 +1,17 @@
 "use client";
 
-import { Badge, Heading, Input, Stack, Text } from "@chakra-ui/react";
+import {
+  Badge,
+  CloseButton,
+  Drawer,
+  Grid,
+  Heading,
+  Input,
+  Portal,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
+import { GiHamburgerMenu } from "react-icons/gi";
 import {
   Dispatch,
   SetStateAction,
@@ -25,6 +36,7 @@ import { responseTransformer } from "@/app/utils/gloomhaven_companion_service/re
 import { fetchWithToast } from "@/app/utils/fetch/fetch_with_toast";
 import { keyboardSelectProps } from "@/app/utils/keyboard_select";
 import { usePermissions } from "@/app/utils/use_permissions";
+import { useRestoreFocus } from "@/app/utils/use_restore_focus";
 import {
   draftFromTemplate,
   draftToInput,
@@ -84,6 +96,8 @@ export function GloomhavenCompanionTemplatesTabContent(props: {
   const [search, setSearch] = useState<string>("");
   const [editor, setEditor] = useState<EditorState | null>(null);
   const [editionState, setEditionState] = useState<EditionState | null>(null);
+  const [menuOpen, setMenuOpen] = useState<boolean>(false);
+  const menuFinalFocus = useRestoreFocus(menuOpen);
   const [counter, setCounter] = useState<number>(0);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [canCreate, setCanCreate] = useState<boolean>(false);
@@ -162,6 +176,18 @@ export function GloomhavenCompanionTemplatesTabContent(props: {
         );
       });
   }, [templates, selectedEditionId, search]);
+
+  // Your own templates come first when you have any, so they are not buried under the system's.
+  const sectionOrder: Scope[] = templates.some(
+    (template) => template.scope === "mine",
+  )
+    ? ["mine", "system", "shared"]
+    : SCOPE_ORDER;
+
+  const chooseEdition = (editionId: string) => {
+    setSelectedEditionId(editionId);
+    setMenuOpen(false);
+  };
 
   const countInEdition = (editionId: string) =>
     templates.filter((template) => template.editionId === editionId).length;
@@ -301,104 +327,43 @@ export function GloomhavenCompanionTemplatesTabContent(props: {
         ? "This was made by another player in one of your campaigns. You can use it and clone it, but only they can change it."
         : "";
 
+  const editionButtonName = selectedEdition?.name ?? "All editions";
+
   return (
-    <Stack
-      direction={{ base: "column", md: "row" }}
-      gap={4}
-      marginLeft={3}
-      marginRight={3}
-      alignItems="flex-start"
-    >
+    <Stack gap={3} marginLeft={3} marginRight={3}>
       <Stack
-        as="nav"
-        aria-label="Editions"
-        gap={2}
-        width={{ base: "100%", md: "16rem" }}
-        flexShrink={0}
+        // Stays in view under the tab bar while the list scrolls.
+        position="sticky"
+        top="var(--navigation-bar-height, 0px)"
+        zIndex={900}
+        bg={{ base: "white", _dark: "black" }}
+        paddingY={2}
+        gap={1}
       >
-        <Heading as="h2" size="md">
-          Editions
-        </Heading>
-        <Button
-          variant={selectedEditionId === ALL_EDITIONS ? "safe" : "outline"}
-          aria-pressed={selectedEditionId === ALL_EDITIONS}
-          justifyContent="space-between"
-          onClick={() => setSelectedEditionId(ALL_EDITIONS)}
+        <Grid
+          // Two by two on a phone, with the edition and the search above and below, and one row
+          // from a tablet up. Every button fills its cell, so that they are all the same size.
+          gap={2}
+          alignItems="center"
+          templateColumns={{
+            base: "repeat(2, 1fr)",
+            md: "minmax(0, 14rem) repeat(4, 6.5rem) minmax(8rem, 1fr)",
+          }}
+          css={{ "& > button": { width: "100%" } }}
         >
-          All editions
-          <Text as="span">{templates.length}</Text>
-        </Button>
-        {sortedEditions.map((edition) => (
-          <Button
-            key={edition.id}
-            variant={selectedEditionId === edition.id ? "safe" : "outline"}
-            aria-pressed={selectedEditionId === edition.id}
-            justifyContent="space-between"
-            onClick={() => setSelectedEditionId(edition.id)}
-          >
-            <Text as="span" truncate>
-              {edition.name}
-            </Text>
-            <Text as="span">
-              {edition.scope !== "system" && (
-                <Badge
-                  marginRight={2}
-                  colorPalette={SCOPE_COLORS[edition.scope]}
-                >
-                  {SCOPE_LABELS[edition.scope]}
-                </Badge>
-              )}
-              {countInEdition(edition.id)}
-            </Text>
-          </Button>
-        ))}
-        <Stack direction="row" gap={2} flexWrap="wrap">
-          <Button
-            variant="safe"
-            disabled={!canCreate}
-            onClick={() => {
-              setCounter((prev) => prev + 1);
-              setEditionState({ key: counter });
-            }}
-          >
-            New edition
-          </Button>
           <Button
             variant="outline"
-            disabled={!editionCanChange}
-            onClick={() => {
-              setCounter((prev) => prev + 1);
-              setEditionState({ key: counter, editing: selectedEdition });
-            }}
+            aria-haspopup="dialog"
+            justifyContent="flex-start"
+            gridColumn={{ base: "1 / -1", md: "auto" }}
+            minWidth={0}
+            onClick={() => setMenuOpen(true)}
           >
-            Rename
+            <GiHamburgerMenu />
+            <Text as="span" truncate>
+              Editions: {editionButtonName}
+            </Text>
           </Button>
-          <AlertDialog
-            titleText="Delete edition?"
-            confirmText="Delete"
-            body={<Text>Delete the edition {selectedEdition?.name}?</Text>}
-            onConfirm={() =>
-              selectedEdition && onDeleteEdition(selectedEdition)
-            }
-            trigger={
-              <Button
-                variant="unsafe"
-                disabled={!editionCanChange || editionHasTemplates}
-              >
-                Delete
-              </Button>
-            }
-          />
-        </Stack>
-        {editionHasTemplates && editionCanChange && (
-          <Text fontSize="sm">
-            An edition can be deleted once it has no templates in it.
-          </Text>
-        )}
-      </Stack>
-
-      <Stack gap={3} flex={1} minWidth={0} width="100%">
-        <Stack direction="row" gap={2} flexWrap="wrap">
           <Button variant="safe" disabled={!canCreate} onClick={onNew}>
             New template
           </Button>
@@ -435,16 +400,137 @@ export function GloomhavenCompanionTemplatesTabContent(props: {
           <Input
             aria-label="Search templates"
             placeholder="Search"
-            maxWidth="16rem"
-            marginLeft={{ md: "auto" }}
+            maxWidth={{ md: "16rem" }}
+            justifySelf={{ md: "end" }}
+            gridColumn={{ base: "1 / -1", md: "auto" }}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-        </Stack>
+        </Grid>
         <Text fontSize="sm" aria-live="polite">
           {templateHint}
         </Text>
+      </Stack>
 
+      <Drawer.Root
+        placement="start"
+        open={menuOpen}
+        finalFocusEl={menuFinalFocus}
+        onOpenChange={(details) => setMenuOpen(details.open)}
+      >
+        <Portal>
+          <Drawer.Backdrop />
+          <Drawer.Positioner>
+            <Drawer.Content>
+              <Drawer.Header>
+                <Drawer.Title>Editions</Drawer.Title>
+              </Drawer.Header>
+              <Drawer.Body>
+                <Stack as="nav" aria-label="Editions" gap={2}>
+                  <Button
+                    variant={
+                      selectedEditionId === ALL_EDITIONS ? "safe" : "outline"
+                    }
+                    aria-pressed={selectedEditionId === ALL_EDITIONS}
+                    justifyContent="space-between"
+                    onClick={() => chooseEdition(ALL_EDITIONS)}
+                  >
+                    All editions
+                    <Text as="span">{templates.length}</Text>
+                  </Button>
+                  {sortedEditions.map((edition) => (
+                    <Button
+                      key={edition.id}
+                      variant={
+                        selectedEditionId === edition.id ? "safe" : "outline"
+                      }
+                      aria-pressed={selectedEditionId === edition.id}
+                      justifyContent="space-between"
+                      onClick={() => chooseEdition(edition.id)}
+                    >
+                      <Text as="span" truncate>
+                        {edition.name}
+                      </Text>
+                      <Text as="span">
+                        {edition.scope !== "system" && (
+                          <Badge
+                            marginRight={2}
+                            colorPalette={SCOPE_COLORS[edition.scope]}
+                          >
+                            {SCOPE_LABELS[edition.scope]}
+                          </Badge>
+                        )}
+                        {countInEdition(edition.id)}
+                      </Text>
+                    </Button>
+                  ))}
+                </Stack>
+              </Drawer.Body>
+              <Drawer.Footer flexDirection="column" alignItems="stretch">
+                {editionHasTemplates && editionCanChange && (
+                  <Text fontSize="sm">
+                    An edition can be deleted once it has no templates in it.
+                  </Text>
+                )}
+                <Grid
+                  gap={2}
+                  templateColumns="repeat(3, 1fr)"
+                  css={{ "& > button": { width: "100%" } }}
+                >
+                  <Button
+                    variant="safe"
+                    disabled={!canCreate}
+                    onClick={() => {
+                      setMenuOpen(false);
+                      setCounter((prev) => prev + 1);
+                      setEditionState({ key: counter });
+                    }}
+                  >
+                    New edition
+                  </Button>
+                  <Button
+                    variant="outline"
+                    disabled={!editionCanChange}
+                    onClick={() => {
+                      setMenuOpen(false);
+                      setCounter((prev) => prev + 1);
+                      setEditionState({
+                        key: counter,
+                        editing: selectedEdition,
+                      });
+                    }}
+                  >
+                    Rename
+                  </Button>
+                  <AlertDialog
+                    titleText="Delete edition?"
+                    confirmText="Delete"
+                    body={
+                      <Text>Delete the edition {selectedEdition?.name}?</Text>
+                    }
+                    onConfirm={() =>
+                      selectedEdition && onDeleteEdition(selectedEdition)
+                    }
+                    trigger={
+                      <Button
+                        variant="unsafe"
+                        disabled={!editionCanChange || editionHasTemplates}
+                      >
+                        Delete
+                      </Button>
+                    }
+                  />
+                </Grid>
+              </Drawer.Footer>
+              <Drawer.CloseTrigger asChild justifyItems="center">
+                <CloseButton size="sm" marginTop={2} />
+              </Drawer.CloseTrigger>
+            </Drawer.Content>
+          </Drawer.Positioner>
+        </Portal>
+      </Drawer.Root>
+
+      <Stack gap={3} flex={1} minWidth={0} width="100%">
         {shownTemplates.length === 0 && (
           <Text>
             {templates.length === 0
@@ -452,7 +538,7 @@ export function GloomhavenCompanionTemplatesTabContent(props: {
               : "No templates match."}
           </Text>
         )}
-        {SCOPE_ORDER.map((scope) => {
+        {sectionOrder.map((scope) => {
           const inScope = shownTemplates.filter(
             (template) => template.scope === scope,
           );
@@ -493,6 +579,18 @@ export function GloomhavenCompanionTemplatesTabContent(props: {
                     {...keyboardSelectProps(() =>
                       setSelectedTemplateId(template.id),
                     )}
+                    // Space only selects. Enter selects and opens it, as double clicking does.
+                    onKeyDown={(e) => {
+                      if (e.target !== e.currentTarget) return;
+                      if (e.key === " ") {
+                        e.preventDefault();
+                        setSelectedTemplateId(template.id);
+                      } else if (e.key === "Enter") {
+                        e.preventDefault();
+                        setSelectedTemplateId(template.id);
+                        onEditOrView(template);
+                      }
+                    }}
                     _focusVisible={{
                       outline: "2px solid",
                       outlineColor: "blue.500",

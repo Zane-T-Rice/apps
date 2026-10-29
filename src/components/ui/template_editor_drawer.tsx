@@ -6,6 +6,7 @@ import {
   Checkbox,
   createListCollection,
   Field,
+  Grid,
   Input,
   Stack,
   Text,
@@ -15,8 +16,9 @@ import { Edition } from "@/app/utils/gloomhaven_companion_service/gloomhaven_com
 import { Template } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_templates";
 import {
   changeKind,
+  type Column,
   columnsFor,
-  copyLevel,
+  type FigureDraft,
   figureKey,
   rankLabel,
   summonSources,
@@ -31,6 +33,7 @@ import {
 import { Button } from "../recipes/button";
 import { DrawerSelect } from "./drawer_select";
 import { SharedDrawer } from "./shared_drawer";
+import { StatusPicker } from "./status_picker";
 
 // Make or change a template: its name, kind, edition and the stats for each level.
 // Mount it when it is wanted. It starts with the draft it is given, and the parent sets `key` so
@@ -67,6 +70,8 @@ export function TemplateEditorDrawer(props: {
   );
 
   const info = getKindInfo(draft.kind);
+  const [levelIndex, setLevelIndex] = useState<number>(0);
+  const level = info.levels[Math.min(levelIndex, info.levels.length - 1)];
   const columns = useMemo(() => columnsFor(draft.kind), [draft.kind]);
 
   // A system template can only be in a system edition. Someone's own template can be in theirs
@@ -238,148 +243,99 @@ export function TemplateEditorDrawer(props: {
           </Checkbox.Label>
         </Checkbox.Root>
       )}
-      {/* Scrolls on its own, so that its horizontal scrollbar is always on screen instead of at the
-          bottom of a table that is taller than the drawer. */}
-      <Box overflow="auto" maxHeight="max(20rem, calc(100dvh - 24rem))">
-        <chakra.table
-          fontSize="sm"
-          width="100%"
-          css={{
-            "& thead th": {
-              position: "sticky",
-              top: 0,
-              zIndex: 1,
-              background: "var(--chakra-colors-bg)",
-            },
-          }}
-        >
-          <caption style={{ textAlign: "left", paddingBottom: 8 }}>
-            Stats for each level. Tab moves along a row.
+      <Stack
+        as="section"
+        aria-label="Stats for each level"
+        gap={3}
+        // Page Up goes to the next level and Page Down to the one before it, from anywhere in the stats.
+        onKeyDown={(e) => {
+          if (e.key === "PageUp" && levelIndex < info.levels.length - 1) {
+            e.preventDefault();
+            setLevelIndex(levelIndex + 1);
+          } else if (e.key === "PageDown" && levelIndex > 0) {
+            e.preventDefault();
+            setLevelIndex(levelIndex - 1);
+          }
+        }}
+      >
+        {info.levels.length > 1 && (
+          <Stack
+            direction="row"
+            gap={1}
+            flexWrap="wrap"
+            alignItems="center"
+            role="group"
+            aria-label="Level"
+          >
+            <Text fontWeight="semibold" marginRight={2}>
+              Level
+            </Text>
+            {info.levels.map((level, index) => {
+              const incomplete = info.ranks.some(
+                (rank) => !draft.figures[figureKey(level, rank)]?.maximumHP,
+              );
+              return (
+                <Button
+                  key={level}
+                  variant={index === levelIndex ? "safe" : "outline"}
+                  aria-pressed={index === levelIndex}
+                  aria-label={`Level ${level}${incomplete ? ", HP missing" : ""}`}
+                  minWidth={9}
+                  paddingX={2}
+                  onClick={() => setLevelIndex(index)}
+                >
+                  {level}
+                  {incomplete && !readOnly && (
+                    <Text as="span" color="orange.500" aria-hidden>
+                      *
+                    </Text>
+                  )}
+                </Button>
+              );
+            })}
+          </Stack>
+        )}
+        {info.levels.length > 1 && !readOnly && (
+          <Text fontSize="sm">
+            * needs HP. Page Up and Page Down change level.
             {draft.kind === "boss" &&
               " Attack + C: when ticked, the boss adds one to its attack for each character in the scenario, so Attack is the base."}
-          </caption>
-          <thead>
-            <tr>
-              <chakra.th textAlign="left" padding={1} scope="col">
-                Level
-              </chakra.th>
-              {info.ranks.length > 1 && (
-                <chakra.th textAlign="left" padding={1} scope="col">
-                  Rank
-                </chakra.th>
-              )}
-              {columns.map((column) => (
-                <chakra.th
-                  key={column.key}
-                  textAlign="left"
-                  padding={1}
-                  scope="col"
-                >
-                  {column.label}
-                </chakra.th>
-              ))}
-              {!readOnly && info.levels.length > 1 && (
-                <chakra.th padding={1} scope="col">
-                  <Box srOnly>Copy</Box>
-                </chakra.th>
-              )}
-            </tr>
-          </thead>
-          <tbody>
-            {info.levels.map((level, levelIndex) =>
-              info.ranks.map((rank, rankIndex) => {
-                const key = figureKey(level, rank);
-                const figure = draft.figures[key] ?? {};
-                const rowName = `level ${level}${
-                  info.ranks.length > 1 ? ` ${rankLabel(rank)}` : ""
-                }`;
-                return (
-                  <tr key={key}>
-                    {rankIndex === 0 && (
-                      <chakra.th
-                        scope="row"
-                        rowSpan={info.ranks.length}
-                        textAlign="left"
-                        padding={1}
-                        verticalAlign="top"
-                      >
-                        {level}
-                      </chakra.th>
-                    )}
-                    {info.ranks.length > 1 && (
-                      <chakra.td padding={1}>{rankLabel(rank)}</chakra.td>
-                    )}
-                    {columns.map((column) => (
-                      <chakra.td key={column.key} padding={1}>
-                        {column.input === "check" ? (
-                          <Checkbox.Root
-                            variant="outline"
-                            checked={figure[column.key] === "true"}
-                            disabled={readOnly}
-                            onCheckedChange={(e) =>
-                              setFigureValue(
-                                key,
-                                column.key,
-                                e.checked ? "true" : "",
-                              )
-                            }
-                          >
-                            <Checkbox.HiddenInput
-                              aria-label={`${column.label}, ${rowName}`}
-                            />
-                            <Checkbox.Control>
-                              <Checkbox.Indicator />
-                            </Checkbox.Control>
-                          </Checkbox.Root>
-                        ) : (
-                          <Input
-                            aria-label={`${column.label}, ${rowName}`}
-                            type={column.input === "number" ? "number" : "text"}
-                            min={column.input === "number" ? 0 : undefined}
-                            readOnly={readOnly}
-                            minWidth={
-                              column.input === "number" ? "4.5rem" : "9rem"
-                            }
-                            value={figure[column.key] ?? ""}
-                            onChange={(e) =>
-                              setFigureValue(key, column.key, e.target.value)
-                            }
-                          />
-                        )}
-                      </chakra.td>
-                    ))}
-                    {!readOnly && info.levels.length > 1 && (
-                      <chakra.td padding={1}>
-                        {rankIndex === 0 && levelIndex > 0 && (
-                          <Button
-                            variant="outline"
-                            height="auto"
-                            paddingX={2}
-                            paddingY={1}
-                            fontSize="xs"
-                            onClick={() =>
-                              setDraft((prev) =>
-                                copyLevel(
-                                  prev,
-                                  info.levels[levelIndex - 1],
-                                  level,
-                                ),
-                              )
-                            }
-                          >
-                            Copy level {info.levels[levelIndex - 1]}
-                            <Box srOnly> into level {level}</Box>
-                          </Button>
-                        )}
-                      </chakra.td>
-                    )}
-                  </tr>
-                );
-              }),
-            )}
-          </tbody>
-        </chakra.table>
-      </Box>
+          </Text>
+        )}
+        <Stack direction={{ base: "column", lg: "row" }} gap={3}>
+          {info.ranks.map((rank) => {
+            const key = figureKey(level, rank);
+            const rowName = `level ${level}${
+              info.ranks.length > 1 ? ` ${rankLabel(rank)}` : ""
+            }`;
+            return (
+              <Box
+                as="fieldset"
+                // Keyed by rank, not level, so that changing level keeps the focused input.
+                key={rank}
+                flex={1}
+                minWidth={0}
+                borderWidth={1}
+                borderRadius="md"
+                padding={3}
+              >
+                <chakra.legend paddingX={1} fontWeight="semibold">
+                  {rankLabel(rank)}
+                </chakra.legend>
+                <FigureFields
+                  columns={columns}
+                  figure={draft.figures[key] ?? {}}
+                  readOnly={readOnly}
+                  rowName={rowName}
+                  onChange={(column, value) =>
+                    setFigureValue(key, column, value)
+                  }
+                />
+              </Box>
+            );
+          })}
+        </Stack>
+      </Stack>
     </Stack>
   );
 
@@ -395,5 +351,89 @@ export function TemplateEditorDrawer(props: {
       size="xl"
       readOnly={readOnly}
     />
+  );
+}
+
+// The stats of one figure: the numbers in a grid, then the text boxes and tick boxes.
+function FigureFields(props: {
+  columns: Column[];
+  figure: FigureDraft;
+  readOnly?: boolean;
+  rowName: string;
+  onChange: (column: string, value: string) => void;
+}) {
+  const { columns, figure, readOnly, rowName, onChange } = props;
+  return (
+    <Stack gap={3}>
+      <Grid
+        gap={3}
+        templateColumns="repeat(auto-fill, minmax(5.5rem, 1fr))"
+        alignItems="end"
+      >
+        {columns
+          .filter((column) => column.input === "number")
+          .map((column) => (
+            <Field.Root key={column.key} required={column.key === "maximumHP"}>
+              <Field.Label>{column.label}</Field.Label>
+              <Input
+                type="number"
+                min={0}
+                readOnly={readOnly}
+                aria-label={`${column.label}, ${rowName}`}
+                value={figure[column.key] ?? ""}
+                onChange={(e) => onChange(column.key, e.target.value)}
+              />
+            </Field.Root>
+          ))}
+      </Grid>
+      {columns
+        .filter((column) => column.input === "text")
+        .map((column) =>
+          column.key === "innateOffenses" || column.key === "innateDefenses" ? (
+            <StatusPicker
+              key={column.key}
+              label={column.label}
+              list={column.key === "innateOffenses" ? "offenses" : "defenses"}
+              ariaLabel={`${column.label}, ${rowName}`}
+              value={figure[column.key] ?? ""}
+              readOnly={readOnly}
+              onChange={(value) => onChange(column.key, value)}
+            />
+          ) : (
+            <Field.Root key={column.key}>
+              <Field.Label>{column.label}</Field.Label>
+              <Input
+                readOnly={readOnly}
+                aria-label={`${column.label}, ${rowName}`}
+                value={figure[column.key] ?? ""}
+                onChange={(e) => onChange(column.key, e.target.value)}
+              />
+            </Field.Root>
+          ),
+        )}
+      <Stack direction="row" gap={5} flexWrap="wrap">
+        {columns
+          .filter((column) => column.input === "check")
+          .map((column) => (
+            <Checkbox.Root
+              key={column.key}
+              variant="outline"
+              checked={figure[column.key] === "true"}
+              disabled={readOnly}
+              onCheckedChange={(e) =>
+                onChange(column.key, e.checked ? "true" : "")
+              }
+            >
+              <Checkbox.HiddenInput
+                aria-label={`${column.label}, ${rowName}`}
+              />
+              <Checkbox.Control>
+                <Checkbox.Indicator />
+              </Checkbox.Control>
+              <Checkbox.Label>{column.label}</Checkbox.Label>
+            </Checkbox.Root>
+          ))}
+      </Stack>
+    </Stack>
   );
 }

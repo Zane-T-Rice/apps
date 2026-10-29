@@ -4,7 +4,11 @@ import { useRestoreFocus } from "@/app/utils/use_restore_focus";
 import { Button } from "../recipes/button";
 
 export function AlertDialog(props: {
-  trigger: ReactNode;
+  // The button that opens it. Left out when `open` is given, so that one dialog can be shared by
+  // many buttons.
+  trigger?: ReactNode;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
   body: ReactNode;
   onConfirm: () => void;
   titleText?: string;
@@ -14,6 +18,8 @@ export function AlertDialog(props: {
 }) {
   const {
     trigger,
+    open,
+    onOpenChange,
     body,
     onConfirm,
     titleText,
@@ -22,7 +28,9 @@ export function AlertDialog(props: {
     confirmVariant,
   } = props;
 
-  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [ownOpen, setOwnOpen] = useState<boolean>(false);
+  const isOpen = open ?? ownOpen;
+  const setIsOpen = onOpenChange ?? setOwnOpen;
   const finalFocusEl = useRestoreFocus(isOpen);
 
   return (
@@ -32,7 +40,7 @@ export function AlertDialog(props: {
       onOpenChange={(details) => setIsOpen(details.open)}
       finalFocusEl={finalFocusEl}
     >
-      <Dialog.Trigger asChild>{trigger}</Dialog.Trigger>
+      {trigger && <Dialog.Trigger asChild>{trigger}</Dialog.Trigger>}
       <Portal>
         <Dialog.Backdrop />
         <Dialog.Positioner>

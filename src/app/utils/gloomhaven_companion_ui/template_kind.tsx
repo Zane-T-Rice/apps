@@ -81,3 +81,16 @@ export function templateLabel(
   if (template.scope !== "system") hints.push("custom");
   return hints.length ? `${text} (${hints.join(", ")})` : text;
 }
+
+export const SCOPE_COLORS: Record<Scope, string> = {
+  system: "blue",
+  mine: "green",
+  shared: "purple",
+};
+
+// What to call a template on screen. A summon is named by its card and by its own name.
+export function templateTitle(template: Template) {
+  return getTemplateKind(template) === "summon"
+    ? `${template.type} – ${template.stats?.[0]?.summon?.name ?? ""}`
+    : template.type;
+}

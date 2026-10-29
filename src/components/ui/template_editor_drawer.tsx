@@ -11,7 +11,7 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
-import { useCallback, useMemo, useState } from "react";
+import { memo, useCallback, useMemo, useState } from "react";
 import { Edition } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_editions";
 import { Template } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_templates";
 import {
@@ -249,13 +249,11 @@ export function TemplateEditorDrawer(props: {
         gap={3}
         // Page Up goes to the next level and Page Down to the one before it, from anywhere in the stats.
         onKeyDown={(e) => {
-          if (e.key === "PageUp" && levelIndex < info.levels.length - 1) {
-            e.preventDefault();
-            setLevelIndex(levelIndex + 1);
-          } else if (e.key === "PageDown" && levelIndex > 0) {
-            e.preventDefault();
-            setLevelIndex(levelIndex - 1);
-          }
+          if (e.key !== "PageUp" && e.key !== "PageDown") return;
+          // Always, so that it does not scroll the drawer at the first and last level.
+          e.preventDefault();
+          const next = levelIndex + (e.key === "PageUp" ? 1 : -1);
+          if (next >= 0 && next < info.levels.length) setLevelIndex(next);
         }}
       >
         {info.levels.length > 1 && (
@@ -324,12 +322,11 @@ export function TemplateEditorDrawer(props: {
                 </chakra.legend>
                 <FigureFields
                   columns={columns}
-                  figure={draft.figures[key] ?? {}}
+                  id={key}
+                  figure={draft.figures[key] ?? NO_FIGURE}
                   readOnly={readOnly}
                   rowName={rowName}
-                  onChange={(column, value) =>
-                    setFigureValue(key, column, value)
-                  }
+                  onChange={setFigureValue}
                 />
               </Box>
             );
@@ -355,14 +352,20 @@ export function TemplateEditorDrawer(props: {
 }
 
 // The stats of one figure: the numbers in a grid, then the text boxes and tick boxes.
-function FigureFields(props: {
+const NO_FIGURE: FigureDraft = {};
+
+// It is drawn again only when its own figure changes, so typing in one card does not draw the other,
+// or the status buttons in it.
+const FigureFields = memo(function FigureFields(props: {
   columns: Column[];
+  id: string;
   figure: FigureDraft;
   readOnly?: boolean;
   rowName: string;
-  onChange: (column: string, value: string) => void;
+  onChange: (id: string, column: string, value: string) => void;
 }) {
-  const { columns, figure, readOnly, rowName, onChange } = props;
+  const { columns, id, figure, readOnly, rowName, onChange: change } = props;
+  const onChange = (column: string, value: string) => change(id, column, value);
   return (
     <Stack gap={3}>
       <Grid
@@ -436,4 +439,4 @@ function FigureFields(props: {
       </Stack>
     </Stack>
   );
-}
+});

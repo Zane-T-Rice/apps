@@ -6,6 +6,8 @@ import { Figure } from "@/app/utils/gloomhaven_companion_service/gloomhaven_comp
 import { Template } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_templates";
 import { DrawerSelect } from "./drawer_select";
 import { SharedDrawer } from "./shared_drawer";
+import { useEditionFilter } from "@/app/utils/gloomhaven_companion_ui/editions_context";
+import { templateLabel } from "@/app/utils/gloomhaven_companion_ui/template_kind";
 
 export function AddBossDrawer(props: {
   isOpen: boolean;
@@ -19,25 +21,34 @@ export function AddBossDrawer(props: {
   const [selectedNumberOfCharacters, setSelectedNumberOfCharacters] = useState<
     string[]
   >([]);
+  const {
+    editions,
+    editionCollection,
+    showEditionSelect,
+    selectedEdition,
+    setSelectedEdition,
+    resetEdition,
+    filteredTemplates,
+  } = useEditionFilter(templates);
 
   const getTypeSelectOptions = useMemo(() => {
-    const dedupeMap: { [key: string]: boolean } = {};
-    templates
+    const dedupeMap: { [key: string]: Template } = {};
+    filteredTemplates
       .filter((template) => {
         return template.stats[0]?.boss?.rank?.toLowerCase() === "boss";
       })
-      .forEach((template) => (dedupeMap[template.type] = true));
+      .forEach((template) => (dedupeMap[template.type] = template));
     return createListCollection({
       items: Object.keys(dedupeMap)
         .sort()
         .map((type) => {
           return {
-            label: type,
+            label: templateLabel(dedupeMap[type], editions),
             value: type,
           };
         }),
     });
-  }, [templates]);
+  }, [filteredTemplates, editions]);
 
   const getLevelSelectOptions = useMemo(() => {
     const selectOptions = ["0", "1", "2", "3", "4", "5", "6", "7"].map(
@@ -63,7 +74,8 @@ export function AddBossDrawer(props: {
     setSelectedType([]);
     setSelectedLevel([]);
     setSelectedNumberOfCharacters([]);
-  }, []);
+    resetEdition();
+  }, [resetEdition]);
 
   const submit = async () => {
     const figureStats = templates.find(
@@ -90,6 +102,17 @@ export function AddBossDrawer(props: {
   const body = useMemo(() => {
     return (
       <Stack direction="column" gap={5}>
+        {showEditionSelect && (
+          <DrawerSelect
+            collection={editionCollection}
+            value={selectedEdition}
+            setValue={(value) => {
+              setSelectedEdition(value);
+              setSelectedType([]);
+            }}
+            label="Edition (optional)"
+          />
+        )}
         <DrawerSelect
           collection={getTypeSelectOptions}
           value={selectedType}
@@ -111,6 +134,10 @@ export function AddBossDrawer(props: {
       </Stack>
     );
   }, [
+    showEditionSelect,
+    editionCollection,
+    selectedEdition,
+    setSelectedEdition,
     getTypeSelectOptions,
     getNumberOfCharactersOptions,
     getLevelSelectOptions,

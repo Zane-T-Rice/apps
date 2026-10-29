@@ -18,9 +18,21 @@ export function SharedDrawer(props: {
   body: ReactNode;
   disableSave: boolean;
   title: string;
+  size?: Drawer.RootProps["size"];
+  // For looking at something that can not be changed. There is nothing to save.
+  readOnly?: boolean;
 }) {
-  const { isOpen, setIsOpen, onSubmit, resetFields, body, disableSave, title } =
-    props;
+  const {
+    isOpen,
+    setIsOpen,
+    onSubmit,
+    resetFields,
+    body,
+    disableSave,
+    title,
+    size,
+    readOnly,
+  } = props;
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   // Cancelling the drawer should reset the fields.
@@ -50,6 +62,7 @@ export function SharedDrawer(props: {
   return (
     <Drawer.Root
       open={isOpen}
+      size={size}
       finalFocusEl={finalFocusEl}
       onOpenChange={(details: DrawerOpenChangeDetails) =>
         setIsOpen(details.open)
@@ -64,7 +77,7 @@ export function SharedDrawer(props: {
             </Drawer.Header>
             <Drawer.Body
               onKeyDown={(e) => {
-                if (e.key === "Enter") {
+                if (e.key === "Enter" && !readOnly) {
                   submit();
                 }
               }}
@@ -78,15 +91,17 @@ export function SharedDrawer(props: {
                   cancel();
                 }}
               >
-                Cancel
+                {readOnly ? "Close" : "Cancel"}
               </Button>
-              <Button
-                variant="safe"
-                onClick={() => submit()}
-                disabled={disableSave || isSubmitting}
-              >
-                {isSubmitting ? "Saving..." : "Save"}
-              </Button>
+              {!readOnly && (
+                <Button
+                  variant="safe"
+                  onClick={() => submit()}
+                  disabled={disableSave || isSubmitting}
+                >
+                  {isSubmitting ? "Saving..." : "Save"}
+                </Button>
+              )}
             </Drawer.Footer>
             <Drawer.CloseTrigger asChild>
               <CloseButton size="sm" />

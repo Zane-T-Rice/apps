@@ -6,6 +6,8 @@ import { Figure } from "@/app/utils/gloomhaven_companion_service/gloomhaven_comp
 import { Template } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_templates";
 import { DrawerSelect } from "./drawer_select";
 import { SharedDrawer } from "./shared_drawer";
+import { useEditionFilter } from "@/app/utils/gloomhaven_companion_ui/editions_context";
+import { templateLabel } from "@/app/utils/gloomhaven_companion_ui/template_kind";
 
 export function AddPlayerDrawer(props: {
   isOpen: boolean;
@@ -16,15 +18,24 @@ export function AddPlayerDrawer(props: {
   const { isOpen, setIsOpen, onSubmit, templates } = props;
   const [selectedClass, setSelectedClass] = useState<string[]>([]);
   const [selectedLevel, setSelectedLevel] = useState<string[]>([]);
+  const {
+    editions,
+    editionCollection,
+    showEditionSelect,
+    selectedEdition,
+    setSelectedEdition,
+    resetEdition,
+    filteredTemplates,
+  } = useEditionFilter(templates);
 
   const getClassSelectOptions = useMemo(() => {
-    const playerTemplates = templates.filter((template) => {
+    const playerTemplates = filteredTemplates.filter((template) => {
       return template.stats[1]?.character?.rank === "Character";
     });
     const selectOptions = playerTemplates
       .map((template) => {
         return {
-          label: template.type,
+          label: templateLabel(template, editions),
           value: template.type,
         };
       })
@@ -34,7 +45,7 @@ export function AddPlayerDrawer(props: {
         else return 0;
       });
     return createListCollection({ items: selectOptions });
-  }, [templates]);
+  }, [filteredTemplates, editions]);
 
   const getLevelSelectOptions = useMemo(() => {
     const selectOptions = [1, 2, 3, 4, 5, 6, 7, 8, 9].map((level) => {
@@ -49,7 +60,8 @@ export function AddPlayerDrawer(props: {
   const resetFields = useCallback(() => {
     setSelectedClass([]);
     setSelectedLevel([]);
-  }, []);
+    resetEdition();
+  }, [resetEdition]);
 
   const submit = async () => {
     const figureStats = templates.find(
@@ -66,6 +78,17 @@ export function AddPlayerDrawer(props: {
   const body = useMemo(() => {
     return (
       <Stack direction="column" gap={5}>
+        {showEditionSelect && (
+          <DrawerSelect
+            collection={editionCollection}
+            value={selectedEdition}
+            setValue={(value) => {
+              setSelectedEdition(value);
+              setSelectedClass([]);
+            }}
+            label="Edition (optional)"
+          />
+        )}
         <DrawerSelect
           collection={getClassSelectOptions}
           value={selectedClass}
@@ -81,6 +104,10 @@ export function AddPlayerDrawer(props: {
       </Stack>
     );
   }, [
+    showEditionSelect,
+    editionCollection,
+    selectedEdition,
+    setSelectedEdition,
     getClassSelectOptions,
     getLevelSelectOptions,
     selectedClass,

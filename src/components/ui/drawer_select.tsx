@@ -1,10 +1,9 @@
 import { ListCollection, Select } from "@chakra-ui/react";
-import { Dispatch, SetStateAction } from "react";
 
 export function DrawerSelect(
   props: {
     collection: ListCollection;
-    setValue: Dispatch<SetStateAction<string[]>>;
+    setValue: (value: string[]) => void;
     value?: string[];
     label: string;
   } & Select.RootProps,

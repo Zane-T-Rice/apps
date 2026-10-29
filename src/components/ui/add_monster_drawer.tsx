@@ -6,6 +6,8 @@ import { Figure } from "@/app/utils/gloomhaven_companion_service/gloomhaven_comp
 import { Template } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_templates";
 import { DrawerSelect } from "./drawer_select";
 import { SharedDrawer } from "./shared_drawer";
+import { useEditionFilter } from "@/app/utils/gloomhaven_companion_ui/editions_context";
+import { templateLabel } from "@/app/utils/gloomhaven_companion_ui/template_kind";
 
 export function AddMonsterDrawer(props: {
   isOpen: boolean;
@@ -18,9 +20,18 @@ export function AddMonsterDrawer(props: {
   const [selectedClass, setSelectedClass] = useState<string[]>([]);
   const [selectedRank, setSelectedRank] = useState<string[]>([]);
   const [selectedLevel, setSelectedLevel] = useState<string[]>([]);
+  const {
+    editions,
+    editionCollection,
+    showEditionSelect,
+    selectedEdition,
+    setSelectedEdition,
+    resetEdition,
+    filteredTemplates,
+  } = useEditionFilter(templates);
 
   const getClassSelectOptions = useMemo(() => {
-    const enemyTemplates = templates.filter((template) => {
+    const enemyTemplates = filteredTemplates.filter((template) => {
       return (
         template.stats[0]?.normal?.rank?.toLowerCase() === "normal" ||
         template.stats[0]?.elite?.rank?.toLowerCase() === "elite"
@@ -29,7 +40,7 @@ export function AddMonsterDrawer(props: {
     const selectOptions = enemyTemplates
       .map((template) => {
         return {
-          label: template.type,
+          label: templateLabel(template, editions),
           value: template.type,
         };
       })
@@ -39,7 +50,7 @@ export function AddMonsterDrawer(props: {
         else return 0;
       });
     return createListCollection({ items: selectOptions });
-  }, [templates]);
+  }, [filteredTemplates, editions]);
 
   const getRankSelectOptions = useMemo(() => {
     const selectOptions = ["Elite", "Normal"].map((type) => {
@@ -65,7 +76,8 @@ export function AddMonsterDrawer(props: {
     setSelectedClass([]);
     setSelectedRank([]);
     setSelectedLevel([]);
-  }, []);
+    resetEdition();
+  }, [resetEdition]);
 
   const submit = async () => {
     let figure: Figure | undefined;
@@ -92,6 +104,17 @@ export function AddMonsterDrawer(props: {
   const body = useMemo(() => {
     return (
       <Stack direction="column" gap={5}>
+        {showEditionSelect && (
+          <DrawerSelect
+            collection={editionCollection}
+            value={selectedEdition}
+            setValue={(value) => {
+              setSelectedEdition(value);
+              setSelectedClass([]);
+            }}
+            label="Edition (optional)"
+          />
+        )}
         <DrawerSelect
           collection={getClassSelectOptions}
           value={selectedClass}
@@ -113,6 +136,10 @@ export function AddMonsterDrawer(props: {
       </Stack>
     );
   }, [
+    showEditionSelect,
+    editionCollection,
+    selectedEdition,
+    setSelectedEdition,
     getClassSelectOptions,
     getLevelSelectOptions,
     getRankSelectOptions,

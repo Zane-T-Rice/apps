@@ -6,6 +6,8 @@ import { Figure } from "@/app/utils/gloomhaven_companion_service/gloomhaven_comp
 import { Template } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_templates";
 import { DrawerSelect } from "./drawer_select";
 import { SharedDrawer } from "./shared_drawer";
+import { useEditionFilter } from "@/app/utils/gloomhaven_companion_ui/editions_context";
+import { templateLabel } from "@/app/utils/gloomhaven_companion_ui/template_kind";
 
 export function AddSummonDrawer(props: {
   isOpen: boolean;
@@ -17,25 +19,34 @@ export function AddSummonDrawer(props: {
   const [selectedType, setSelectedType] = useState<string[]>([]);
   const [selectedSummoner, setSelectedSummoner] = useState<string[]>([]);
   const [selectedSummon, setSelectedSummon] = useState<string[]>([]);
+  const {
+    editions,
+    editionCollection,
+    showEditionSelect,
+    selectedEdition,
+    setSelectedEdition,
+    resetEdition,
+    filteredTemplates,
+  } = useEditionFilter(templates);
 
   const getTypeSelectOptions = useMemo(() => {
-    const dedupeMap: { [key: string]: boolean } = {};
-    templates
+    const dedupeMap: { [key: string]: Template } = {};
+    filteredTemplates
       .filter((template) => {
         return template.stats[0]?.summon?.rank === "Summon";
       })
-      .forEach((template) => (dedupeMap[template.type] = true));
+      .forEach((template) => (dedupeMap[template.type] = template));
     return createListCollection({
       items: Object.keys(dedupeMap)
         .sort()
         .map((type) => {
           return {
-            label: type,
+            label: templateLabel(dedupeMap[type], editions),
             value: type,
           };
         }),
     });
-  }, [templates]);
+  }, [filteredTemplates, editions]);
 
   const getSummonSelectOptions = useMemo(() => {
     const summonTemplates = templates
@@ -85,7 +96,8 @@ export function AddSummonDrawer(props: {
     setSelectedType([]);
     setSelectedSummon([]);
     setSelectedSummoner([]);
-  }, []);
+    resetEdition();
+  }, [resetEdition]);
 
   useEffect(() => {
     const matchSummonerWithType = async () => {
@@ -119,6 +131,17 @@ export function AddSummonDrawer(props: {
   const body = useMemo(() => {
     return (
       <Stack direction="column" gap={5}>
+        {showEditionSelect && (
+          <DrawerSelect
+            collection={editionCollection}
+            value={selectedEdition}
+            setValue={(value) => {
+              setSelectedEdition(value);
+              setSelectedType([]);
+            }}
+            label="Edition (optional)"
+          />
+        )}
         <DrawerSelect
           collection={getTypeSelectOptions}
           value={selectedType}
@@ -142,6 +165,10 @@ export function AddSummonDrawer(props: {
       </Stack>
     );
   }, [
+    showEditionSelect,
+    editionCollection,
+    selectedEdition,
+    setSelectedEdition,
     getTypeSelectOptions,
     getSummonerOptions,
     getSummonSelectOptions,

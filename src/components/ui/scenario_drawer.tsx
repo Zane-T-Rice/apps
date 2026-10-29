@@ -7,6 +7,8 @@ import { DrawerSelect } from "./drawer_select";
 import { SharedDrawer } from "./shared_drawer";
 import { Scenario } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_scenarios";
 import { SharedStringInput } from "./shared_string_input";
+import { useEditionList } from "@/app/utils/gloomhaven_companion_ui/editions_context";
+import { templateLabel } from "@/app/utils/gloomhaven_companion_ui/template_kind";
 
 export function ScenarioDrawer(props: {
   isOpen: boolean;
@@ -19,6 +21,7 @@ export function ScenarioDrawer(props: {
   const [name, setName] = useState<string | null>(null);
   const [selectedClass, setSelectedClass] = useState<string[]>([]);
   const [selectedLevel, setSelectedLevel] = useState<string[]>([]);
+  const editions = useEditionList();
 
   useEffect(() => {
     const setFields = async () => {
@@ -43,7 +46,7 @@ export function ScenarioDrawer(props: {
     const selectOptions = enemyTemplates
       .map((template) => {
         return {
-          label: template.type,
+          label: templateLabel(template, editions),
           value: template.type,
         };
       })
@@ -53,7 +56,7 @@ export function ScenarioDrawer(props: {
         else return 0;
       });
     return createListCollection({ items: selectOptions });
-  }, [templates]);
+  }, [templates, editions]);
 
   const getLevelSelectOptions = useMemo(() => {
     const selectOptions = [0, 1, 2, 3, 4, 5, 6, 7].map((level) => {

@@ -3,13 +3,14 @@
 import { Box, Tabs } from "@chakra-ui/react";
 import { NavigationBar } from "../ui/navigation_bar";
 import { FaCity } from "react-icons/fa";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { GloomhavenCompanionCampaignTabContent } from "./gloomhaven_companion_campaign_tab_content";
 import { GloomhavenCompanionScenarioTabContent } from "./gloomhaven_companion_scenario_tab_content";
 import { Campaign } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_campaigns";
 import { Scenario } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_scenarios";
 import { GiMeepleGroup } from "react-icons/gi";
 import { FiHexagon } from "react-icons/fi";
+import { FaClone } from "react-icons/fa";
 import { useSearchParams } from "next/navigation";
 import { useQueryString } from "@/app/utils/use_query_string";
 import { GloomhavenCompanionAllyEnemyTabSharedContent } from "./gloomhaven_companion_allies_enemies_tab_shared_content";
@@ -17,6 +18,12 @@ import {
   Template,
   useTemplates,
 } from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_templates";
+import {
+  Edition,
+  useEditions,
+} from "@/app/utils/gloomhaven_companion_service/gloomhaven_companion_service_editions";
+import { EditionsContext } from "@/app/utils/gloomhaven_companion_ui/editions_context";
+import { GloomhavenCompanionTemplatesTabContent } from "./gloomhaven_companion_templates_tab_content";
 import { responseTransformer } from "@/app/utils/gloomhaven_companion_service/response_transformer";
 
 export default function GloomhavenCompanionPageContent() {
@@ -26,14 +33,23 @@ export default function GloomhavenCompanionPageContent() {
   const [selectedCampaign, setSelectedCampaign] = useState<Campaign>();
   const [selectedScenario, setSelectedScenario] = useState<Scenario>();
   const [templates, setTemplates] = useState<Template[]>([]);
+  const [editions, setEditions] = useState<Edition[]>([]);
   const { getAllREST: getTemplates } = useTemplates(responseTransformer);
+  const { getAllREST: getEditions } = useEditions(responseTransformer);
   const [scroll, setScroll] = useState<boolean>(false);
+
+  const reloadTemplates = useCallback(async () => {
+    const [responseTemplates, responseEditions] = await Promise.all([
+      getTemplates(),
+      getEditions(),
+    ]);
+    if (responseTemplates) setTemplates(responseTemplates);
+    if (responseEditions) setEditions(responseEditions);
+  }, [getTemplates, getEditions]);
 
   useEffect(() => {
     const getAllTemplates = async () => {
-      getTemplates().then((responseTemplates) => {
-        if (responseTemplates) setTemplates(responseTemplates);
-      });
+      reloadTemplates();
     };
     const selectActiveTab = async () => {
       const lastActiveTab = searchParams.get("activeTab");
@@ -97,6 +113,19 @@ export default function GloomhavenCompanionPageContent() {
       </Tabs.Trigger>
       <Tabs.Trigger
         tabIndex={0}
+        value="templates"
+        onClick={() => {
+          if (activeTab !== "templates")
+            setQueryString("activeTab", "templates");
+        }}
+      >
+        <Box hideBelow="sm">
+          <FaClone />
+        </Box>
+        Templates
+      </Tabs.Trigger>
+      <Tabs.Trigger
+        tabIndex={0}
         value="enemies"
         onClick={() => {
           setScroll(true);
@@ -146,6 +175,15 @@ export default function GloomhavenCompanionPageContent() {
           />
         </Tabs.Content>
       )}
+      <Tabs.Content tabIndex={-1} value="templates">
+        <GloomhavenCompanionTemplatesTabContent
+          templates={templates}
+          setTemplates={setTemplates}
+          editions={editions}
+          setEditions={setEditions}
+          reload={reloadTemplates}
+        />
+      </Tabs.Content>
       {selectedCampaign && selectedScenario && activeTab && (
         <GloomhavenCompanionAllyEnemyTabSharedContent
           activeTab={activeTab}
@@ -160,7 +198,7 @@ export default function GloomhavenCompanionPageContent() {
   );
 
   return (
-    <>
+    <EditionsContext.Provider value={editions}>
       <NavigationBar
         defaultTab="campaigns"
         tabTriggers={tabTriggers}
@@ -169,6 +207,6 @@ export default function GloomhavenCompanionPageContent() {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
       />
-    </>
+    </EditionsContext.Provider>
   );
 }
